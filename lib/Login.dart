@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/painting.dart';
@@ -157,6 +156,12 @@ Future<Login1?> createLogin(String email, String password) async{
     final String responseString = response.body;
     return login1FromJson(responseString);
   }
+  if(response.statusCode == 401) {
+    loginCode=401;
+    Login1 b=new Login1(
+        token: "", user: new User(id: 0, name: "", email: "", role: "", status: "", createdAt: DateTime.now(), updatedAt: DateTime.now()), status:0);
+    return b;
+  }
   else{
     throw Exception("failed");
   }
@@ -283,8 +288,21 @@ class _LoginPageState extends State<LoginPage> {
                               userEmail=_log!.user.email;
                               Navigator.push(context,MaterialPageRoute(builder: (context)=>Dashboard()));
                             }
-                            else
-                              Fluttertoast.showToast(msg: "unauthorized");
+                            if(loginCode==401){
+                              showDialog<String>(
+                                context: context,
+                                builder: (BuildContext context) => AlertDialog(
+                                  title: const Text("Unauthorized Login"),
+                                  content: const Text('Invalid Login Credentials'),
+                                  actions: <Widget>[
+                                    TextButton(
+                                      onPressed: () => Navigator.pop(context, 'OK'),
+                                        child: const Text('OK',style: TextStyle(color: Colors.teal))
+                                    ),
+                                  ],
+                                ),
+                              );
+                            }
                           },
                           child: Text('SIGN IN',
                               style: TextStyle(

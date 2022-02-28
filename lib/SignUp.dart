@@ -4,7 +4,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
 import 'package:learning_duniya/Login.dart';
 import 'package:http/http.dart' as http;
-
 import 'main.dart';
 
 
@@ -108,6 +107,11 @@ Future<User1> createUser(String name, String phone, String email, String passwor
     code=200;
     final String responseString = response.body;
     return user1FromJson(responseString);
+  }
+  if(response.statusCode==404){
+    code=404;
+    User1 a=new User1(success: false, data:new Data(token: "", name:""), message: "Email id already taken");
+    return a;
   }
   else
     {
@@ -289,7 +293,22 @@ class _SignUpPageState extends State<SignUpPage> {
                               {
                                 Navigator.push(context, MaterialPageRoute(
                                     builder: (context) => Login()));
-
+                              }
+                            if(code==404)
+                              {
+                                showDialog<String>(
+                                  context: context,
+                                  builder: (BuildContext context) => AlertDialog(
+                                    title: const Text("Registration Unsuccessful!"),
+                                    content: const Text('Email already registered'),
+                                    actions: <Widget>[
+                                      TextButton(
+                                        onPressed: () => Navigator.pop(context, 'OK'),
+                                        child: const Text('OK',style: TextStyle(color: Colors.teal))
+                                      ),
+                                    ],
+                                  ),
+                                );
                               }
 
                           },
@@ -339,10 +358,6 @@ class _SignUpPageState extends State<SignUpPage> {
                         Container()
                       else if(code==200)
                         Text("The user  is created successfully as ${_user!.data.token}")
-                      else
-                        Text("EITHER INVALID EMAIL OF USER ALREADY REGISTERED")
-
-
                     ],
                   )
               ),
