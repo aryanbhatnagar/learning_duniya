@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:favorite_button/favorite_button.dart';
@@ -8,6 +9,201 @@ import 'package:group_button/group_button.dart';
 import 'package:learning_duniya/seeall.dart';
 import 'package:toggle_switch/toggle_switch.dart';
 import 'Login.dart';
+import 'package:http/http.dart' as http;
+
+
+
+LandingApi landingApiFromJson(String str) => LandingApi.fromJson(json.decode(str));
+String landingApiToJson(LandingApi data) => json.encode(data.toJson());
+class LandingApi {
+  LandingApi({
+    required this.success,
+    required this.data,
+    required this.message,
+  });
+
+  bool success;
+  Data data;
+  String message;
+
+  factory LandingApi.fromJson(Map<String, dynamic> json) => LandingApi(
+    success: json["success"],
+    data: Data.fromJson(json["data"]),
+    message: json["message"],
+  );
+
+  Map<String, dynamic> toJson() => {
+    "success": success,
+    "data": data.toJson(),
+    "message": message,
+  };
+}
+
+class Data {
+  Data({
+    required this.subjects,
+    required this.mentors,
+    required this.assessments,
+    required this.dataClass,
+    required this.k12,
+  });
+
+  List<Subject> subjects;
+  List<Mentor> mentors;
+  List<Assessment1> assessments;
+  List<Class> dataClass;
+  List<K12> k12;
+
+  factory Data.fromJson(Map<String, dynamic> json) => Data(
+    subjects: List<Subject>.from(json["subjects"].map((x) => Subject.fromJson(x))),
+    mentors: List<Mentor>.from(json["mentors"].map((x) => Mentor.fromJson(x))),
+    assessments: List<Assessment1>.from(json["assessments"].map((x) => Assessment1.fromJson(x))),
+    dataClass: List<Class>.from(json["class"].map((x) => Class.fromJson(x))),
+    k12: List<K12>.from(json["k12"].map((x) => K12.fromJson(x))),
+  );
+
+  Map<String, dynamic> toJson() => {
+    "subjects": List<dynamic>.from(subjects.map((x) => x.toJson())),
+    "mentors": List<dynamic>.from(mentors.map((x) => x.toJson())),
+    "assessments": List<dynamic>.from(assessments.map((x) => x.toJson())),
+    "class": List<dynamic>.from(dataClass.map((x) => x.toJson())),
+    "k12": List<dynamic>.from(k12.map((x) => x.toJson())),
+  };
+}
+
+class Assessment1 {
+  Assessment1({
+    required this.id,
+    required this.assessmentName,
+    required this.img,
+    required this.price,
+  });
+
+  int id;
+  String assessmentName;
+  String img;
+  String price;
+
+  factory Assessment1.fromJson(Map<String, dynamic> json) => Assessment1(
+    id: json["id"],
+    assessmentName: json["assessment_name"],
+    img: json["img"],
+    price: json["price"],
+  );
+
+  Map<String, dynamic> toJson() => {
+    "id": id,
+    "assessment_name": assessmentName,
+    "img": img,
+    "price": price,
+  };
+}
+
+class Class {
+  Class({
+    required this.id,
+    required this.className,
+  });
+
+  int id;
+  String className;
+
+  factory Class.fromJson(Map<String, dynamic> json) => Class(
+    id: json["id"],
+    className: json["class_name"],
+  );
+
+  Map<String, dynamic> toJson() => {
+    "id": id,
+    "class_name": className,
+  };
+}
+
+class K12 {
+  K12({
+    required this.id,
+    required this.courseName,
+    this.img,
+    required this.chapter,
+  });
+
+  int id;
+  String courseName;
+  dynamic img;
+  int chapter;
+
+  factory K12.fromJson(Map<String, dynamic> json) => K12(
+    id: json["id"],
+    courseName: json["course_name"],
+    img: json["img"],
+    chapter: json["chapter"],
+  );
+
+  Map<String, dynamic> toJson() => {
+    "id": id,
+    "course_name": courseName,
+    "img": img,
+    "chapter": chapter,
+  };
+}
+
+class Mentor {
+  Mentor({
+    required this.id,
+    required this.eduName,
+    required this.img,
+  });
+
+  int id;
+  String eduName;
+  String img;
+
+  factory Mentor.fromJson(Map<String, dynamic> json) => Mentor(
+    id: json["id"],
+    eduName: json["edu_name"],
+    img: json["img"],
+  );
+
+  Map<String, dynamic> toJson() => {
+    "id": id,
+    "edu_name": eduName,
+    "img": img,
+  };
+}
+
+class Subject {
+  Subject({
+    required this.id,
+    required this.subjectName,
+  });
+
+  int id;
+  String subjectName;
+
+  factory Subject.fromJson(Map<String, dynamic> json) => Subject(
+    id: json["id"],
+    subjectName: json["subject_name"],
+  );
+
+  Map<String, dynamic> toJson() => {
+    "id": id,
+    "subject_name": subjectName,
+  };
+}
+
+Future<LandingApi> getLanding() async {
+
+  final String apiUrl = "http://ec2-13-234-116-155.ap-south-1.compute.amazonaws.com/api/dashboard";
+  final response = await http.get(Uri.parse(apiUrl));
+
+  if (response.statusCode == 200) {
+    final String responseString = response.body;
+    return landingApiFromJson(responseString);
+  }
+  else {
+    throw Exception('Failed to load album');
+  }
+}
 
 class landing extends StatelessWidget {
   const landing({Key? key}) : super(key: key);
@@ -30,6 +226,7 @@ class landingPage extends StatefulWidget {
 
 
 class _landingPageState extends State<landingPage> {
+  late LandingApi? _landApi;
 
   int _selectedIndex = 0;
   String sub="Chemistry";
@@ -81,8 +278,25 @@ class _landingPageState extends State<landingPage> {
   }
 
 
+
   @override
-  Widget build(BuildContext context) {
+  Future<void> callapi() async {
+    LandingApi landApi= await getLanding() ;
+    setState(() {
+      _landApi=landApi;
+    });
+  }
+
+  @override
+  void initState()  {
+    super.initState();
+
+    callapi();
+  }
+
+
+  @override
+  Widget build(BuildContext context)  {
 
     final controller = GroupButtonController();
     List<bool> isSelected=[false,false,false];
@@ -136,55 +350,63 @@ class _landingPageState extends State<landingPage> {
                     ],
                   ),
                 ),
-              )
+              ),
+              Visibility(
+                child: Text("Gone"),
+                visible: false,
+              ),
             ],
           ),
 
         ),
       ));
-    for(var i=0;i<=7;i++)
+    for(var i=0;i<(_landApi!.data.assessments.length);i++)
       asses.add(GestureDetector(
         onTap:(){Navigator.push(context,MaterialPageRoute(builder: (context)=>quiz()));},
-        child: Card(
-          elevation: 5,
-          shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.all(Radius.circular(10))),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: <Widget>[
-              ClipRRect(borderRadius: BorderRadius.circular(10),child: Image(image: AssetImage("images/hindiass.jpg"),height: 120,width: 200,fit: BoxFit.fitWidth)),
-              Padding(
-                padding: const EdgeInsets.fromLTRB(8,5,8,5),
-                child: Container(
-                  //width: 200,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text("Hindi Assessment",style: TextStyle(fontSize: 17,fontFamily: "Candara",color: Colors.black)),
-                          //IconButton(onPressed: (){  }, icon: Icon(Icons.favorite_outline,size: 25),color: Colors.grey,)
-                          SizedBox(width: 5),
-                          FavoriteButton(
-                            iconSize: 30,
-                            isFavorite: false,
-                            // iconDisabledColor: Colors.white,
-                            valueChanged: (_isFavorite) {
-                              print('Is Favorite : $_isFavorite');
-                            },
-                          )
-                        ],
-                      ),
-                      SizedBox(height: 10),
-                      Text("\$1234",style: TextStyle(fontSize: 20, fontFamily: "Candara",color: Colors.red))
-                    ],
+        child: Container(
+          //width: 220,
+          child: Card(
+            elevation: 5,
+            shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.all(Radius.circular(10))),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: <Widget>[
+                ClipRRect(borderRadius: BorderRadius.circular(10),child: Image(image: AssetImage("images/hindiass.jpg"),height: 120,width: 200,fit: BoxFit.fitWidth)),
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(5,5,5,5),
+                  child: Container(
+                    //width: 200,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          mainAxisSize: MainAxisSize.min,
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(_landApi!.data.assessments[i].assessmentName,overflow: TextOverflow.clip,style: TextStyle(fontSize: 15,fontFamily: "Candara",color: Colors.black)),
+                            //IconButton(onPressed: (){  }, icon: Icon(Icons.favorite_outline,size: 25),color: Colors.grey,)
+                            SizedBox(width: 5),
+                            FavoriteButton(
+                              iconSize: 30,
+                              isFavorite: false,
+                              // iconDisabledColor: Colors.white,
+                              valueChanged: (_isFavorite) {
+                                print('Is Favorite : $_isFavorite');
+                              },
+                            )
+                          ],
+                        ),
+                        SizedBox(height: 10),
+                        Text("\$1234",style: TextStyle(fontSize: 20, fontFamily: "Candara",color: Colors.red))
+                      ],
+                    ),
                   ),
-                ),
-              )
-            ],
-          ),
+                )
+              ],
+            ),
 
+          ),
         ),
       ));
     for(var i=0;i<=7;i++)
@@ -241,7 +463,7 @@ class _landingPageState extends State<landingPage> {
 
         ),
       ));
-    for(var i=0;i<=3;i++)
+    for(var i=0;i<_landApi!.data.mentors.length;i++)
       mento.add(GestureDetector(
         onTap:(){Navigator.push(context,MaterialPageRoute(builder: (context)=>mentor()));},
         child: Card(
@@ -262,7 +484,7 @@ class _landingPageState extends State<landingPage> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Text("Mentor Name",style: TextStyle(fontSize: 20,fontFamily: "Candara",color: Colors.black)),
+                          Text(_landApi!.data.mentors[i].eduName,style: TextStyle(fontSize: 20,fontFamily: "Candara",color: Colors.black)),
                           //IconButton(onPressed: (){  }, icon: Icon(Icons.favorite_outline,size: 25),color: Colors.grey,)
                         ],
                       ),
@@ -527,185 +749,7 @@ class _landingPageState extends State<landingPage> {
                     SingleChildScrollView(
                         scrollDirection: Axis.horizontal,
                         child: Row(
-                            children: <Widget>[
-                              GestureDetector(
-                                onTap:(){Navigator.push(context,MaterialPageRoute(builder: (context)=>quiz()));},
-                                child: Card(
-                                  elevation: 5,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.all(Radius.circular(10))),
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.center,
-                                    children: <Widget>[
-                                      ClipRRect(borderRadius: BorderRadius.circular(10),child: Image(image: AssetImage("images/hindiass.jpg"),height: 120,width: 200,fit: BoxFit.fitWidth)),
-                                      Padding(
-                                        padding: const EdgeInsets.fromLTRB(8,5,8,5),
-                                        child: Container(
-                                          //width: 200,
-                                          child: Column(
-                                            crossAxisAlignment: CrossAxisAlignment.start,
-                                            children: [
-                                              Row(
-                                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                                children: [
-                                                  Text("Hindi Assessment",style: TextStyle(fontSize: 17,fontFamily: "Candara",color: Colors.black)),
-                                                  //IconButton(onPressed: (){  }, icon: Icon(Icons.favorite_outline,size: 25),color: Colors.grey,)
-                                                  SizedBox(width: 5),
-                                                  FavoriteButton(
-                                                    iconSize: 30,
-                                                    isFavorite: false,
-                                                    // iconDisabledColor: Colors.white,
-                                                    valueChanged: (_isFavorite) {
-                                                      print('Is Favorite : $_isFavorite');
-                                                    },
-                                                  )
-                                                ],
-                                              ),
-                                              SizedBox(height: 10),
-                                              Text("\$1234",style: TextStyle(fontSize: 20, fontFamily: "Candara",color: Colors.red))
-                                            ],
-                                          ),
-                                        ),
-                                      )
-                                    ],
-                                  ),
-
-                                ),
-                              ),
-                              GestureDetector(
-                                onTap:(){Navigator.push(context,MaterialPageRoute(builder: (context)=>quiz()));},
-                                child: Card(
-                                  elevation: 5,
-                                  shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.all(Radius.circular(10))),
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.center,
-                                    children: <Widget>[
-                                      ClipRRect(borderRadius: BorderRadius.circular(10),child: Image(image: AssetImage("images/hindiass.jpg"),height: 120,width: 200,fit: BoxFit.fitWidth)),
-                                      Padding(
-                                        padding: const EdgeInsets.fromLTRB(8,5,8,5),
-                                        child: Container(
-                                          //width: 200,
-                                          child: Column(
-                                            crossAxisAlignment: CrossAxisAlignment.start,
-                                            children: [
-                                              Row(
-                                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                                children: [
-                                                  Text("Hindi Assessment",style: TextStyle(fontSize: 17,fontFamily: "Candara",color: Colors.black)),
-                                                  //IconButton(onPressed: (){  }, icon: Icon(Icons.favorite_outline,size: 25),color: Colors.grey,)
-                                                  SizedBox(width: 5),
-                                                  FavoriteButton(
-                                                    iconSize: 30,
-                                                    isFavorite: false,
-                                                    // iconDisabledColor: Colors.white,
-                                                    valueChanged: (_isFavorite) {
-                                                      print('Is Favorite : $_isFavorite');
-                                                    },
-                                                  )
-                                                ],
-                                              ),
-                                              SizedBox(height: 10),
-                                              Text("\$1234",style: TextStyle(fontSize: 20, fontFamily: "Candara",color: Colors.red))
-                                            ],
-                                          ),
-                                        ),
-                                      )
-                                    ],
-                                  ),
-
-                                ),
-                              ),
-                              GestureDetector(
-                                onTap:(){Navigator.push(context,MaterialPageRoute(builder: (context)=>quiz()));},
-                                child: Card(
-                                  elevation: 5,
-                                  shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.all(Radius.circular(10))),
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.center,
-                                    children: <Widget>[
-                                      ClipRRect(borderRadius: BorderRadius.circular(10),child: Image(image: AssetImage("images/hindiass.jpg"),height: 120,width: 200,fit: BoxFit.fitWidth)),
-                                      Padding(
-                                        padding: const EdgeInsets.fromLTRB(8,5,8,5),
-                                        child: Container(
-                                          //width: 200,
-                                          child: Column(
-                                            crossAxisAlignment: CrossAxisAlignment.start,
-                                            children: [
-                                              Row(
-                                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                                children: [
-                                                  Text("Hindi Assessment",style: TextStyle(fontSize: 17,fontFamily: "Candara",color: Colors.black)),
-                                                  //IconButton(onPressed: (){  }, icon: Icon(Icons.favorite_outline,size: 25),color: Colors.grey,)
-                                                  SizedBox(width: 5),
-                                                  FavoriteButton(
-                                                    iconSize: 30,
-                                                    isFavorite: false,
-                                                    // iconDisabledColor: Colors.white,
-                                                    valueChanged: (_isFavorite) {
-                                                      print('Is Favorite : $_isFavorite');
-                                                    },
-                                                  )
-                                                ],
-                                              ),
-                                              SizedBox(height: 10),
-                                              Text("\$1234",style: TextStyle(fontSize: 20, fontFamily: "Candara",color: Colors.red))
-                                            ],
-                                          ),
-                                        ),
-                                      )
-                                    ],
-                                  ),
-
-                                ),
-                              ),
-                              GestureDetector(
-                                onTap:(){Navigator.push(context,MaterialPageRoute(builder: (context)=>quiz()));},
-                                child: Card(
-                                  elevation: 5,
-                                  shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.all(Radius.circular(10))),
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.center,
-                                    children: <Widget>[
-                                      ClipRRect(borderRadius: BorderRadius.circular(10),child: Image(image: AssetImage("images/hindiass.jpg"),height: 120,width: 200,fit: BoxFit.fitWidth)),
-                                      Padding(
-                                        padding: const EdgeInsets.fromLTRB(8,5,8,5),
-                                        child: Container(
-                                          //width: 200,
-                                          child: Column(
-                                            crossAxisAlignment: CrossAxisAlignment.start,
-                                            children: [
-                                              Row(
-                                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                                children: [
-                                                  Text("Hindi Assessment",style: TextStyle(fontSize: 17,fontFamily: "Candara",color: Colors.black)),
-                                                  //IconButton(onPressed: (){  }, icon: Icon(Icons.favorite_outline,size: 25),color: Colors.grey,)
-                                                  SizedBox(width: 5),
-                                                  FavoriteButton(
-                                                    iconSize: 30,
-                                                    isFavorite: false,
-                                                    // iconDisabledColor: Colors.white,
-                                                    valueChanged: (_isFavorite) {
-                                                      print('Is Favorite : $_isFavorite');
-                                                    },
-                                                  )
-                                                ],
-                                              ),
-                                              SizedBox(height: 10),
-                                              Text("\$1234",style: TextStyle(fontSize: 20, fontFamily: "Candara",color: Colors.red))
-                                            ],
-                                          ),
-                                        ),
-                                      )
-                                    ],
-                                  ),
-
-                                ),
-                              ),
-
-                            ]
+                            children: asses
                         )
                     ),
                     SizedBox(height: 30),
