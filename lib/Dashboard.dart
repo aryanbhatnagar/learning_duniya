@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'Login.dart';
 import 'main.dart';
 import 'courses.dart';
-
+import 'package:shared_preferences/shared_preferences.dart';
 class Dashboard extends StatelessWidget {
   const Dashboard({Key? key}) : super(key: key);
 
@@ -22,12 +22,14 @@ class DashboardPage extends StatefulWidget {
   _DashboardPageState createState() => _DashboardPageState();
 }
 
+
+final Future<SharedPreferences> prefs = SharedPreferences.getInstance();
+String? name;
+
+
 class _DashboardPageState extends State<DashboardPage> {
   int _selectedIndex = 0;
-
-  List<Widget> add = [
-
-  ];
+  List<Widget> add = [];
 
   static List<Widget> _widgetOptions = <Widget>[
     SingleChildScrollView(
@@ -37,7 +39,7 @@ class _DashboardPageState extends State<DashboardPage> {
           Container(
             padding: EdgeInsets.only(left: 25, top: 10),
             child: Text(
-              "Hi ${userName}",
+              'Hi ${userName}',
               style: TextStyle(
                   fontSize: 17.5, color: Colors.black, fontFamily: "Candara"),
             ),
@@ -421,10 +423,16 @@ class _DashboardPageState extends State<DashboardPage> {
   }
 
   @override
+  void _initstate() async{
+    final prefs = await SharedPreferences.getInstance();
+    name=prefs.getString('name');
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: Colors.white70,
         centerTitle: true,
         actions: <Icon>[
           Icon(Icons.notifications, color: Colors.teal, size: 30)
@@ -460,10 +468,12 @@ class _DashboardPageState extends State<DashboardPage> {
               ListTile(
                 title: const Text('Logout'),
                 onTap: () {
-                  userName="";
-                  userEmail="";
-                  userId=0;
-                  token="";
+                  setState(() {
+                    userName="";
+                    userEmail="";
+                    userId=0;
+                    token="";
+                  });
                   Navigator.push(context,MaterialPageRoute(builder: (context)=>Login()));
                 },
               ),

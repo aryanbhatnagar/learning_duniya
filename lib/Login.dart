@@ -5,7 +5,9 @@ import 'package:flutter/painting.dart';
 import 'package:learning_duniya/Dashboard.dart';
 import 'package:learning_duniya/SignUp.dart';
 import 'package:http/http.dart' as http;
+import 'package:learning_duniya/forgot_password.dart';
 import 'package:learning_duniya/main.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 late Login1? _log =null;
 Login1 login1FromJson(String str) => Login1.fromJson(json.decode(str));
@@ -143,7 +145,7 @@ class LoginPage extends StatefulWidget {
 }
 
 
-Future<Login1?> createLogin(String email, String password) async{
+Future<Login1> createLogin(String email, String password) async{
   final String apiUrl = "http://ec2-13-234-116-155.ap-south-1.compute.amazonaws.com/api/login";
 
   final response = await http.post(Uri.parse(apiUrl), body: {
@@ -176,6 +178,7 @@ class _LoginPageState extends State<LoginPage> {
       Navigator.push(context,MaterialPageRoute(builder: (context)=>Dashboard()));
     }
   }
+
 
 
   final TextEditingController emailController = TextEditingController();
@@ -262,7 +265,7 @@ class _LoginPageState extends State<LoginPage> {
                           mainAxisAlignment: MainAxisAlignment.end,
                           children: <Widget>[
                             GestureDetector(
-
+                              onTap:(){Navigator.push(context,MaterialPageRoute(builder: (context)=>forgot()));},
                               child: Text("FORGOT PASSWORD",style: TextStyle(fontFamily: "Candara",fontSize: 15,color: Colors.grey)),
                             )
                           ],
@@ -275,19 +278,27 @@ class _LoginPageState extends State<LoginPage> {
                           onPressed: () async {
                             _email=emailController.text;
                             _password=passwordController.text;
-                            Login1? log = await createLogin(_email, _password);
+                            Login1 log = await createLogin(_email, _password);
 
                             setState(() {
                               _log=log;
                             });
 
                             if(loginCode==200){
-                              token=_log!.token;
-                              userId=_log!.user.id;
-                              userName=_log!.user.name;
-                              userEmail=_log!.user.email;
+
+                                token=_log!.token;
+                                userId=_log!.user.id;
+                                userName=_log!.user.name;
+                                userEmail=_log!.user.email;
+                                final prefs = await SharedPreferences.getInstance(); // set value
+                                prefs.setString('token', token);
+                                prefs.setInt('id', userId);
+                                prefs.setString('name', userName);
+                                prefs.setString('email', userEmail);
+
                               Navigator.push(context,MaterialPageRoute(builder: (context)=>Dashboard()));
                             }
+
                             if(loginCode==401){
                               showDialog<String>(
                                 context: context,
