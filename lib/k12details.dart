@@ -355,6 +355,7 @@ class _k12detailState extends State<k12detail> {
 
                                 },
                                 child: Card(
+                                  elevation: 5,
                                   child: Container(
                                     padding: EdgeInsets.all(8),
                                     child: Row(
