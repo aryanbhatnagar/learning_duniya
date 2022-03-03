@@ -203,7 +203,7 @@ class _seeallpageState extends State<seeallpage> {
       ));
     for(var i=0;i<=3;i++)
       mento.add(GestureDetector(
-        onTap:(){Navigator.push(context,MaterialPageRoute(builder: (context)=>mentor()));},
+        onTap:(){Navigator.push(context,MaterialPageRoute(builder: (context)=>mentor(1)));},
         child: Card(
           shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.all(Radius.circular(10))),

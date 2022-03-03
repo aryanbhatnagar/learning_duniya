@@ -2,7 +2,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:intro_slider/intro_slider.dart';
 import 'package:intro_slider/slide_object.dart';
 import 'package:flutter/material.dart';
-import 'landing.dart';
 
 
 class IntroScreen extends StatefulWidget {
@@ -55,7 +54,6 @@ class _IntroScreenState extends State<IntroScreen>
 
   void onDonePress() async {
     // Do what you want
-
     Navigator.pushReplacementNamed(context, "Landing");
     print("End of slides");
   }
