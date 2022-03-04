@@ -182,8 +182,8 @@ class _needHelpPageState extends State<need_help_page> {
                     onPressed: () async {
                       Navigator.pop(context);
                       final Future<ConfirmAction?> action =
-                          await _asyncConfirmDialog(
-                              context, 'userName', selected);
+                      await _asyncConfirmDialog(
+                          context, 'userName', selected);
                       print("Confirm Action $action");
                     },
                   ),
@@ -201,19 +201,19 @@ class _needHelpPageState extends State<need_help_page> {
   }
 
   Widget buildSingleCheckbox(CategorySetting catValue) => buildCheckbox(
-        categorySetting: catValue,
-        onClicked: () {
-          setState(() {
-            final newValue = !catValue.value;
-            catValue.value = newValue;
-            if (catValue.value != false) {
-              selected.add(catValue.title);
-            } else {
-              selected.remove(catValue.title);
-            }
-          });
-        },
-      );
+    categorySetting: catValue,
+    onClicked: () {
+      setState(() {
+        final newValue = !catValue.value;
+        catValue.value = newValue;
+        if (catValue.value != false) {
+          selected.add(catValue.title);
+        } else {
+          selected.remove(catValue.title);
+        }
+      });
+    },
+  );
 
   Widget buildCheckbox({
     required CategorySetting categorySetting,
