@@ -13,24 +13,22 @@ import 'package:toggle_switch/toggle_switch.dart';
 import 'Login.dart';
 import 'package:http/http.dart' as http;
 
+Future<LandingApi> getLanding() async {
+  final String apiUrl =
+      "http://ec2-13-234-116-155.ap-south-1.compute.amazonaws.com/api/dashboard";
+  final response = await http.get(Uri.parse(apiUrl));
 
-  Future<LandingApi> getLanding() async {
-
-    final String apiUrl = "http://ec2-13-234-116-155.ap-south-1.compute.amazonaws.com/api/dashboard";
-    final response = await http.get(Uri.parse(apiUrl));
-
-    if (response.statusCode == 200) {
-      final String responseString = response.body;
-      return landingApiFromJson(responseString);
-    }
-    else {
-      throw Exception('Failed to load album');
-    }
+  if (response.statusCode == 200) {
+    final String responseString = response.body;
+    return landingApiFromJson(responseString);
+  } else {
+    throw Exception('Failed to load album');
   }
-
+}
 
 //late LandingApi? _landApi;
-LandingApi landingApiFromJson(String str) => LandingApi.fromJson(json.decode(str));
+LandingApi landingApiFromJson(String str) =>
+    LandingApi.fromJson(json.decode(str));
 String landingApiToJson(LandingApi data) => json.encode(data.toJson());
 
 class LandingApi {
@@ -45,16 +43,16 @@ class LandingApi {
   String message;
 
   factory LandingApi.fromJson(Map<String, dynamic> json) => LandingApi(
-    success: json["success"],
-    data: Data.fromJson(json["data"]),
-    message: json["message"],
-  );
+        success: json["success"],
+        data: Data.fromJson(json["data"]),
+        message: json["message"],
+      );
 
   Map<String, dynamic> toJson() => {
-    "success": success,
-    "data": data.toJson(),
-    "message": message,
-  };
+        "success": success,
+        "data": data.toJson(),
+        "message": message,
+      };
 }
 
 class Data {
@@ -77,24 +75,32 @@ class Data {
   List<popular> popularCourses;
 
   factory Data.fromJson(Map<String, dynamic> json) => Data(
-    subjects: List<Subject>.from(json["subjects"].map((x) => Subject.fromJson(x))),
-    mentors: List<Mentor>.from(json["mentors"].map((x) => Mentor.fromJson(x))),
-    assessments: List<Assessment>.from(json["assessments"].map((x) => Assessment.fromJson(x))),
-    dataClass: List<Class>.from(json["class"].map((x) => Class.fromJson(x))),
-    k12: List<K12>.from(json["k12"].map((x) => K12.fromJson(x))),
-    competitiveExams: List<Compete>.from(json["competitive_exams"].map((x) => Compete.fromJson(x))),
-    popularCourses: List<popular>.from(json["popular_courses"].map((x) => popular.fromJson(x))),
-  );
+        subjects: List<Subject>.from(
+            json["subjects"].map((x) => Subject.fromJson(x))),
+        mentors:
+            List<Mentor>.from(json["mentors"].map((x) => Mentor.fromJson(x))),
+        assessments: List<Assessment>.from(
+            json["assessments"].map((x) => Assessment.fromJson(x))),
+        dataClass:
+            List<Class>.from(json["class"].map((x) => Class.fromJson(x))),
+        k12: List<K12>.from(json["k12"].map((x) => K12.fromJson(x))),
+        competitiveExams: List<Compete>.from(
+            json["competitive_exams"].map((x) => Compete.fromJson(x))),
+        popularCourses: List<popular>.from(
+            json["popular_courses"].map((x) => popular.fromJson(x))),
+      );
 
   Map<String, dynamic> toJson() => {
-    "subjects": List<dynamic>.from(subjects.map((x) => x.toJson())),
-    "mentors": List<dynamic>.from(mentors.map((x) => x.toJson())),
-    "assessments": List<dynamic>.from(assessments.map((x) => x.toJson())),
-    "class": List<dynamic>.from(dataClass.map((x) => x.toJson())),
-    "k12": List<dynamic>.from(k12.map((x) => x.toJson())),
-    "competitive_exams": List<dynamic>.from(competitiveExams.map((x) => x.toJson())),
-    "popular_courses": List<dynamic>.from(popularCourses.map((x) => x.toJson())),
-  };
+        "subjects": List<dynamic>.from(subjects.map((x) => x.toJson())),
+        "mentors": List<dynamic>.from(mentors.map((x) => x.toJson())),
+        "assessments": List<dynamic>.from(assessments.map((x) => x.toJson())),
+        "class": List<dynamic>.from(dataClass.map((x) => x.toJson())),
+        "k12": List<dynamic>.from(k12.map((x) => x.toJson())),
+        "competitive_exams":
+            List<dynamic>.from(competitiveExams.map((x) => x.toJson())),
+        "popular_courses":
+            List<dynamic>.from(popularCourses.map((x) => x.toJson())),
+      };
 }
 
 class Assessment {
@@ -103,7 +109,6 @@ class Assessment {
     required this.assessmentName,
     required this.img,
     required this.price,
-
   });
 
   int id;
@@ -111,22 +116,19 @@ class Assessment {
   String img;
   String price;
 
-
   factory Assessment.fromJson(Map<String, dynamic> json) => Assessment(
-    id: json["id"],
-    assessmentName: json["assessment_name"],
-    img: json["img"],
-    price: json["price"],
-
-  );
+        id: json["id"],
+        assessmentName: json["assessment_name"],
+        img: json["img"],
+        price: json["price"],
+      );
 
   Map<String, dynamic> toJson() => {
-    "id": id,
-    "assessment_name": assessmentName ,
-    "img": img,
-    "price": [price],
-
-  };
+        "id": id,
+        "assessment_name": assessmentName,
+        "img": img,
+        "price": [price],
+      };
 }
 
 class Class {
@@ -139,14 +141,14 @@ class Class {
   String className;
 
   factory Class.fromJson(Map<String, dynamic> json) => Class(
-    id: json["id"],
-    className: json["class_name"],
-  );
+        id: json["id"],
+        className: json["class_name"],
+      );
 
   Map<String, dynamic> toJson() => {
-    "id": id,
-    "class_name": className,
-  };
+        "id": id,
+        "class_name": className,
+      };
 }
 
 class K12 {
@@ -163,18 +165,18 @@ class K12 {
   int chapter;
 
   factory K12.fromJson(Map<String, dynamic> json) => K12(
-    id: json["id"],
-    courseName: json["course_name"],
-    img: json["img"],
-    chapter: json["chapter"],
-  );
+        id: json["id"],
+        courseName: json["course_name"],
+        img: json["img"],
+        chapter: json["chapter"],
+      );
 
   Map<String, dynamic> toJson() => {
-    "id": id,
-    "course_name": courseName,
-    "img": img,
-    "chapter": chapter,
-  };
+        "id": id,
+        "course_name": courseName,
+        "img": img,
+        "chapter": chapter,
+      };
 }
 
 class Mentor {
@@ -188,17 +190,10 @@ class Mentor {
   String eduName;
   String img;
 
-  factory Mentor.fromJson(Map<String, dynamic> json) => Mentor(
-    id: json["id"],
-    eduName: json["edu_name"],
-    img: json["img"]
-  );
+  factory Mentor.fromJson(Map<String, dynamic> json) =>
+      Mentor(id: json["id"], eduName: json["edu_name"], img: json["img"]);
 
-  Map<String, dynamic> toJson() => {
-    "id": id,
-    "edu_name": eduName,
-    "img": img
-  };
+  Map<String, dynamic> toJson() => {"id": id, "edu_name": eduName, "img": img};
 }
 
 class Subject {
@@ -211,17 +206,17 @@ class Subject {
   String subjectName;
 
   factory Subject.fromJson(Map<String, dynamic> json) => Subject(
-    id: json["id"],
-    subjectName: json["subject_name"],
-  );
+        id: json["id"],
+        subjectName: json["subject_name"],
+      );
 
   Map<String, dynamic> toJson() => {
-    "id": id,
-    "subject_name": subjectName,
-  };
+        "id": id,
+        "subject_name": subjectName,
+      };
 }
 
-class Compete{
+class Compete {
   Compete({
     required this.id,
     required this.img,
@@ -235,22 +230,20 @@ class Compete{
   String subjectName;
 
   factory Compete.fromJson(Map<String, dynamic> json) => Compete(
-    id: json["id"],
-    img: json["img"],
-    price: json["price"],
-    subjectName: json["subject_name"]
-
-  );
+      id: json["id"],
+      img: json["img"],
+      price: json["price"],
+      subjectName: json["subject_name"]);
 
   Map<String, dynamic> toJson() => {
-    "id": id,
-    "img": img,
-    "price": [price],
-    "subject_name": subjectName
-  };
+        "id": id,
+        "img": img,
+        "price": [price],
+        "subject_name": subjectName
+      };
 }
 
-class popular{
+class popular {
   popular({
     required this.id,
     required this.img,
@@ -266,25 +259,20 @@ class popular{
   String subject;
 
   factory popular.fromJson(Map<String, dynamic> json) => popular(
-    id: json["id"],
-    img: json["img"],
-    price: json["price"],
-    subjectName: json["subject_name"] ,
-    subject: json["subject"]
-  );
+      id: json["id"],
+      img: json["img"],
+      price: json["price"],
+      subjectName: json["subject_name"],
+      subject: json["subject"]);
 
   Map<String, dynamic> toJson() => {
-    "id": id,
-    "img": img,
-    "price": [price],
-    "subject_name": subjectName ,
-    "subject": subject
-  };
+        "id": id,
+        "img": img,
+        "price": [price],
+        "subject_name": subjectName,
+        "subject": subject
+      };
 }
-
-
-
-
 
 class landing extends StatelessWidget {
   const landing({Key? key}) : super(key: key);
@@ -304,27 +292,23 @@ class landingPage extends StatefulWidget {
   _landingPageState createState() => _landingPageState();
 }
 
-
-
 class _landingPageState extends State<landingPage> {
-
   int _selectedIndex = 0;
-  String sub="Chemistry";
+  String sub = "Chemistry";
   List<Widget> add = [];
 
   //list for views
-  List <Widget> pop_c= <Widget>[];
-  List <Widget> asses= <Widget>[];
-  List <Widget> k12= <Widget>[];
-  List <Widget> comp_e= <Widget>[];
-  List <Widget> mento= <Widget>[];
+  List<Widget> pop_c = <Widget>[];
+  List<Widget> asses = <Widget>[];
+  List<Widget> k12 = <Widget>[];
+  List<Widget> comp_e = <Widget>[];
+  List<Widget> mento = <Widget>[];
 
   //for k-12 subjects, list
-  List <Widget> sci= <Widget>[];
-  List <Widget> hin= <Widget>[];
-  List <Widget> eng= <Widget>[];
-  List <Widget> comp= <Widget>[];
-
+  List<Widget> sci = <Widget>[];
+  List<Widget> hin = <Widget>[];
+  List<Widget> eng = <Widget>[];
+  List<Widget> comp = <Widget>[];
 
   void _onItemTapped(int index) {
     setState(() {
@@ -357,49 +341,36 @@ class _landingPageState extends State<landingPage> {
     }
   }
 
-
-
-
-  Future<void> callapi() async {
-
-
-  }
+  Future<void> callapi() async {}
 
   @override
-  void initState()  {
+  void initState() {
     super.initState();
     callapi();
   }
 
   @override
   Widget build(BuildContext context) {
+    final controller = GroupButtonController();
+    List<bool> isSelected = [false, false, false];
 
-      final controller = GroupButtonController();
-      List<bool> isSelected = [false, false, false];
+    //update.list
 
+    k12 = sci;
 
-
-
-      //update.list
-
-
-      k12 = sci;
-
-      List<Widget> _widgetOptions = <Widget>[
-
-        FutureBuilder(
+    List<Widget> _widgetOptions = <Widget>[
+      FutureBuilder(
           future: getLanding(),
-          builder: (context,AsyncSnapshot<LandingApi> snapshot) {
+          builder: (context, AsyncSnapshot<LandingApi> snapshot) {
             print(snapshot.data);
-            if (snapshot.hasData)
-            {
-              LandingApi? landApi=snapshot.data;
+            if (snapshot.hasData) {
+              LandingApi? landApi = snapshot.data;
 
-              for (var i = 0; i < landApi!.data.popularCourses.length ; i++)
+              for (var i = 0; i < landApi!.data.popularCourses.length; i++)
                 pop_c.add(GestureDetector(
                   onTap: () {
-                    Navigator.push(
-                        context, MaterialPageRoute(builder: (context) => courseDesc()));
+                    Navigator.push(context,
+                        MaterialPageRoute(builder: (context) => courseDesc()));
                   },
                   child: Card(
                     elevation: 5,
@@ -408,9 +379,11 @@ class _landingPageState extends State<landingPage> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: <Widget>[
-                        ClipRRect(borderRadius: BorderRadius.circular(10),
+                        ClipRRect(
+                            borderRadius: BorderRadius.circular(10),
                             child: Center(
-                                child: Image(image: AssetImage("images/sci.jfif"),
+                                child: Image(
+                                    image: AssetImage("images/sci.jfif"),
                                     height: 120,
                                     width: 150))),
                         Padding(
@@ -421,12 +394,17 @@ class _landingPageState extends State<landingPage> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
                                   children: [
                                     Flexible(
-                                      child: Text(landApi.data.popularCourses[i].subjectName, style: TextStyle(fontSize: 15,
-                                          fontFamily: "Candara",
-                                          color: Colors.black)),
+                                      child: Text(
+                                          landApi.data.popularCourses[i]
+                                              .subjectName,
+                                          style: TextStyle(
+                                              fontSize: 15,
+                                              fontFamily: "Candara",
+                                              color: Colors.black)),
                                     ),
                                     //IconButton(onPressed: (){  }, icon: Icon(Icons.favorite_outline,size: 25),color: Colors.grey,)
                                     FavoriteButton(
@@ -442,19 +420,23 @@ class _landingPageState extends State<landingPage> {
                                 Row(
                                   mainAxisAlignment: MainAxisAlignment.start,
                                   children: [
-                                    IconButton(padding: EdgeInsets.zero,
+                                    IconButton(
+                                        padding: EdgeInsets.zero,
                                         onPressed: () {},
-                                        icon: Icon(Icons.person, size: 20,
-                                            color: Colors.grey)),
-                                    Text("Name", style: TextStyle(fontSize: 17,
-                                        fontFamily: "Candara",
-                                        color: Colors.grey))
+                                        icon: Icon(Icons.person,
+                                            size: 20, color: Colors.grey)),
+                                    Text("Name",
+                                        style: TextStyle(
+                                            fontSize: 17,
+                                            fontFamily: "Candara",
+                                            color: Colors.grey))
                                   ],
-
                                 ),
-                                Text("\$1234", style: TextStyle(
-                                    fontSize: 20, fontFamily: "Candara", color: Colors
-                                    .red))
+                                Text("\$1234",
+                                    style: TextStyle(
+                                        fontSize: 20,
+                                        fontFamily: "Candara",
+                                        color: Colors.red))
                               ],
                             ),
                           ),
@@ -465,14 +447,16 @@ class _landingPageState extends State<landingPage> {
                         ),
                       ],
                     ),
-
                   ),
                 ));
-              for (var i = 0; i < landApi!.data.assessments.length; i++)
+              for (var i = 0; i < landApi.data.assessments.length; i++)
                 asses.add(GestureDetector(
                   onTap: () {
                     Navigator.push(
-                        context, MaterialPageRoute(builder: (context) => assess(landApi!.data.assessments[i].id)));
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) =>
+                                assess(landApi.data.assessments[i].id)));
                   },
                   child: Container(
                     //width: 220,
@@ -483,8 +467,10 @@ class _landingPageState extends State<landingPage> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: <Widget>[
-                          ClipRRect(borderRadius: BorderRadius.circular(10),
-                              child: Image(image: AssetImage("images/hindiass.jpg"),
+                          ClipRRect(
+                              borderRadius: BorderRadius.circular(10),
+                              child: Image(
+                                  image: AssetImage("images/hindiass.jpg"),
                                   height: 120,
                                   width: 200,
                                   fit: BoxFit.fitWidth)),
@@ -497,11 +483,16 @@ class _landingPageState extends State<landingPage> {
                                 children: [
                                   Row(
                                     mainAxisSize: MainAxisSize.min,
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
                                     children: [
                                       Flexible(
-                                        child: Text(landApi!.data.assessments[i].assessmentName, overflow: TextOverflow.clip,
-                                            style: TextStyle(fontSize: 17,
+                                        child: Text(
+                                            landApi.data.assessments[i]
+                                                .assessmentName,
+                                            overflow: TextOverflow.clip,
+                                            style: TextStyle(
+                                                fontSize: 17,
                                                 fontFamily: "Candara",
                                                 color: Colors.black)),
                                       ),
@@ -518,20 +509,21 @@ class _landingPageState extends State<landingPage> {
                                     ],
                                   ),
                                   SizedBox(height: 10),
-                                  Text("\$1234", style: TextStyle(fontSize: 20,
-                                      fontFamily: "Candara",
-                                      color: Colors.red))
+                                  Text("\$1234",
+                                      style: TextStyle(
+                                          fontSize: 20,
+                                          fontFamily: "Candara",
+                                          color: Colors.red))
                                 ],
                               ),
                             ),
                           )
                         ],
                       ),
-
                     ),
                   ),
                 ));
-              for (var i = 0; i < landApi!.data.competitiveExams.length; i++)
+              for (var i = 0; i < landApi.data.competitiveExams.length; i++)
                 comp_e.add(GestureDetector(
                   onTap: () {},
                   child: Card(
@@ -544,7 +536,8 @@ class _landingPageState extends State<landingPage> {
                         Center(
                             child: ClipRRect(
                                 borderRadius: BorderRadius.circular(10),
-                                child: Image(image: AssetImage("images/hindiass.jpg"),
+                                child: Image(
+                                    image: AssetImage("images/hindiass.jpg"),
                                     height: 120,
                                     width: 150))),
                         Padding(
@@ -555,11 +548,16 @@ class _landingPageState extends State<landingPage> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
                                   children: [
-                                    Text(landApi.data.competitiveExams[i].subjectName, style: TextStyle(fontSize: 17,
-                                        fontFamily: "Candara",
-                                        color: Colors.black)),
+                                    Text(
+                                        landApi.data.competitiveExams[i]
+                                            .subjectName,
+                                        style: TextStyle(
+                                            fontSize: 17,
+                                            fontFamily: "Candara",
+                                            color: Colors.black)),
                                     //IconButton(onPressed: (){  }, icon: Icon(Icons.favorite_outline,size: 25),color: Colors.grey,)
                                     FavoriteButton(
                                       iconSize: 30,
@@ -574,86 +572,39 @@ class _landingPageState extends State<landingPage> {
                                 Row(
                                   mainAxisAlignment: MainAxisAlignment.start,
                                   children: [
-                                    IconButton(padding: EdgeInsets.zero,
+                                    IconButton(
+                                        padding: EdgeInsets.zero,
                                         onPressed: () {},
-                                        icon: Icon(Icons.person, size: 20,
-                                            color: Colors.grey)),
-                                    Text("Name", style: TextStyle(fontSize: 17,
-                                        fontFamily: "Candara",
-                                        color: Colors.grey))
+                                        icon: Icon(Icons.person,
+                                            size: 20, color: Colors.grey)),
+                                    Text("Name",
+                                        style: TextStyle(
+                                            fontSize: 17,
+                                            fontFamily: "Candara",
+                                            color: Colors.grey))
                                   ],
-
                                 ),
-                                Text("\$1234", style: TextStyle(
-                                    fontSize: 20, fontFamily: "Candara", color: Colors
-                                    .red))
+                                Text("\$1234",
+                                    style: TextStyle(
+                                        fontSize: 20,
+                                        fontFamily: "Candara",
+                                        color: Colors.red))
                               ],
                             ),
                           ),
                         )
                       ],
                     ),
-
                   ),
                 ));
-              for (var i = 0; i < landApi!.data.mentors.length; i++)
+              for (var i = 0; i < landApi.data.mentors.length; i++)
                 mento.add(GestureDetector(
-                onTap: () {
-                  Navigator.push(
-                      context, MaterialPageRoute(builder: (context) => mentor(landApi!.data.mentors[i].id)));
-                },
-                child: Card(
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.all(Radius.circular(10))),
-                  elevation: 5,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: <Widget>[
-                      Image(image: AssetImage("images/mentor1.PNG"),
-                          height: 250,
-                          width: 120),
-                      Padding(
-                        padding: const EdgeInsets.fromLTRB(8, 5, 8, 5),
-                        child: Container(
-                          width: 150,
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text(landApi!.data.mentors[i].eduName,
-                                      style: TextStyle(fontSize: 20,
-                                          fontFamily: "Candara",
-                                          color: Colors.black)),
-                                  //IconButton(onPressed: (){  }, icon: Icon(Icons.favorite_outline,size: 25),color: Colors.grey,)
-                                ],
-                              ),
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                children: [
-                                  Text("Specialisation", style: TextStyle(
-                                      fontSize: 15,
-                                      fontFamily: "Candara",
-                                      color: Colors.grey))
-                                ],
-
-                              ),
-                            ],
-                          ),
-                        ),
-                      )
-                    ],
-                  ),
-
-                ),
-              ));
-
-              for (var i = 0; i <= 7; i++)
-                sci.add(GestureDetector(
                   onTap: () {
                     Navigator.push(
-                        context, MaterialPageRoute(builder: (context) => k12_det()));
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) =>
+                                mentor(landApi.data.mentors[i].id)));
                   },
                   child: Card(
                     shape: RoundedRectangleBorder(
@@ -662,10 +613,10 @@ class _landingPageState extends State<landingPage> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: <Widget>[
-                        Center(child: ClipRRect(borderRadius: BorderRadius.circular(10),
-                            child: Image(image: AssetImage("images/sci.jfif"),
-                                height: 120,
-                                width: 150))),
+                        Image(
+                            image: AssetImage("images/mentor1.PNG"),
+                            height: 250,
+                            width: 120),
                         Padding(
                           padding: const EdgeInsets.fromLTRB(8, 5, 8, 5),
                           child: Container(
@@ -674,28 +625,91 @@ class _landingPageState extends State<landingPage> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
                                   children: [
-                                    Text("Course Title", style: TextStyle(fontSize: 17,
-                                        fontFamily: "Candara",
-                                        color: Colors.black)),
+                                    Text(landApi.data.mentors[i].eduName,
+                                        style: TextStyle(
+                                            fontSize: 20,
+                                            fontFamily: "Candara",
+                                            color: Colors.black)),
                                     //IconButton(onPressed: (){  }, icon: Icon(Icons.favorite_outline,size: 25),color: Colors.grey,)
-
                                   ],
                                 ),
-                                Text("22 Chapters", style: TextStyle(
-                                    fontSize: 15, fontFamily: "Candara", color: Colors
-                                    .grey)),
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  children: [
+                                    Text("Specialisation",
+                                        style: TextStyle(
+                                            fontSize: 15,
+                                            fontFamily: "Candara",
+                                            color: Colors.grey))
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ),
+                        )
+                      ],
+                    ),
+                  ),
+                ));
+
+              for (var i = 0; i <= 7; i++)
+                sci.add(GestureDetector(
+                  onTap: () {
+                    Navigator.push(context,
+                        MaterialPageRoute(builder: (context) => k12_det()));
+                  },
+                  child: Card(
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.all(Radius.circular(10))),
+                    elevation: 5,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: <Widget>[
+                        Center(
+                            child: ClipRRect(
+                                borderRadius: BorderRadius.circular(10),
+                                child: Image(
+                                    image: AssetImage("images/sci.jfif"),
+                                    height: 120,
+                                    width: 150))),
+                        Padding(
+                          padding: const EdgeInsets.fromLTRB(8, 5, 8, 5),
+                          child: Container(
+                            width: 150,
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text("Course Title",
+                                        style: TextStyle(
+                                            fontSize: 17,
+                                            fontFamily: "Candara",
+                                            color: Colors.black)),
+                                    //IconButton(onPressed: (){  }, icon: Icon(Icons.favorite_outline,size: 25),color: Colors.grey,)
+                                  ],
+                                ),
+                                Text("22 Chapters",
+                                    style: TextStyle(
+                                        fontSize: 15,
+                                        fontFamily: "Candara",
+                                        color: Colors.grey)),
                                 SizedBox(height: 5),
                                 Center(
                                   child: RaisedButton(
                                     padding: EdgeInsets.zero,
                                     onPressed: () {},
                                     color: Colors.indigo,
-                                    child: (Text("Subscribe", style: TextStyle(
-                                        fontSize: 12,
-                                        fontFamily: "Candara",
-                                        color: Colors.white))),
+                                    child: (Text("Subscribe",
+                                        style: TextStyle(
+                                            fontSize: 12,
+                                            fontFamily: "Candara",
+                                            color: Colors.white))),
                                   ),
                                 )
                               ],
@@ -704,7 +718,6 @@ class _landingPageState extends State<landingPage> {
                         )
                       ],
                     ),
-
                   ),
                 ));
               for (var i = 0; i <= 7; i++)
@@ -717,10 +730,13 @@ class _landingPageState extends State<landingPage> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: <Widget>[
-                        Center(child: ClipRRect(borderRadius: BorderRadius.circular(10),
-                            child: Image(image: AssetImage("images/hindiass.jpg"),
-                                height: 120,
-                                width: 150))),
+                        Center(
+                            child: ClipRRect(
+                                borderRadius: BorderRadius.circular(10),
+                                child: Image(
+                                    image: AssetImage("images/hindiass.jpg"),
+                                    height: 120,
+                                    width: 150))),
                         Padding(
                           padding: const EdgeInsets.fromLTRB(8, 5, 8, 5),
                           child: Container(
@@ -729,28 +745,33 @@ class _landingPageState extends State<landingPage> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
                                   children: [
-                                    Text("Course Title", style: TextStyle(fontSize: 17,
-                                        fontFamily: "Candara",
-                                        color: Colors.black)),
+                                    Text("Course Title",
+                                        style: TextStyle(
+                                            fontSize: 17,
+                                            fontFamily: "Candara",
+                                            color: Colors.black)),
                                     //IconButton(onPressed: (){  }, icon: Icon(Icons.favorite_outline,size: 25),color: Colors.grey,)
-
                                   ],
                                 ),
-                                Text("22 Chapters", style: TextStyle(
-                                    fontSize: 15, fontFamily: "Candara", color: Colors
-                                    .grey)),
+                                Text("22 Chapters",
+                                    style: TextStyle(
+                                        fontSize: 15,
+                                        fontFamily: "Candara",
+                                        color: Colors.grey)),
                                 SizedBox(height: 5),
                                 Center(
                                   child: RaisedButton(
                                     padding: EdgeInsets.zero,
                                     onPressed: () {},
                                     color: Colors.indigo,
-                                    child: (Text("Subscribe", style: TextStyle(
-                                        fontSize: 12,
-                                        fontFamily: "Candara",
-                                        color: Colors.white))),
+                                    child: (Text("Subscribe",
+                                        style: TextStyle(
+                                            fontSize: 12,
+                                            fontFamily: "Candara",
+                                            color: Colors.white))),
                                   ),
                                 )
                               ],
@@ -759,7 +780,6 @@ class _landingPageState extends State<landingPage> {
                         )
                       ],
                     ),
-
                   ),
                 ));
               for (var i = 0; i <= 7; i++)
@@ -772,10 +792,13 @@ class _landingPageState extends State<landingPage> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: <Widget>[
-                        Center(child: ClipRRect(borderRadius: BorderRadius.circular(10),
-                            child: Image(image: AssetImage("images/sci.jfif"),
-                                height: 120,
-                                width: 150))),
+                        Center(
+                            child: ClipRRect(
+                                borderRadius: BorderRadius.circular(10),
+                                child: Image(
+                                    image: AssetImage("images/sci.jfif"),
+                                    height: 120,
+                                    width: 150))),
                         Padding(
                           padding: const EdgeInsets.fromLTRB(8, 5, 8, 5),
                           child: Container(
@@ -784,28 +807,33 @@ class _landingPageState extends State<landingPage> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
                                   children: [
-                                    Text("Course Title", style: TextStyle(fontSize: 17,
-                                        fontFamily: "Candara",
-                                        color: Colors.black)),
+                                    Text("Course Title",
+                                        style: TextStyle(
+                                            fontSize: 17,
+                                            fontFamily: "Candara",
+                                            color: Colors.black)),
                                     //IconButton(onPressed: (){  }, icon: Icon(Icons.favorite_outline,size: 25),color: Colors.grey,)
-
                                   ],
                                 ),
-                                Text("22 Chapters", style: TextStyle(
-                                    fontSize: 15, fontFamily: "Candara", color: Colors
-                                    .grey)),
+                                Text("22 Chapters",
+                                    style: TextStyle(
+                                        fontSize: 15,
+                                        fontFamily: "Candara",
+                                        color: Colors.grey)),
                                 SizedBox(height: 5),
                                 Center(
                                   child: RaisedButton(
                                     padding: EdgeInsets.zero,
                                     onPressed: () {},
                                     color: Colors.indigo,
-                                    child: (Text("Subscribe", style: TextStyle(
-                                        fontSize: 12,
-                                        fontFamily: "Candara",
-                                        color: Colors.white))),
+                                    child: (Text("Subscribe",
+                                        style: TextStyle(
+                                            fontSize: 12,
+                                            fontFamily: "Candara",
+                                            color: Colors.white))),
                                   ),
                                 )
                               ],
@@ -814,7 +842,6 @@ class _landingPageState extends State<landingPage> {
                         )
                       ],
                     ),
-
                   ),
                 ));
               for (var i = 0; i <= 3; i++)
@@ -827,10 +854,13 @@ class _landingPageState extends State<landingPage> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: <Widget>[
-                        Center(child: ClipRRect(borderRadius: BorderRadius.circular(10),
-                            child: Image(image: AssetImage("images/hindiass.jpg"),
-                                height: 120,
-                                width: 150))),
+                        Center(
+                            child: ClipRRect(
+                                borderRadius: BorderRadius.circular(10),
+                                child: Image(
+                                    image: AssetImage("images/hindiass.jpg"),
+                                    height: 120,
+                                    width: 150))),
                         Padding(
                           padding: const EdgeInsets.fromLTRB(8, 5, 8, 5),
                           child: Container(
@@ -839,28 +869,33 @@ class _landingPageState extends State<landingPage> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
                                   children: [
-                                    Text("Course Title", style: TextStyle(fontSize: 17,
-                                        fontFamily: "Candara",
-                                        color: Colors.black)),
+                                    Text("Course Title",
+                                        style: TextStyle(
+                                            fontSize: 17,
+                                            fontFamily: "Candara",
+                                            color: Colors.black)),
                                     //IconButton(onPressed: (){  }, icon: Icon(Icons.favorite_outline,size: 25),color: Colors.grey,)
-
                                   ],
                                 ),
-                                Text("22 Chapters", style: TextStyle(
-                                    fontSize: 15, fontFamily: "Candara", color: Colors
-                                    .grey)),
+                                Text("22 Chapters",
+                                    style: TextStyle(
+                                        fontSize: 15,
+                                        fontFamily: "Candara",
+                                        color: Colors.grey)),
                                 SizedBox(height: 5),
                                 Center(
                                   child: RaisedButton(
                                     padding: EdgeInsets.zero,
                                     onPressed: () {},
                                     color: Colors.indigo,
-                                    child: (Text("Subscribe", style: TextStyle(
-                                        fontSize: 12,
-                                        fontFamily: "Candara",
-                                        color: Colors.white))),
+                                    child: (Text("Subscribe",
+                                        style: TextStyle(
+                                            fontSize: 12,
+                                            fontFamily: "Candara",
+                                            color: Colors.white))),
                                   ),
                                 )
                               ],
@@ -869,14 +904,12 @@ class _landingPageState extends State<landingPage> {
                         )
                       ],
                     ),
-
                   ),
                 ));
 
-            return SingleChildScrollView(
-              child: Column(
+              return SingleChildScrollView(
+                  child: Column(
                 children: [
-
                   Container(
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.only(
@@ -889,29 +922,36 @@ class _landingPageState extends State<landingPage> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: <Widget>[
-                        Text("Let's Start Learning", style: TextStyle(
-                            fontSize: 25,
-                            fontFamily: "Candara",
-                            color: Colors.teal),),
+                        Text(
+                          "Let's Start Learning",
+                          style: TextStyle(
+                              fontSize: 25,
+                              fontFamily: "Candara",
+                              color: Colors.teal),
+                        ),
                         SizedBox(height: 30),
-
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: <Widget>[
-                            Text("Popular Courses", style: TextStyle(
-                                fontFamily: "Candara",
-                                fontSize: 22,
-                                color: Colors.black)),
+                            Text("Popular Courses",
+                                style: TextStyle(
+                                    fontFamily: "Candara",
+                                    fontSize: 22,
+                                    color: Colors.black)),
                             GestureDetector(
-                              child: Text("See all", style: TextStyle(
-                                  fontSize: 20,
-                                  color: Colors.blue,
-                                  fontFamily: "Candara")),
+                              child: Text("See all",
+                                  style: TextStyle(
+                                      fontSize: 20,
+                                      color: Colors.blue,
+                                      fontFamily: "Candara")),
                               onTap: () {
-                                Navigator.push(context, MaterialPageRoute(
-                                    builder: (context) =>
-                                        seeallpage("Popular Courses", 1)));
-                              },)
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) =>
+                                            seeallpage("Popular Courses", 1)));
+                              },
+                            )
                           ],
                         ),
                         SizedBox(height: 20),
@@ -919,16 +959,10 @@ class _landingPageState extends State<landingPage> {
                             scrollDirection: Axis.horizontal,
                             child: Row(
                               children: pop_c,
-
-                            )
-                        ),
+                            )),
                         SizedBox(height: 30),
-
-
                       ],
                     ),
-
-
                   ),
                   Container(
                     padding: EdgeInsets.fromLTRB(15, 30, 15, 15),
@@ -936,35 +970,35 @@ class _landingPageState extends State<landingPage> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: <Widget>[
-
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: <Widget>[
-                            Text("Assessment", style: TextStyle(
-                                fontFamily: "Candara",
-                                fontSize: 22,
-                                color: Colors.white)),
+                            Text("Assessment",
+                                style: TextStyle(
+                                    fontFamily: "Candara",
+                                    fontSize: 22,
+                                    color: Colors.white)),
                             GestureDetector(
-                              child: Text("See all", style: TextStyle(
-                                  fontSize: 20,
-                                  color: Colors.lightBlueAccent,
-                                  fontFamily: "Candara")),
+                              child: Text("See all",
+                                  style: TextStyle(
+                                      fontSize: 20,
+                                      color: Colors.lightBlueAccent,
+                                      fontFamily: "Candara")),
                               onTap: () {
-                                Navigator.push(context, MaterialPageRoute(
-                                    builder: (context) =>
-                                        seeallpage("Assessment", 2)));
-                              },)
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) =>
+                                            seeallpage("Assessment", 2)));
+                              },
+                            )
                           ],
                         ),
                         SizedBox(height: 20),
                         SingleChildScrollView(
                             scrollDirection: Axis.horizontal,
-                            child: Row(
-                                children: asses
-                            )
-                        ),
+                            child: Row(children: asses)),
                         SizedBox(height: 30),
-
                       ],
                     ),
                   ),
@@ -979,9 +1013,11 @@ class _landingPageState extends State<landingPage> {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: <Widget>[
-                            Text("K12", style: TextStyle(fontFamily: "Candara",
-                                fontSize: 22,
-                                color: Colors.black)),
+                            Text("K12",
+                                style: TextStyle(
+                                    fontFamily: "Candara",
+                                    fontSize: 22,
+                                    color: Colors.black)),
                             //GestureDetector(child: Text("See all",style: TextStyle(fontSize: 20,color: Colors.blue,fontFamily: "Candara")))
                           ],
                         ),
@@ -1000,12 +1036,8 @@ class _landingPageState extends State<landingPage> {
                                     'Computer',
                                     'SST'
                                   ],
-
                                   onSelected: (i, selected) {
-                                    if(i==1)
-                                      {
-
-                                      }
+                                    if (i == 1) {}
                                   },
                                   selectedTextStyle: const TextStyle(
                                       fontFamily: "Candara",
@@ -1017,14 +1049,13 @@ class _landingPageState extends State<landingPage> {
                                       color: Colors.black),
                                   unselectedColor: Colors.transparent,
                                   selectedColor: Colors.teal,
-                                  selectedShadow: const <BoxShadow>[BoxShadow(
-                                      color: Colors.transparent)
+                                  selectedShadow: const <BoxShadow>[
+                                    BoxShadow(color: Colors.transparent)
                                   ],
-                                  unselectedShadow: const <BoxShadow>[BoxShadow(
-                                      color: Colors.transparent)
+                                  unselectedShadow: const <BoxShadow>[
+                                    BoxShadow(color: Colors.transparent)
                                   ],
-                                  borderRadius: BorderRadius.circular(5.0)
-                              ),
+                                  borderRadius: BorderRadius.circular(5.0)),
                             ],
                           ),
                         ),
@@ -1032,377 +1063,363 @@ class _landingPageState extends State<landingPage> {
                         //ListView.builder(itemBuilder: itemBuilder)
                         SingleChildScrollView(
                             scrollDirection: Axis.horizontal,
-                            child: Row(
-                                children: k12
-                            )
-                        ),
+                            child: Row(children: k12)),
                         SizedBox(height: 30),
-
-
                       ],
                     ),
-
                   ),
                   Container(
-                    decoration: BoxDecoration(borderRadius: BorderRadius.only(
-                        topLeft: Radius.circular(20),
-                        topRight: Radius.circular(20)), color: Colors.teal),
+                    decoration: BoxDecoration(
+                        borderRadius: BorderRadius.only(
+                            topLeft: Radius.circular(20),
+                            topRight: Radius.circular(20)),
+                        color: Colors.teal),
                     padding: EdgeInsets.fromLTRB(15, 30, 15, 15),
                     width: double.infinity,
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: <Widget>[
-
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: <Widget>[
-                            Text("Competitive Exam", style: TextStyle(
-                                fontFamily: "Candara",
-                                fontSize: 22,
-                                color: Colors.white)),
+                            Text("Competitive Exam",
+                                style: TextStyle(
+                                    fontFamily: "Candara",
+                                    fontSize: 22,
+                                    color: Colors.white)),
                             GestureDetector(
-                                child: Text("See all", style: TextStyle(
-                                    fontSize: 20,
-                                    color: Colors.lightBlueAccent,
-                                    fontFamily: "Candara")),
+                                child: Text("See all",
+                                    style: TextStyle(
+                                        fontSize: 20,
+                                        color: Colors.lightBlueAccent,
+                                        fontFamily: "Candara")),
                                 onTap: () {
-                                  Navigator.push(context, MaterialPageRoute(
-                                      builder: (context) =>
-                                          seeallpage("Competitive Exam", 3)));
+                                  Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) => seeallpage(
+                                              "Competitive Exam", 3)));
                                 })
                           ],
                         ),
                         SizedBox(height: 20),
                         SingleChildScrollView(
                             scrollDirection: Axis.horizontal,
-                            child: Row(
-                                children: comp_e
-                            )
-                        ),
+                            child: Row(children: comp_e)),
                         SizedBox(height: 30),
-
-
                       ],
                     ),
-
-
                   ),
                   Container(
                     padding: EdgeInsets.fromLTRB(15, 30, 15, 15),
-                    decoration: BoxDecoration(borderRadius: BorderRadius.only(
-                        topLeft: Radius.circular(20),
-                        topRight: Radius.circular(20)), color: Colors.white),
+                    decoration: BoxDecoration(
+                        borderRadius: BorderRadius.only(
+                            topLeft: Radius.circular(20),
+                            topRight: Radius.circular(20)),
+                        color: Colors.white),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: <Widget>[
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: <Widget>[
-                            Text("MENTORS", style: TextStyle(
-                                fontFamily: "Candara",
-                                fontSize: 25,
-                                color: Colors.black)),
+                            Text("MENTORS",
+                                style: TextStyle(
+                                    fontFamily: "Candara",
+                                    fontSize: 25,
+                                    color: Colors.black)),
                             GestureDetector(
-                                child: Text("See all", style: TextStyle(
-                                    fontSize: 20,
-                                    color: Colors.lightBlueAccent,
-                                    fontFamily: "Candara")),
+                                child: Text("See all",
+                                    style: TextStyle(
+                                        fontSize: 20,
+                                        color: Colors.lightBlueAccent,
+                                        fontFamily: "Candara")),
                                 onTap: () {
-                                  Navigator.push(context, MaterialPageRoute(
-                                      builder: (context) =>
-                                          seeallpage("Mentors", 4)));
+                                  Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) =>
+                                              seeallpage("Mentors", 4)));
                                 })
                           ],
                         ),
                         SizedBox(height: 20),
                         SingleChildScrollView(
                             scrollDirection: Axis.horizontal,
-                            child: Row(
-                                children: mento
-                            )
-                        ),
+                            child: Row(children: mento)),
                         SizedBox(height: 30)
                       ],
                     ),
                   )
                 ],
-              )
-          );
-            }
-            else
+              ));
+            } else
               return Container(child: CircularProgressIndicator());
-          }
-        ),
-        SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Container(
-                padding: EdgeInsets.only(left: 25, top: 10),
-                child: Text(
-                  "Hi Aryan!",
-                  style: TextStyle(
-                      fontSize: 17.5,
-                      color: Colors.black,
-                      fontFamily: "Candara"),
-                ),
+          }),
+      SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Container(
+              padding: EdgeInsets.only(left: 25, top: 10),
+              child: Text(
+                "Hi Aryan!",
+                style: TextStyle(
+                    fontSize: 17.5, color: Colors.black, fontFamily: "Candara"),
               ),
-              Container(
-                padding: EdgeInsets.only(left: 25, bottom: 10),
-                child: Text(
-                  "Choose your courses",
-                  style: TextStyle(
-                      fontFamily: "Candara",
-                      fontSize: 12.5,
-                      color: Colors.grey),
-                ),
+            ),
+            Container(
+              padding: EdgeInsets.only(left: 25, bottom: 10),
+              child: Text(
+                "Choose your courses",
+                style: TextStyle(
+                    fontFamily: "Candara", fontSize: 12.5, color: Colors.grey),
               ),
-              Container(
+            ),
+            Container(
+              color: Colors.white,
+              //height: 100,
+              padding: EdgeInsets.only(left: 25, right: 25, top: 10),
+              child: Card(
                 color: Colors.white,
-                //height: 100,
-                padding: EdgeInsets.only(left: 25, right: 25, top: 10),
-                child: Card(
-                  color: Colors.white,
-                  shadowColor: Colors.grey,
-                  borderOnForeground: true,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: <Widget>[
-                      Container(
-                        padding: EdgeInsets.all(5),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          children: <Widget>[
-                            GestureDetector(
-                              child: Container(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  children: [
-                                    CircleAvatar(
-                                        radius: 30,
-                                        backgroundImage:
-                                        AssetImage('images/maths.png')),
-                                    SizedBox(height: 5),
-                                    Text(
-                                      "MATHS",
-                                      style: TextStyle(
-                                          color: Colors.black,
-                                          fontSize: 12.5,
-                                          fontFamily: "Candara"),
-                                    )
-                                  ],
-                                ),
+                shadowColor: Colors.grey,
+                borderOnForeground: true,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: <Widget>[
+                    Container(
+                      padding: EdgeInsets.all(5),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: <Widget>[
+                          GestureDetector(
+                            child: Container(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  CircleAvatar(
+                                      radius: 30,
+                                      backgroundImage:
+                                          AssetImage('images/maths.png')),
+                                  SizedBox(height: 5),
+                                  Text(
+                                    "MATHS",
+                                    style: TextStyle(
+                                        color: Colors.black,
+                                        fontSize: 12.5,
+                                        fontFamily: "Candara"),
+                                  )
+                                ],
                               ),
-                              onTap: () {},
                             ),
-                            GestureDetector(
-                              child: Container(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  children: [
-                                    CircleAvatar(
-                                        radius: 30,
-                                        backgroundImage:
-                                        AssetImage('images/chemistry.png')),
-                                    SizedBox(height: 5),
-                                    Text(
-                                      "SCIENCE",
-                                      style: TextStyle(
-                                          color: Colors.black,
-                                          fontSize: 12.5,
-                                          fontFamily: "Candara"),
-                                    )
-                                  ],
-                                ),
+                            onTap: () {},
+                          ),
+                          GestureDetector(
+                            child: Container(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  CircleAvatar(
+                                      radius: 30,
+                                      backgroundImage:
+                                          AssetImage('images/chemistry.png')),
+                                  SizedBox(height: 5),
+                                  Text(
+                                    "SCIENCE",
+                                    style: TextStyle(
+                                        color: Colors.black,
+                                        fontSize: 12.5,
+                                        fontFamily: "Candara"),
+                                  )
+                                ],
                               ),
-                              onTap: () {},
                             ),
-                            GestureDetector(
-                              child: Container(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  children: [
-                                    CircleAvatar(
-                                        radius: 30,
-                                        backgroundImage:
-                                        AssetImage('images/hindi.png')),
-                                    SizedBox(height: 5),
-                                    Text(
-                                      "HINDI",
-                                      style: TextStyle(
-                                          color: Colors.black,
-                                          fontSize: 12.5,
-                                          fontFamily: "Candara"),
-                                    )
-                                  ],
-                                ),
+                            onTap: () {},
+                          ),
+                          GestureDetector(
+                            child: Container(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  CircleAvatar(
+                                      radius: 30,
+                                      backgroundImage:
+                                          AssetImage('images/hindi.png')),
+                                  SizedBox(height: 5),
+                                  Text(
+                                    "HINDI",
+                                    style: TextStyle(
+                                        color: Colors.black,
+                                        fontSize: 12.5,
+                                        fontFamily: "Candara"),
+                                  )
+                                ],
                               ),
-                              onTap: () {},
                             ),
-                          ],
-                        ),
+                            onTap: () {},
+                          ),
+                        ],
                       ),
-                      SizedBox(height: 5),
-                      Container(
-                        padding: EdgeInsets.all(5),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          children: <Widget>[
-                            GestureDetector(
-                              child: Container(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  children: [
-                                    CircleAvatar(
-                                        radius: 30,
-                                        backgroundImage:
-                                        AssetImage('images/english.png')),
-                                    SizedBox(height: 5),
-                                    Text(
-                                      "ENGLISH",
-                                      style: TextStyle(
-                                          color: Colors.black,
-                                          fontSize: 12.5,
-                                          fontFamily: "Candara"),
-                                    )
-                                  ],
-                                ),
+                    ),
+                    SizedBox(height: 5),
+                    Container(
+                      padding: EdgeInsets.all(5),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: <Widget>[
+                          GestureDetector(
+                            child: Container(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  CircleAvatar(
+                                      radius: 30,
+                                      backgroundImage:
+                                          AssetImage('images/english.png')),
+                                  SizedBox(height: 5),
+                                  Text(
+                                    "ENGLISH",
+                                    style: TextStyle(
+                                        color: Colors.black,
+                                        fontSize: 12.5,
+                                        fontFamily: "Candara"),
+                                  )
+                                ],
                               ),
-                              onTap: () {},
                             ),
-                            GestureDetector(
-                              child: Container(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  children: [
-                                    CircleAvatar(
-                                        radius: 30,
-                                        backgroundImage:
-                                        AssetImage('images/sst.png')),
-                                    SizedBox(height: 5),
-                                    Text(
-                                      "SST",
-                                      style: TextStyle(
-                                          color: Colors.black,
-                                          fontSize: 12.5,
-                                          fontFamily: "Candara"),
-                                    )
-                                  ],
-                                ),
+                            onTap: () {},
+                          ),
+                          GestureDetector(
+                            child: Container(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  CircleAvatar(
+                                      radius: 30,
+                                      backgroundImage:
+                                          AssetImage('images/sst.png')),
+                                  SizedBox(height: 5),
+                                  Text(
+                                    "SST",
+                                    style: TextStyle(
+                                        color: Colors.black,
+                                        fontSize: 12.5,
+                                        fontFamily: "Candara"),
+                                  )
+                                ],
                               ),
-                              onTap: () {},
                             ),
-                            GestureDetector(
-                              child: Container(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  children: [
-                                    CircleAvatar(
-                                        radius: 30,
-                                        backgroundImage:
-                                        AssetImage('images/computer.png')),
-                                    SizedBox(height: 5),
-                                    Text(
-                                      "COMPUTER",
-                                      style: TextStyle(
-                                          color: Colors.black,
-                                          fontSize: 12.5,
-                                          fontFamily: "Candara"),
-                                    )
-                                  ],
-                                ),
+                            onTap: () {},
+                          ),
+                          GestureDetector(
+                            child: Container(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  CircleAvatar(
+                                      radius: 30,
+                                      backgroundImage:
+                                          AssetImage('images/computer.png')),
+                                  SizedBox(height: 5),
+                                  Text(
+                                    "COMPUTER",
+                                    style: TextStyle(
+                                        color: Colors.black,
+                                        fontSize: 12.5,
+                                        fontFamily: "Candara"),
+                                  )
+                                ],
                               ),
-                              onTap: () {},
                             ),
-                          ],
-                        ),
-                      )
-                    ],
-                  ),
+                            onTap: () {},
+                          ),
+                        ],
+                      ),
+                    )
+                  ],
                 ),
               ),
-            ],
-          ),
+            ),
+          ],
         ),
-        SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Container(
-                color: Colors.white,
-                height: 100,
-                padding: EdgeInsets.only(left: 30, right: 30, top: 10),
-                child: Card(
-                  color: Colors.blue,
-                  shadowColor: Colors.grey,
-                ),
+      ),
+      SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Container(
+              color: Colors.white,
+              height: 100,
+              padding: EdgeInsets.only(left: 30, right: 30, top: 10),
+              child: Card(
+                color: Colors.blue,
+                shadowColor: Colors.grey,
               ),
-              SizedBox(height: 10),
-              Container(
-                color: Colors.white,
-                height: 100,
-                padding: EdgeInsets.only(left: 30, right: 30, top: 10),
-                child: Card(
-                  color: Colors.blue,
-                  shadowColor: Colors.grey,
-                ),
+            ),
+            SizedBox(height: 10),
+            Container(
+              color: Colors.white,
+              height: 100,
+              padding: EdgeInsets.only(left: 30, right: 30, top: 10),
+              child: Card(
+                color: Colors.blue,
+                shadowColor: Colors.grey,
               ),
-              SizedBox(height: 10),
-              Container(
-                color: Colors.white,
-                height: 100,
-                padding: EdgeInsets.only(left: 30, right: 30, top: 10),
-                child: Card(
-                  color: Colors.blue,
-                  shadowColor: Colors.grey,
-                ),
+            ),
+            SizedBox(height: 10),
+            Container(
+              color: Colors.white,
+              height: 100,
+              padding: EdgeInsets.only(left: 30, right: 30, top: 10),
+              child: Card(
+                color: Colors.blue,
+                shadowColor: Colors.grey,
               ),
-              SizedBox(height: 10),
-            ],
-          ),
+            ),
+            SizedBox(height: 10),
+          ],
         ),
-        SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Container(
-                color: Colors.white,
-                height: 100,
-                padding: EdgeInsets.only(left: 30, right: 30, top: 10),
-                child: Card(
-                  color: Colors.orange,
-                  shadowColor: Colors.grey,
-                ),
+      ),
+      SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Container(
+              color: Colors.white,
+              height: 100,
+              padding: EdgeInsets.only(left: 30, right: 30, top: 10),
+              child: Card(
+                color: Colors.orange,
+                shadowColor: Colors.grey,
               ),
-              SizedBox(height: 10),
-              Container(
-                color: Colors.white,
-                height: 100,
-                padding: EdgeInsets.only(left: 30, right: 30, top: 10),
-                child: Card(
-                  color: Colors.orange,
-                  shadowColor: Colors.grey,
-                ),
+            ),
+            SizedBox(height: 10),
+            Container(
+              color: Colors.white,
+              height: 100,
+              padding: EdgeInsets.only(left: 30, right: 30, top: 10),
+              child: Card(
+                color: Colors.orange,
+                shadowColor: Colors.grey,
               ),
-              SizedBox(height: 10),
-              Container(
-                color: Colors.white,
-                height: 100,
-                padding: EdgeInsets.only(left: 30, right: 30, top: 10),
-                child: Card(
-                  color: Colors.orange,
-                  shadowColor: Colors.grey,
-                ),
+            ),
+            SizedBox(height: 10),
+            Container(
+              color: Colors.white,
+              height: 100,
+              padding: EdgeInsets.only(left: 30, right: 30, top: 10),
+              child: Card(
+                color: Colors.orange,
+                shadowColor: Colors.grey,
               ),
-              SizedBox(height: 10),
-            ],
-          ),
-        )
+            ),
+            SizedBox(height: 10),
+          ],
+        ),
+      )
+    ];
 
-      ];
-
-
-      return Scaffold(
+    return Scaffold(
         backgroundColor: Colors.teal,
         appBar: AppBar(
           toolbarHeight: 100,
@@ -1411,10 +1428,12 @@ class _landingPageState extends State<landingPage> {
           //Icon(Icons.menu, color: Colors.black, size: 30,),
           //centerTitle: true,
           actions: <IconButton>[
-            IconButton(onPressed: () {
-              Navigator.push(
-                  context, MaterialPageRoute(builder: (context) => Login()));
-            }, icon: Icon(Icons.person, color: Colors.white, size: 30))
+            IconButton(
+                onPressed: () {
+                  Navigator.push(context,
+                      MaterialPageRoute(builder: (context) => Login()));
+                },
+                icon: Icon(Icons.person, color: Colors.white, size: 30))
           ],
           title: Container(
             //height: 40,
@@ -1430,27 +1449,24 @@ class _landingPageState extends State<landingPage> {
                     fillColor: Colors.white,
 
                     enabledBorder: OutlineInputBorder(
-                        borderSide: const BorderSide(
-                            color: Colors.white, width: 2.0),
+                        borderSide:
+                            const BorderSide(color: Colors.white, width: 2.0),
                         borderRadius: BorderRadius.circular(15)),
                     focusedBorder: OutlineInputBorder(
-                        borderSide: const BorderSide(
-                            color: Colors.white, width: 2.0),
-                        borderRadius: BorderRadius.circular(15)
-                    ),
+                        borderSide:
+                            const BorderSide(color: Colors.white, width: 2.0),
+                        borderRadius: BorderRadius.circular(15)),
                     labelText: 'Search',
-                    labelStyle: TextStyle(
-                        fontFamily: "Candara", color: Colors.white),
+                    labelStyle:
+                        TextStyle(fontFamily: "Candara", color: Colors.white),
                     prefixIcon: Icon(Icons.search, color: Colors.white),
                     //fillColor: Colors.grey,
                     focusColor: Colors.white,
                   ),
                 )
-
               ],
             ),
           ),
-
         ),
         drawer: Drawer(
           elevation: 5,
@@ -1491,41 +1507,37 @@ class _landingPageState extends State<landingPage> {
             items: const <BottomNavigationBarItem>[
               BottomNavigationBarItem(
                   icon: Icon(Icons.home_outlined, size: 30),
-                  title: Text('Dashboard'),
+                  label: 'Dashboard',
                   backgroundColor: Colors.white),
               BottomNavigationBarItem(
                 icon: Icon(Icons.favorite_outline, size: 30),
-                title: Text('Favourites'),
+                label: 'Favourites',
               ),
               BottomNavigationBarItem(
                 icon: Icon(
                   Icons.school_outlined,
                   size: 30,
                 ),
-                title: Text('Scholarship'),
+                label: 'Scholarship',
               ),
               BottomNavigationBarItem(
                   icon: Icon(Icons.notifications_active_outlined, size: 30),
-                  title: Text('Exam Alert')),
+                  label: 'Exam Alert'),
             ],
             type: BottomNavigationBarType.shifting,
             currentIndex: _selectedIndex,
             onTap: _onItemTapped,
             elevation: 5),
         body: FutureBuilder(
-            future: getLanding(),
-            builder: (context, AsyncSnapshot<LandingApi> snapshot){
-              if(snapshot.hasData){
-
-                return SafeArea(child:_widgetOptions.elementAt(_selectedIndex));
-              }
-              else{
-                return Container(child: Center(child: CircularProgressIndicator()));
-              }
-            },
-          )
-
-      );
-    }
-
+          future: getLanding(),
+          builder: (context, AsyncSnapshot<LandingApi> snapshot) {
+            if (snapshot.hasData) {
+              return SafeArea(child: _widgetOptions.elementAt(_selectedIndex));
+            } else {
+              return Container(
+                  child: Center(child: CircularProgressIndicator()));
+            }
+          },
+        ));
+  }
 }

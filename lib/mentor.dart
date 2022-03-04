@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:favorite_button/favorite_button.dart';
 import 'package:http/http.dart' as http;
+import 'package:learning_duniya/trial.dart';
 import 'need_help_page.dart';
 
 Mentor mentorFromJson(String str) => Mentor.fromJson(json.decode(str));
@@ -252,13 +253,13 @@ class _mentorpageState extends State<mentorpage> {
                           )
                         ],
                       ),
-                        Text(men1.data.educator.specilization,
+                      Text(men1.data.educator.specilization,
                           style: TextStyle(
                               fontSize: 25,
                               fontFamily: "Candara",
                               color: Colors.teal)),
-                        SizedBox(height: 10),
-                        Row(
+                      SizedBox(height: 10),
+                      Row(
                         mainAxisAlignment: MainAxisAlignment.start,
                         children: [
                           Icon(Icons.favorite, color: Colors.red, size: 25),
@@ -358,61 +359,51 @@ class _mentorpageState extends State<mentorpage> {
                                                         context,
                                                         MaterialPageRoute(
                                                           builder: (context) {
-                                                            /*for(i=0; i<snapshot.data!.data.services.length; i++) {
-                                                              if (snapshot.data!
-                                                                  .data
-                                                                  .services[i]
-                                                                  .communicationAudio !=
-                                                                  "")
-                                                                serviceList.add(
-                                                                    snapshot
-                                                                        .data!
-                                                                        .data
-                                                                        .services[i]
-                                                                        .communicationAudio);
-                                                              if (snapshot.data!
-                                                                  .data
-                                                                  .services[i]
-                                                                  .communicationText !=
-                                                                  "")
-                                                                serviceList.add(
-                                                                    snapshot
-                                                                        .data!
-                                                                        .data
-                                                                        .services[i]
-                                                                        .communicationText);
-                                                              if (snapshot.data!
-                                                                  .data
-                                                                  .services[i]
-                                                                  .communicationVideo !=
-                                                                  "")
-                                                                serviceList.add(
-                                                                    snapshot
-                                                                        .data!
-                                                                        .data
-                                                                        .services[i]
-                                                                        .communicationVideo);
-                                                            }*/
+                                                            serviceList.clear();
+                                                            if (snapshot
+                                                                    .data!
+                                                                    .data
+                                                                    .services[i]
+                                                                    .communicationAudio !=
+                                                                "")
+                                                              serviceList.add(
+                                                                  snapshot
+                                                                      .data!
+                                                                      .data
+                                                                      .services[
+                                                                          i]
+                                                                      .communicationAudio);
+                                                            if (snapshot
+                                                                    .data!
+                                                                    .data
+                                                                    .services[i]
+                                                                    .communicationText !=
+                                                                "")
+                                                              serviceList.add(
+                                                                  snapshot
+                                                                      .data!
+                                                                      .data
+                                                                      .services[
+                                                                          i]
+                                                                      .communicationText);
+                                                            if (snapshot
+                                                                    .data!
+                                                                    .data
+                                                                    .services[i]
+                                                                    .communicationVideo !=
+                                                                "")
+                                                              serviceList.add(
+                                                                  snapshot
+                                                                      .data!
+                                                                      .data
+                                                                      .services[
+                                                                          i]
+                                                                      .communicationVideo);
+                                                            print(serviceList);
+                                                            /*return trial(
+                                                                serviceList);*/
                                                             return need_help_page(
-                                                              name:
-                                                                  "Profile Name",
-                                                              items1: [
-                                                                'Item 1',
-                                                                'Item 2',
-                                                                'Item 3',
-                                                                'Item 4'
-                                                              ],
-                                                              items2: [
-                                                                'Item 1',
-                                                                'Item 2',
-                                                                'Item 3',
-                                                              ],
-                                                              category: [
-                                                                'Cat 1',
-                                                                'Cat 2',
-                                                                'Cat 3'
-                                                              ],
-                                                            );
+                                                                serviceList);
                                                           },
                                                         ),
                                                       );

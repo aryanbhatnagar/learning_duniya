@@ -4,6 +4,7 @@ import 'Login.dart';
 import 'main.dart';
 import 'courses.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
 class Dashboard extends StatelessWidget {
   const Dashboard({Key? key}) : super(key: key);
 
@@ -22,10 +23,8 @@ class DashboardPage extends StatefulWidget {
   _DashboardPageState createState() => _DashboardPageState();
 }
 
-
 final Future<SharedPreferences> prefs = SharedPreferences.getInstance();
 String? name;
-
 
 class _DashboardPageState extends State<DashboardPage> {
   int _selectedIndex = 0;
@@ -59,79 +58,78 @@ class _DashboardPageState extends State<DashboardPage> {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: <Widget>[
                 Container(
-                  //padding: EdgeInsets.all(5),
+                    //padding: EdgeInsets.all(5),
                     child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: <Widget>[
-                        GestureDetector(
-                          child: Container(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                CircleAvatar(
-                                    radius: 35,
-                                    backgroundImage:
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: <Widget>[
+                    GestureDetector(
+                      child: Container(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            CircleAvatar(
+                                radius: 35,
+                                backgroundImage:
                                     AssetImage('images/maths.png')),
-                                SizedBox(height: 10),
-                                Text(
-                                  "MATHS",
-                                  style: TextStyle(
-                                      color: Colors.black,
-                                      fontSize: 15,
-                                      fontFamily: "Candara"),
-                                )
-                              ],
-                            ),
-                          ),
-                          onTap: () {},
+                            SizedBox(height: 10),
+                            Text(
+                              "MATHS",
+                              style: TextStyle(
+                                  color: Colors.black,
+                                  fontSize: 15,
+                                  fontFamily: "Candara"),
+                            )
+                          ],
                         ),
-                        GestureDetector(
-                          child: Container(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                CircleAvatar(
-                                    radius: 35,
-                                    backgroundImage:
+                      ),
+                      onTap: () {},
+                    ),
+                    GestureDetector(
+                      child: Container(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            CircleAvatar(
+                                radius: 35,
+                                backgroundImage:
                                     AssetImage('images/chemistry.png')),
-                                SizedBox(height: 10),
-                                Text(
-                                  "SCIENCE",
-                                  style: TextStyle(
-                                      color: Colors.black,
-                                      fontSize: 15,
-                                      fontFamily: "Candara"),
-                                )
-                              ],
-                            ),
-                          ),
-                          onTap: () {},
+                            SizedBox(height: 10),
+                            Text(
+                              "SCIENCE",
+                              style: TextStyle(
+                                  color: Colors.black,
+                                  fontSize: 15,
+                                  fontFamily: "Candara"),
+                            )
+                          ],
                         ),
-                        GestureDetector(
-                          child: Container(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                CircleAvatar(
-                                    radius: 35,
-                                    backgroundImage:
+                      ),
+                      onTap: () {},
+                    ),
+                    GestureDetector(
+                      child: Container(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            CircleAvatar(
+                                radius: 35,
+                                backgroundImage:
                                     AssetImage('images/hindi.png')),
-                                SizedBox(height: 10),
-                                Text(
-                                  "HINDI",
-                                  style: TextStyle(
-                                      color: Colors.black,
-                                      fontSize: 15,
-                                      fontFamily: "Candara"),
-                                )
-                              ],
-                            ),
-                          ),
-                          onTap: () {},
+                            SizedBox(height: 10),
+                            Text(
+                              "HINDI",
+                              style: TextStyle(
+                                  color: Colors.black,
+                                  fontSize: 15,
+                                  fontFamily: "Candara"),
+                            )
+                          ],
                         ),
-                      ],
-                    )
-                ),
+                      ),
+                      onTap: () {},
+                    ),
+                  ],
+                )),
                 SizedBox(height: 7.5),
                 Container(
                   padding: EdgeInsets.all(5),
@@ -146,7 +144,7 @@ class _DashboardPageState extends State<DashboardPage> {
                               CircleAvatar(
                                   radius: 35,
                                   backgroundImage:
-                                  AssetImage('images/english.png')),
+                                      AssetImage('images/english.png')),
                               SizedBox(height: 10),
                               Text(
                                 "ENGLISH",
@@ -168,7 +166,7 @@ class _DashboardPageState extends State<DashboardPage> {
                               CircleAvatar(
                                   radius: 35,
                                   backgroundImage:
-                                  AssetImage('images/sst.png')),
+                                      AssetImage('images/sst.png')),
                               SizedBox(height: 10),
                               Text(
                                 "SST",
@@ -190,7 +188,7 @@ class _DashboardPageState extends State<DashboardPage> {
                               CircleAvatar(
                                   radius: 35,
                                   backgroundImage:
-                                  AssetImage('images/computer.png')),
+                                      AssetImage('images/computer.png')),
                               SizedBox(height: 10),
                               Text(
                                 "COMPUTER",
@@ -211,28 +209,41 @@ class _DashboardPageState extends State<DashboardPage> {
             ),
           ),
           Padding(
-            padding: const EdgeInsets.only(left: 20,right:20,top: 15,bottom: 10),
+            padding:
+                const EdgeInsets.only(left: 20, right: 20, top: 15, bottom: 10),
             child: SingleChildScrollView(
                 scrollDirection: Axis.horizontal,
-                child: Row(
-                    children: <Widget>[TextButton(onPressed: (){},child: Image.asset("images/ad.png",height: 100,width: 200)),
-                      TextButton(onPressed: (){},child: Image.asset("images/ad.png",height: 100,width: 200)),
-                      TextButton(onPressed: (){},child: Image.asset("images/ad.png",height: 100,width: 200)),
-                      TextButton(onPressed: (){},child: Image.asset("images/ad.png",height: 100,width: 200))
-
-                    ]
-                )
-            ),
+                child: Row(children: <Widget>[
+                  TextButton(
+                      onPressed: () {},
+                      child: Image.asset("images/ad.png",
+                          height: 100, width: 200)),
+                  TextButton(
+                      onPressed: () {},
+                      child: Image.asset("images/ad.png",
+                          height: 100, width: 200)),
+                  TextButton(
+                      onPressed: () {},
+                      child: Image.asset("images/ad.png",
+                          height: 100, width: 200)),
+                  TextButton(
+                      onPressed: () {},
+                      child:
+                          Image.asset("images/ad.png", height: 100, width: 200))
+                ])),
           ),
           Padding(
-            padding: const EdgeInsets.only(left: 25,right: 20,bottom: 5),
+            padding: const EdgeInsets.only(left: 25, right: 20, bottom: 5),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: <Widget>[
-                Text("ScoreCard",style: TextStyle(fontSize: 20,color: Colors.black,fontFamily: "Candara")),
+                Text("ScoreCard",
+                    style: TextStyle(
+                        fontSize: 20,
+                        color: Colors.black,
+                        fontFamily: "Candara")),
                 RaisedButton(
-                  onPressed: (){
-                    },
+                  onPressed: () {},
                   child: Text('Browse all mock tests',
                       style: TextStyle(
                           color: Colors.white,
@@ -250,7 +261,6 @@ class _DashboardPageState extends State<DashboardPage> {
             //height: 100,
             padding: EdgeInsets.only(left: 20, right: 20),
             child: Card(
-
               color: Colors.white,
               shadowColor: Colors.grey,
               borderOnForeground: true,
@@ -258,48 +268,84 @@ class _DashboardPageState extends State<DashboardPage> {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: <Widget>[
                   Container(
-                    padding: EdgeInsets.only(left:10, top: 10),
+                    padding: EdgeInsets.only(left: 10, top: 10),
                     child: Text(
                       "PRACTICE TESTS",
                       style: TextStyle(
-                          fontSize: 12, color: Colors.indigo, fontWeight:FontWeight.bold,fontFamily: "Candara"),
+                          fontSize: 12,
+                          color: Colors.indigo,
+                          fontWeight: FontWeight.bold,
+                          fontFamily: "Candara"),
                     ),
                   ),
                   Container(
-                    padding: EdgeInsets.only(left: 10, bottom:5),
+                    padding: EdgeInsets.only(left: 10, bottom: 5),
                     child: Text(
                       "Drive your competency",
                       style: TextStyle(
-                          fontFamily: "Candara", fontSize: 17.5, color: Colors.black),
+                          fontFamily: "Candara",
+                          fontSize: 17.5,
+                          color: Colors.black),
                     ),
                   ),
                   Padding(
-                    padding: const EdgeInsets.only(left: 15,right:15,top:5),
+                    padding: const EdgeInsets.only(left: 15, right: 15, top: 5),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: <Widget>[
-                        Text("Total Tests",style: TextStyle(fontWeight: FontWeight.bold,fontSize: 12,color: Colors.grey,fontFamily: "Candara")),
-                        Text("Pass In",style: TextStyle(fontWeight: FontWeight.bold,fontSize: 12,color: Colors.grey,fontFamily: "Candara")),
-                        Text("Re-Test",style: TextStyle(fontWeight: FontWeight.bold,fontSize: 12,color: Colors.grey,fontFamily: "Candara"))
+                        Text("Total Tests",
+                            style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 12,
+                                color: Colors.grey,
+                                fontFamily: "Candara")),
+                        Text("Pass In",
+                            style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 12,
+                                color: Colors.grey,
+                                fontFamily: "Candara")),
+                        Text("Re-Test",
+                            style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 12,
+                                color: Colors.grey,
+                                fontFamily: "Candara"))
                       ],
                     ),
                   ),
                   Padding(
-                    padding: const EdgeInsets.only(left: 20,right:20,top:5,bottom:10),
+                    padding: const EdgeInsets.only(
+                        left: 20, right: 20, top: 5, bottom: 10),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: <Widget>[
-                        Text("  5",style: TextStyle(fontWeight: FontWeight.bold,fontSize: 25,color: Colors.black,fontFamily: "Candara")),
-                        Text(" 4",style: TextStyle(fontWeight: FontWeight.bold,fontSize: 25,color: Colors.black,fontFamily: "Candara")),
-                        Text("1",style: TextStyle(fontWeight: FontWeight.bold,fontSize: 25,color: Colors.red,fontFamily: "Candara"))
+                        Text("  5",
+                            style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 25,
+                                color: Colors.black,
+                                fontFamily: "Candara")),
+                        Text(" 4",
+                            style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 25,
+                                color: Colors.black,
+                                fontFamily: "Candara")),
+                        Text("1",
+                            style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 25,
+                                color: Colors.red,
+                                fontFamily: "Candara"))
                       ],
                     ),
                   ),
                   Padding(
-                    padding: const EdgeInsets.only(left: 10,right: 10,bottom:10),
+                    padding:
+                        const EdgeInsets.only(left: 10, right: 10, bottom: 10),
                     child: RaisedButton(
-                      onPressed: (){
-                        },
+                      onPressed: () {},
                       child: Text('PRACTICE AGAIN',
                           style: TextStyle(
                               color: Colors.white,
@@ -316,30 +362,39 @@ class _DashboardPageState extends State<DashboardPage> {
             ),
           ),
           Padding(
-            padding: const EdgeInsets.only(left: 20,right:20,top: 15,bottom: 10),
+            padding:
+                const EdgeInsets.only(left: 20, right: 20, top: 15, bottom: 10),
             child: SingleChildScrollView(
                 scrollDirection: Axis.horizontal,
-                child: Row(
-                    children: <Widget>[TextButton(onPressed: (){},child: Image.asset("images/ad.png",height: 100,width: 200)),
-                      TextButton(onPressed: (){},child: Image.asset("images/ad.png",height: 100,width: 200)),
-                      TextButton(onPressed: (){},child: Image.asset("images/ad.png",height: 100,width: 200)),
-                      TextButton(onPressed: (){},child: Image.asset("images/ad.png",height: 100,width: 200))
-
-                    ]
-                )
-            ),
+                child: Row(children: <Widget>[
+                  TextButton(
+                      onPressed: () {},
+                      child: Image.asset("images/ad.png",
+                          height: 100, width: 200)),
+                  TextButton(
+                      onPressed: () {},
+                      child: Image.asset("images/ad.png",
+                          height: 100, width: 200)),
+                  TextButton(
+                      onPressed: () {},
+                      child: Image.asset("images/ad.png",
+                          height: 100, width: 200)),
+                  TextButton(
+                      onPressed: () {},
+                      child:
+                          Image.asset("images/ad.png", height: 100, width: 200))
+                ])),
           ),
-
         ],
       ),
     ),
     MaterialApp(
-        home: Scaffold(backgroundColor: Colors.white,
-          body: SafeArea(
-            child: coursepage(),
-          ),
-        )
-    ),
+        home: Scaffold(
+      backgroundColor: Colors.white,
+      body: SafeArea(
+        child: coursepage(),
+      ),
+    )),
     SingleChildScrollView(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -423,9 +478,9 @@ class _DashboardPageState extends State<DashboardPage> {
   }
 
   @override
-  void _initstate() async{
+  void _initstate() async {
     final prefs = await SharedPreferences.getInstance();
-    name=prefs.getString('name');
+    name = prefs.getString('name');
   }
 
   @override
@@ -446,7 +501,7 @@ class _DashboardPageState extends State<DashboardPage> {
       ),
       drawer: Drawer(
           elevation: 5,
-          child:  ListView(
+          child: ListView(
             // Important: Remove any padding from the ListView.
             padding: EdgeInsets.zero,
             children: [
@@ -469,17 +524,17 @@ class _DashboardPageState extends State<DashboardPage> {
                 title: const Text('Logout'),
                 onTap: () {
                   setState(() {
-                    userName="";
-                    userEmail="";
-                    userId=0;
-                    token="";
+                    userName = "";
+                    userEmail = "";
+                    userId = 0;
+                    token = "";
                   });
-                  Navigator.push(context,MaterialPageRoute(builder: (context)=>Login()));
+                  Navigator.push(context,
+                      MaterialPageRoute(builder: (context) => Login()));
                 },
               ),
             ],
-          )
-      ),
+          )),
       bottomNavigationBar: BottomNavigationBar(
           showUnselectedLabels: true,
           selectedItemColor: Colors.teal,
@@ -487,22 +542,22 @@ class _DashboardPageState extends State<DashboardPage> {
           items: const <BottomNavigationBarItem>[
             BottomNavigationBarItem(
                 icon: Icon(Icons.home_outlined, size: 30),
-                title: Text('Dashboard'),
+                label: 'Dashboard',
                 backgroundColor: Colors.white),
             BottomNavigationBarItem(
               icon: Icon(Icons.assignment_outlined, size: 30),
-              title: Text('Courses'),
+              label: 'Courses',
             ),
             BottomNavigationBarItem(
               icon: Icon(
                 Icons.school_outlined,
                 size: 30,
               ),
-              title: Text('Scholarship'),
+              label: 'Scholarship',
             ),
             BottomNavigationBarItem(
                 icon: Icon(Icons.notifications_active_outlined, size: 30),
-                title: Text('Exam Alert')),
+                label: 'Exam Alert'),
           ],
           type: BottomNavigationBarType.shifting,
           currentIndex: _selectedIndex,
@@ -514,5 +569,3 @@ class _DashboardPageState extends State<DashboardPage> {
     );
   }
 }
-
-

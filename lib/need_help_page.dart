@@ -1,49 +1,31 @@
-// ignore_for_file: prefer_const_constructors, must_be_immutable, camel_case_types, prefer_const_literals_to_create_immutables, unnecessary_this, non_constant_identifier_names, use_key_in_widget_constructors
-
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:learning_duniya/CategorySetting.dart';
+import 'package:learning_duniya/mentor.dart';
+
+late List<String> moc;
 
 class need_help_page extends StatefulWidget {
-  String name;
-  List items1, items2, category;
-
-  need_help_page(
-      {Key? key,
-      required this.name,
-      required this.items1,
-      required this.items2,
-      required this.category})
-      : super(key: key);
+  need_help_page(List<String> serviceList);
 
   @override
-  _needHelpPageState createState() =>
-      _needHelpPageState(name, items1, items2, category);
+  _needHelpPageState createState() => _needHelpPageState(serviceList);
 }
 
 class _needHelpPageState extends State<need_help_page> {
-  String name;
-  List items1, items2, category;
-  var itm1 = ['Cat 1', 'Cat 2', 'Cat 3', 'Cat 4', 'Cat 5'];
-  var itm2 = ['Opt 1', 'Opt 2', 'Opt 3', 'Opt 4', 'Opt 5'];
-  var cat = ['Cat 1', 'Cat 2', 'Cat 3'];
-
-  String userName = "User Name";
+  _needHelpPageState(List<String> serviceList);
   var selected = [''];
-
-  final catNew = [
-    CategorySetting(title: 'Cat 1'),
-    CategorySetting(title: 'Cat 2'),
-    CategorySetting(title: 'Cat 3'),
-  ];
-
   String? curValue1, curValue2;
 
-  _needHelpPageState(this.name, this.items1, this.items2, this.category);
+  final catNew = [
+    CategorySetting(title: 'Study'),
+    CategorySetting(title: 'Art & Entertainment'),
+    CategorySetting(title: 'Health & Fitness'),
+  ];
 
   @override
   Widget build(BuildContext context) {
     // TODO: implement build
+
     return Scaffold(
       appBar: AppBar(
         title: Text("Request Help"),
@@ -66,7 +48,7 @@ class _needHelpPageState extends State<need_help_page> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
                   Text(
-                    name,
+                    'userName',
                     style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                     textAlign: TextAlign.left,
                   ),
@@ -99,10 +81,19 @@ class _needHelpPageState extends State<need_help_page> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
-                  Text(
-                    "Mode Of Communication *",
-                    style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
-                    textAlign: TextAlign.left,
+                  Row(
+                    children: [
+                      Text(
+                        "Mode Of Communication ",
+                        style: TextStyle(
+                            fontSize: 15, fontWeight: FontWeight.bold),
+                        textAlign: TextAlign.left,
+                      ),
+                      Text(
+                        "*",
+                        style: TextStyle(color: Colors.red, fontSize: 18),
+                      ),
+                    ],
                   ),
                   DropdownButton<String>(
                     hint: Text(
@@ -110,17 +101,32 @@ class _needHelpPageState extends State<need_help_page> {
                       style: TextStyle(fontSize: 12),
                     ),
                     value: curValue1,
-                    items: itm1.map(buildMenuItem1).toList(),
+                    items: serviceList
+                        .map<DropdownMenuItem<String>>((String value) {
+                      return DropdownMenuItem<String>(
+                        value: value,
+                        child: Text(value),
+                      );
+                    }).toList(),
                     onChanged: (value) =>
                         setState(() => this.curValue1 = value),
                   ),
-                  Text(
-                    "Category Of Required Help *",
-                    style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
-                    textAlign: TextAlign.left,
+                  Row(
+                    children: [
+                      Text(
+                        "Category Of Required Help ",
+                        style: TextStyle(
+                            fontSize: 15, fontWeight: FontWeight.bold),
+                        textAlign: TextAlign.left,
+                      ),
+                      Text(
+                        "*",
+                        style: TextStyle(color: Colors.red, fontSize: 18),
+                      ),
+                    ],
                   ),
                   ...catNew.map(buildSingleCheckbox).toList(),
-                  DropdownButton<String>(
+                  /*DropdownButton<String>(
                     hint: Text(
                       "Comments",
                       style: TextStyle(
@@ -132,31 +138,56 @@ class _needHelpPageState extends State<need_help_page> {
                     items: itm2.map(buildMenuItem2).toList(),
                     onChanged: (value) =>
                         setState(() => this.curValue2 = value),
+                  ),*/
+                  Row(
+                    children: [
+                      Text("Comment",
+                          style: TextStyle(
+                            fontSize: 15,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black,
+                          )),
+                      Icon(Icons.arrow_drop_down,
+                          color: Colors.black, size: 30),
+                    ],
                   ),
+                  TextField(
+                    keyboardType: TextInputType.multiline,
+                    minLines: 1,
+                    maxLines: 5,
+                  )
                 ],
               ),
             ),
-            Container(
-              margin: const EdgeInsets.symmetric(horizontal: 10.0),
-              child: ElevatedButton(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: <Widget>[
-                    Text('Request Help '),
-                    Icon(
-                      Icons.arrow_forward,
-                      color: Colors.white,
-                    )
-                  ],
-                ),
-                onPressed: () async {
-                  Navigator.pop(context);
-                  final Future<ConfirmAction?> action =
-                      await _asyncConfirmDialog(context, userName, selected);
-                  print("Confirm Action $action");
-                },
-              ),
+            const SizedBox(
+              height: 10,
             ),
+            Container(
+                margin: const EdgeInsets.symmetric(horizontal: 10.0),
+                child: Align(
+                  alignment: Alignment.centerRight,
+                  child: ElevatedButton(
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      //crossAxisAlignment: CrossAxisAlignment.end,
+                      children: <Widget>[
+                        Text('Request Help '),
+                        Icon(
+                          Icons.arrow_forward_ios,
+                          color: Colors.white,
+                          size: 20,
+                        )
+                      ],
+                    ),
+                    onPressed: () async {
+                      Navigator.pop(context);
+                      final Future<ConfirmAction?> action =
+                          await _asyncConfirmDialog(
+                              context, 'userName', selected);
+                      print("Confirm Action $action");
+                    },
+                  ),
+                )),
             Divider(
               color: Color.fromARGB(255, 218, 217, 217),
               thickness: 2,
@@ -175,6 +206,11 @@ class _needHelpPageState extends State<need_help_page> {
           setState(() {
             final newValue = !catValue.value;
             catValue.value = newValue;
+            if (catValue.value != false) {
+              selected.add(catValue.title);
+            } else {
+              selected.remove(catValue.title);
+            }
           });
         },
       );
@@ -196,21 +232,6 @@ class _needHelpPageState extends State<need_help_page> {
             )),
       );
 
-  DropdownMenuItem<String> buildMenuItem1(String item) => DropdownMenuItem(
-        value: item.toString(),
-        child: Text(
-          item,
-          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
-        ),
-      );
-
-  DropdownMenuItem<String> buildMenuItem2(String item) => DropdownMenuItem(
-        value: item.toString(),
-        child: Text(
-          item,
-          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
-        ),
-      );
   setstate(Null Function() param0) {}
 }
 
@@ -225,7 +246,7 @@ Future<Future<ConfirmAction?>> _asyncConfirmDialog(
         //title: Text('Delete This Contact?'),
 
         title: Image.asset(
-          'assets/images/tick.png',
+          'images/tick.png',
           height: 50,
           width: 50,
         ),
