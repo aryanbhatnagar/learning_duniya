@@ -441,7 +441,7 @@ class _quizpageState extends State<quizpage> with TickerProviderStateMixin {
                           child: Container(
                             child: Column(children: [
                               Text(
-                                  "QUES: 1 of " +
+                                  "QUES: " + (j+1).toString() + " of " +
                                       que.data.questions.length.toString(),
                                   style: TextStyle(
                                       fontSize: 25,
