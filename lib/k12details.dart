@@ -1,9 +1,10 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
+import 'package:learning_duniya/courseDesc.dart';
 
 K12Api k12ApiFromJson(String str) => K12Api.fromJson(json.decode(str));
-
+String courseID="1";
 String k12ApiToJson(K12Api data) => json.encode(data.toJson());
 
 class K12Api {
@@ -151,22 +152,30 @@ class K12Detail {
     required this.id,
     required this.chapterName,
     required this.about,
+    required this.quiztime,
+    required this.video_count,
   });
 
   int id;
   String chapterName;
   dynamic about;
+  String quiztime;
+  int video_count;
 
   factory K12Detail.fromJson(Map<String, dynamic> json) => K12Detail(
     id: json["id"],
     chapterName: json["chapter_name"],
     about: json["about"],
+    quiztime: json["quiz_time"],
+    video_count: json["video_count"],
   );
 
   Map<String, dynamic> toJson() => {
     "id": id,
     "chapter_name": chapterName,
     "about": about ,
+    "quiz_time": quiztime,
+    "video_count":video_count,
   };
 }
 
@@ -188,16 +197,19 @@ Future<K12Api> createK12(String id) async {
 }
 
 class k12_det extends StatelessWidget {
-  const k12_det({Key? key}) : super(key: key);
+
+  String courseId;
+
+  k12_det(this.courseId); //const k12_det({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    courseID=courseId;
     return MaterialApp(
       home:k12detail()
     );
   }
 }
-
 
 class k12detail extends StatefulWidget {
   const k12detail({Key? key}) : super(key: key);
@@ -213,7 +225,7 @@ class _k12detailState extends State<k12detail> {
     Size size = MediaQuery.of(context).size;
     return Scaffold(
       body: FutureBuilder(
-        future: createK12("1"),
+        future: createK12(courseID),
         builder: (context, AsyncSnapshot<K12Api> snapshot) {
           if (snapshot.hasData) {
             K12Api? k12 = snapshot.data;
@@ -348,11 +360,13 @@ class _k12detailState extends State<k12detail> {
                             ),
 
                             SizedBox(height: 25),
-                            for(int i=0; i<3; i++)
+                            for(int i=0; i<k12.data.k12Details.length; i++)
 
                               GestureDetector(
                                 onTap: () {
-
+                                  Navigator.push(context, MaterialPageRoute(
+                                      builder: (context) =>
+                                          courseDesc(k12.data.k12Details[i].id.toString())));
                                 },
                                 child: Card(
                                   elevation: 5,
@@ -374,7 +388,7 @@ class _k12detailState extends State<k12detail> {
                                               ),
                                               Align(
                                                 alignment: Alignment.topLeft,
-                                                child: Text(k12.data.k12Details[i].about,
+                                                child: Text("Videos : ${k12.data.k12Details[i].video_count.toString()}",
                                                   style: TextStyle(fontFamily: "Candara",color: Colors.grey,
                                                       fontSize: 12),
                                                 ),
