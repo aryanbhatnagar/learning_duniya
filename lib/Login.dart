@@ -290,12 +290,9 @@ class _LoginPageState extends State<LoginPage> {
                                 userId=_log!.user.id;
                                 userName=_log!.user.name;
                                 userEmail=_log!.user.email;
-                                final prefs = await SharedPreferences.getInstance(); // set value
-                                prefs.setString('token', token);
-                                prefs.setInt('id', userId);
-                                prefs.setString('name', userName);
-                                prefs.setString('email', userEmail);
-
+                                SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+                                sharedPreferences.setString('token', _log!.token);
+                                sharedPreferences.setString('name', _log!.user.name);
                               Navigator.push(context,MaterialPageRoute(builder: (context)=>Dashboard()));
                             }
 

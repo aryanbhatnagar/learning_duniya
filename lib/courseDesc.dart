@@ -3,6 +3,8 @@ import 'package:favorite_button/favorite_button.dart';
 import 'package:group_button/group_button.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:learning_duniya/videoplayer.dart';
+import 'package:video_player/video_player.dart';
 import 'package:learning_duniya/quiz.dart';
 
 K12Chapter k12ChapterFromJson(String str) => K12Chapter.fromJson(json.decode(str));
@@ -229,11 +231,13 @@ class courseDescPage extends StatefulWidget {
 }
 
 class _courseDescPageState extends State<courseDescPage> {
+  bool curr_vis=true,mcq_vis=false;
+  List<bool> isSelected = List.generate(2, (index) => false);
   @override
   Widget build(BuildContext context) {
     Size size =MediaQuery.of(context).size;
     final controller = GroupButtonController();
-    List<bool> isSelected=[false,false,false];
+
 
     return Scaffold(
       body: FutureBuilder(
@@ -313,73 +317,116 @@ class _courseDescPageState extends State<courseDescPage> {
                             ),
 
                             SizedBox(height: 25),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                SizedBox(width: 10,),
-                                Text("Curriculum",style: TextStyle(fontSize: 22,fontFamily: "Candara",color: Colors.black)),
-                                Center(
-                                  child: RaisedButton(
-                                    onPressed: (){
-                                      Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                              builder: (context) => quiz(1)));
-                                    },
-                                    child: Text('MCQ',
-                                        style: TextStyle(
-                                            color: Colors.white,
-                                            fontSize: 30.0,
-                                            fontFamily: "Candara")),
-                                    color: Colors.deepOrange,
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(5.0),
-                                    ),
-                                  ),
-                                ),
-                                SizedBox(width: 20,),
-                              ],
-                            ),
-                            SizedBox(height: 10),
-                            for(int i=0; i<k12.data.videos.length; i++)
-                              GestureDetector(
-                                onTap: () {
-
+                            Center(
+                              child: ToggleButtons(
+                                children: <Widget>[
+                                  Text(" Curriculum ",style: TextStyle(fontSize: 27,fontFamily: "Candara",color: Colors.black)),
+                                  Text(" MCQ ",style: TextStyle(fontSize: 27,fontFamily: "Candara",color: Colors.black)),
+                                ],
+                                selectedBorderColor: Colors.teal,
+                                selectedColor: Colors.white,
+                                borderColor: Colors.transparent,
+                                borderRadius: BorderRadius.circular(10),
+                                disabledColor: Colors.transparent,
+                                disabledBorderColor: Colors.transparent,
+                                focusColor: Colors.teal,
+                                fillColor: Colors.teal,
+                                onPressed: (int index) {
+                                  setState(() {
+                                    for (int buttonIndex = 0; buttonIndex < isSelected.length; buttonIndex++) {
+                                      if (buttonIndex == index) {
+                                        isSelected[buttonIndex] = true;
+                                      } else {
+                                        isSelected[buttonIndex] = false;
+                                      }
+                                      if(index==0)
+                                        {
+                                          curr_vis=true;
+                                          mcq_vis=false;
+                                        }
+                                      if(index==1)
+                                      {
+                                        curr_vis=false;
+                                        mcq_vis=true;
+                                      }
+                                    }
+                                  });
                                 },
-                                child: Card(
-                                  elevation: 5,
-                                  child: Container(
-                                    padding: EdgeInsets.all(8),
-                                    child: Row(
-                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        Flexible(
-                                          child: Column(
-                                            mainAxisAlignment: MainAxisAlignment.start,
-                                            children: <Widget>[
-                                              Align(
-                                                alignment: Alignment.topLeft,
-                                                child: Text(k12.data.videos[i].title,
-                                                  style: TextStyle(fontFamily: "Candara",
-                                                      fontSize: 15),
+                                isSelected: isSelected,
+                              ),
+                            ),
+
+                            SizedBox(height: 10),
+                            Visibility(
+                              visible: curr_vis,
+                              child: Column(
+                                children: [
+                                  for(int i=0; i<k12.data.videos.length; i++)
+                                    GestureDetector(
+                                      onTap: () {
+                                        Navigator.push(context, MaterialPageRoute(
+                                            builder: (context) =>
+                                                video(k12.data.videos[i].url,k12.data.videos[i].title)));
+                                      },
+                                      child: Card(
+                                        elevation: 5,
+                                        child: Container(
+                                          padding: EdgeInsets.all(8),
+                                          child: Row(
+                                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              Flexible(
+                                                child: Column(
+                                                  mainAxisAlignment: MainAxisAlignment.start,
+                                                  children: <Widget>[
+                                                    Align(
+                                                      alignment: Alignment.topLeft,
+                                                      child: Text(k12.data.videos[i].title,
+                                                        style: TextStyle(fontFamily: "Candara",
+                                                            fontSize: 15),
+                                                      ),
+                                                    ),
+                                                    Align(
+                                                      alignment: Alignment.topLeft,
+                                                      child: Text("Video",
+                                                        style: TextStyle(fontFamily: "Candara",color: Colors.grey,
+                                                            fontSize: 12),
+                                                      ),
+                                                    )
+                                                  ],
                                                 ),
                                               ),
-                                              Align(
-                                                alignment: Alignment.topLeft,
-                                                child: Text("Video",
-                                                  style: TextStyle(fontFamily: "Candara",color: Colors.grey,
-                                                      fontSize: 12),
-                                                ),
-                                              )
+                                              Icon(Icons.play_arrow_rounded, color: Colors.green, size: 30)
                                             ],
                                           ),
                                         ),
-                                        Icon(Icons.play_arrow_rounded, color: Colors.green, size: 30)
-                                      ],
+                                      ),
                                     ),
+                                ],
+                              ),
+                            ),
+                            Visibility(
+                              visible: mcq_vis,
+                              child: Center(
+                                child: RaisedButton(
+                                  onPressed: (){
+                                    Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) => quiz(1)));
+                                  },
+                                  child: Text('MCQ',
+                                      style: TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 30.0,
+                                          fontFamily: "Candara")),
+                                  color: Colors.deepOrange,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(5.0),
                                   ),
                                 ),
                               ),
+                            ),
 
 
 

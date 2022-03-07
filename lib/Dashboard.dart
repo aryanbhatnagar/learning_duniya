@@ -23,9 +23,7 @@ class DashboardPage extends StatefulWidget {
   _DashboardPageState createState() => _DashboardPageState();
 }
 
-final Future<SharedPreferences> prefs = SharedPreferences.getInstance();
-String? name;
-
+late String name="";
 class _DashboardPageState extends State<DashboardPage> {
   int _selectedIndex = 0;
   List<Widget> add = [];
@@ -38,7 +36,7 @@ class _DashboardPageState extends State<DashboardPage> {
           Container(
             padding: EdgeInsets.only(left: 25, top: 10),
             child: Text(
-              'Hi ${userName}',
+              'Hi $name',
               style: TextStyle(
                   fontSize: 17.5, color: Colors.black, fontFamily: "Candara"),
             ),
@@ -478,9 +476,10 @@ class _DashboardPageState extends State<DashboardPage> {
   }
 
   @override
-  void _initstate() async {
-    final prefs = await SharedPreferences.getInstance();
-    name = prefs.getString('name');
+  void _initState() async {
+    SharedPreferences sharedPreferences= await SharedPreferences.getInstance();
+    sharedPreferences.getString('token');
+    name=sharedPreferences.getString('name')!;
   }
 
   @override
@@ -523,11 +522,14 @@ class _DashboardPageState extends State<DashboardPage> {
               ListTile(
                 title: const Text('Logout'),
                 onTap: () {
-                  setState(() {
+                  setState(() async {
                     userName = "";
                     userEmail = "";
                     userId = 0;
                     token = "";
+                    SharedPreferences sharedPreferences= await SharedPreferences.getInstance();
+                    sharedPreferences.remove('token');
+                    sharedPreferences.remove('name');
                   });
                   Navigator.push(context,
                       MaterialPageRoute(builder: (context) => Login()));

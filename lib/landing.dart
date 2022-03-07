@@ -968,10 +968,13 @@ class _landingPageState extends State<landingPage> {
                                                             .spaceBetween,
                                                         children: [
                                                           Flexible(
-                                                            child: Text(k12_obj!.data1.k12[i].courseName,
+                                                            child: Text("${k12_obj!.data1.k12[i].courseName}                       .",
                                                                 style: TextStyle(fontSize: 15,
                                                                     fontFamily: "Candara",
-                                                                    color: Colors.black)),
+                                                                    color: Colors.black),
+                                                              maxLines: 2,
+                                                              overflow: TextOverflow.ellipsis,
+                                                            ),
                                                           ),
                                                           //IconButton(onPressed: (){  }, icon: Icon(Icons.favorite_outline,size: 15),color: Colors.grey,)
 
