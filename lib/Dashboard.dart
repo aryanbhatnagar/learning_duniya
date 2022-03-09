@@ -1,10 +1,12 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:learning_duniya/sharedPreferences.dart';
 import 'Login.dart';
-import 'main.dart';
+import 'globals.dart';
 import 'courses.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+SharedPref s = SharedPref();
 class Dashboard extends StatelessWidget {
   const Dashboard({Key? key}) : super(key: key);
 
@@ -25,8 +27,15 @@ class DashboardPage extends StatefulWidget {
 
 late String name="";
 class _DashboardPageState extends State<DashboardPage> {
+
+  getloginDetails() async {
+
+    }
+
   int _selectedIndex = 0;
   List<Widget> add = [];
+
+
 
   static List<Widget> _widgetOptions = <Widget>[
     SingleChildScrollView(
@@ -36,7 +45,7 @@ class _DashboardPageState extends State<DashboardPage> {
           Container(
             padding: EdgeInsets.only(left: 25, top: 10),
             child: Text(
-              'Hi $name',
+              'Hi $userName',
               style: TextStyle(
                   fontSize: 17.5, color: Colors.black, fontFamily: "Candara"),
             ),
@@ -402,7 +411,7 @@ class _DashboardPageState extends State<DashboardPage> {
             height: 100,
             padding: EdgeInsets.only(left: 30, right: 30, top: 10),
             child: Card(
-              color: Colors.blue,
+              color: Colors.orange,
               shadowColor: Colors.grey,
             ),
           ),
@@ -412,7 +421,7 @@ class _DashboardPageState extends State<DashboardPage> {
             height: 100,
             padding: EdgeInsets.only(left: 30, right: 30, top: 10),
             child: Card(
-              color: Colors.blue,
+              color: Colors.orange,
               shadowColor: Colors.grey,
             ),
           ),
@@ -422,7 +431,7 @@ class _DashboardPageState extends State<DashboardPage> {
             height: 100,
             padding: EdgeInsets.only(left: 30, right: 30, top: 10),
             child: Card(
-              color: Colors.blue,
+              color: Colors.orange,
               shadowColor: Colors.grey,
             ),
           ),
@@ -476,14 +485,16 @@ class _DashboardPageState extends State<DashboardPage> {
   }
 
   @override
-  void _initState() async {
-    SharedPreferences sharedPreferences= await SharedPreferences.getInstance();
-    sharedPreferences.getString('token');
-    name=sharedPreferences.getString('name')!;
+  Future<void> _initState() async {
+    super.initState();
+    getloginDetails();
+    build(context);
+
   }
 
-  @override
+
   Widget build(BuildContext context) {
+
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.white70,
@@ -522,14 +533,11 @@ class _DashboardPageState extends State<DashboardPage> {
               ListTile(
                 title: const Text('Logout'),
                 onTap: () {
-                  setState(() async {
+                  setState(()  {
                     userName = "";
                     userEmail = "";
                     userId = 0;
                     token = "";
-                    SharedPreferences sharedPreferences= await SharedPreferences.getInstance();
-                    sharedPreferences.remove('token');
-                    sharedPreferences.remove('name');
                   });
                   Navigator.push(context,
                       MaterialPageRoute(builder: (context) => Login()));

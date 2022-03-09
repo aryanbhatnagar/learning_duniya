@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:favorite_button/favorite_button.dart';
+import 'package:learning_duniya/Dashboard.dart';
 import 'package:learning_duniya/assessment.dart';
 import 'package:learning_duniya/courseDesc.dart';
 import 'package:learning_duniya/k12details.dart';
@@ -12,6 +13,8 @@ import 'package:learning_duniya/seeall.dart';
 import 'package:toggle_switch/toggle_switch.dart';
 import 'Login.dart';
 import 'package:http/http.dart' as http;
+
+import 'globals.dart';
 
 K12Card k12CardFromJson(String str) => K12Card.fromJson(json.decode(str));
 String k12CardToJson(K12Card data) => json.encode(data.toJson());
@@ -1395,8 +1398,13 @@ class _landingPageState extends State<landingPage> {
           //centerTitle: true,
           actions: <IconButton>[
             IconButton(onPressed: () {
+              if(token=="")
               Navigator.push(
                   context, MaterialPageRoute(builder: (context) => Login()));
+              else{
+                print(userName);
+                Navigator.push(
+                    context, MaterialPageRoute(builder: (context) => Dashboard()));}
             }, icon: Icon(Icons.person, color: Colors.white, size: 30))
           ],
           title: Container(

@@ -3,6 +3,8 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:favorite_button/favorite_button.dart';
 import 'package:http/http.dart' as http;
+import 'package:learning_duniya/Login.dart';
+import 'globals.dart';
 import 'need_help_page.dart';
 
 Mentor mentorFromJson(String str) => Mentor.fromJson(json.decode(str));
@@ -354,6 +356,7 @@ class _mentorpageState extends State<mentorpage> {
                                                           child: RaisedButton(
                                                             padding: EdgeInsets.zero,
                                                             onPressed: () {
+                                                              if(token!=""){
                                                               Navigator.push(
                                                                 context,
                                                                 MaterialPageRoute(
@@ -403,9 +406,14 @@ class _mentorpageState extends State<mentorpage> {
                                                                 serviceList);*/
                                                                     return need_help_page(
                                                                         serviceList);
-                                                                  },
+                                                                    }
+                                                                  ,
                                                                 ),
                                                               );
+                                                            }
+                                                              else
+                                                                Navigator.push(
+                                                                    context, MaterialPageRoute(builder: (context) => Login()));
                                                             },
                                                             color: Colors.lightBlue,
                                                             child: (Text("Start",
@@ -424,170 +432,13 @@ class _mentorpageState extends State<mentorpage> {
                                               ],
                                             ),
                                           ),
-/*Card(
-                          shape: RoundedRectangleBorder(
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(10))),
-                          elevation: 5,
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: <Widget>[
-                              //Center(child: Image(image: AssetImage("images/sci.jfif"),height: 120,width: 150)),
-                              Container(
-                                decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(10),
-                                    color: Colors.grey),
-                                width: 175,
-                                child: Padding(
-                                  padding: const EdgeInsets.all(10),
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text("Course Title",
-                                          style: TextStyle(
-                                              fontSize: 20,
-                                              fontFamily: "Candara",
-                                              color: Colors.black)),
-                                      Text("23 min- 4 parts",
-                                          style: TextStyle(
-                                              fontSize: 17,
-                                              fontFamily: "Candara",
-                                              color: Colors.white)),
-                                      SizedBox(height: 10),
-                                      Center(
-                                        child: RaisedButton(
-                                          padding: EdgeInsets.zero,
-                                          onPressed: () {},
-                                          color: Colors.teal,
-                                          child: (Text("Start",
-                                              style: TextStyle(
-                                                  fontSize: 15,
-                                                  fontFamily: "Candara",
-                                                  color: Colors.white))),
-                                        ),
-                                      )
-                                    ],
-                                  ),
-                                ),
-                              )
-                            ],
-                          ),
-                        ),*/
+
                                         ],
                                       ),
                                     ),
                                   ),
                                 ),
                               SizedBox(height: 10),
-                              /*SingleChildScrollView(
-                    scrollDirection: Axis.vertical,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: <Widget>[
-                        Card(
-                          shape: RoundedRectangleBorder(
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(10))),
-                          elevation: 5,
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: <Widget>[
-                              //Center(child: Image(image: AssetImage("images/sci.jfif"),height: 120,width: 150)),
-                              Container(
-                                decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(10),
-                                    color: Colors.grey),
-                                width: 175,
-                                child: Padding(
-                                  padding: const EdgeInsets.all(10),
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text("Course Title",
-                                          style: TextStyle(
-                                              fontSize: 20,
-                                              fontFamily: "Candara",
-                                              color: Colors.black)),
-                                      Text("23 min- 4 parts",
-                                          style: TextStyle(
-                                              fontSize: 17,
-                                              fontFamily: "Candara",
-                                              color: Colors.white)),
-                                      SizedBox(height: 10),
-                                      Center(
-                                        child: RaisedButton(
-                                          padding: EdgeInsets.zero,
-                                          onPressed: () {},
-                                          color: Colors.teal,
-                                          child: (Text("Start",
-                                              style: TextStyle(
-                                                  fontSize: 15,
-                                                  fontFamily: "Candara",
-                                                  color: Colors.white))),
-                                        ),
-                                      )
-                                    ],
-                                  ),
-                                ),
-                              )
-                            ],
-                          ),
-                        ),
-                        Card(
-                          shape: RoundedRectangleBorder(
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(10))),
-                          elevation: 5,
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: <Widget>[
-                              //Center(child: Image(image: AssetImage("images/sci.jfif"),height: 120,width: 150)),
-                              Container(
-                                decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(10),
-                                    color: Colors.grey),
-                                width: 175,
-                                child: Padding(
-                                  padding: const EdgeInsets.all(10),
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text("Course Title",
-                                          style: TextStyle(
-                                              fontSize: 20,
-                                              fontFamily: "Candara",
-                                              color: Colors.black)),
-                                      Text("23 min- 4 parts",
-                                          style: TextStyle(
-                                              fontSize: 17,
-                                              fontFamily: "Candara",
-                                              color: Colors.white)),
-                                      SizedBox(height: 10),
-                                      Center(
-                                        child: RaisedButton(
-                                          padding: EdgeInsets.zero,
-                                          onPressed: () {},
-                                          color: Colors.teal,
-                                          child: (Text("Start",
-                                              style: TextStyle(
-                                                  fontSize: 15,
-                                                  fontFamily: "Candara",
-                                                  color: Colors.white))),
-                                        ),
-                                      )
-                                    ],
-                                  ),
-                                ),
-                              )
-                            ],
-                          ),
-                        )
-                      ],
-                    ),
-                  ),*/
                             ],
                           )),
                     ),
@@ -605,5 +456,3 @@ class _mentorpageState extends State<mentorpage> {
         ));
   }
 }
-
-/**/

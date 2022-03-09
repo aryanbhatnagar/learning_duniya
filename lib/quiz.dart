@@ -1,5 +1,7 @@
 // ignore_for_file: deprecated_member_use
 
+import 'dart:io';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_countdown_timer/countdown_timer_controller.dart';
@@ -9,6 +11,7 @@ import 'package:http/http.dart' as http;
 import 'dart:async';
 import 'package:flutter_countdown_timer/flutter_countdown_timer.dart';
 import 'package:group_button/group_button.dart';
+import 'package:learning_duniya/trial.dart';
 import 'package:video_player/video_player.dart';
 
 import 'dart:convert';
@@ -240,34 +243,34 @@ class quizpage extends StatefulWidget {
 }
 
 class _quizpageState extends State<quizpage> with TickerProviderStateMixin {
-  int qnum = 0;
 
+  int qnum = 0;
   int score = 0;
 
-  List<String> question = [
-    'You can lead a cow down stairs but not up stairs.',
-    'Approximately one quarter of human bones are in the feet.',
-    'A slug\'s blood is green.'
-  ];
+  //late AnimationController controller;
+  //bool isPlaying = false;
 
-  late AnimationController controller;
-
-  bool isPlaying = false;
   bool buttonState = true;
   bool quesState = false;
+  bool prevVis = false;
+  bool nextVis = true;
+  bool submitVis = false;
 
-  var answers = [''];
+  var answers = [];
   int j = 0;
 
+  late String data1, data2, data3, data4, data5, data6, data7;
+
+  /*
   String get countText {
     Duration count = controller.duration! * controller.value;
     return controller.isDismissed
         ? '${controller.duration!.inHours}:${(controller.duration!.inMinutes % 60).toString().padLeft(2, '0')}:${(controller.duration!.inSeconds % 60).toString().padLeft(2, '0')}'
         : '${count.inHours}:${(count.inMinutes % 60).toString().padLeft(2, '0')}:${(count.inSeconds % 60).toString().padLeft(2, '0')}';
-  }
+  }*/
 
   double progress = 1.0;
-
+  /*
   @override
   void initState() {
     super.initState();
@@ -290,9 +293,13 @@ class _quizpageState extends State<quizpage> with TickerProviderStateMixin {
       }
     });
   }
+  */
 
   @override
   Widget build(BuildContext context) {
+    List quizInputData = [];
+    List allQuizData = [];
+
     Size size = MediaQuery.of(context).size;
     final controllerr = GroupButtonController();
 
@@ -310,7 +317,15 @@ class _quizpageState extends State<quizpage> with TickerProviderStateMixin {
           builder: (context, AsyncSnapshot<Questions> snapshot) {
             if (snapshot.hasData) {
               Questions? que = snapshot.data;
-              print(snapshot.data);
+              debugPrint(snapshot.data.toString());
+
+              var nof = que?.data.questions.length;
+              quizInputData = ['', '', '', ''];
+              for(var sampleIndex = 0; sampleIndex< nof!; sampleIndex) {
+                allQuizData.add(quizInputData);
+              }
+
+              debugPrint(nof.toString() + ' Number of questions');
 
               return Stack(
                 children: [
@@ -355,6 +370,7 @@ class _quizpageState extends State<quizpage> with TickerProviderStateMixin {
                               Row(
                                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: [
+                                  /*
                                   Center(
                                     child: Container(
                                       child: Stack(
@@ -373,7 +389,7 @@ class _quizpageState extends State<quizpage> with TickerProviderStateMixin {
                                         ],
                                       ),
                                     ),
-                                  ),
+                                  ),*/
                                   Center(
                                     child: Padding(
                                       padding: const EdgeInsets.symmetric(
@@ -406,12 +422,12 @@ class _quizpageState extends State<quizpage> with TickerProviderStateMixin {
                                                 ),
                                               ),
                                               onPressed: () {
-                                                controller.reverse(
+                                                /*controller.reverse(
                                                     from: controller.value == 0
                                                         ? 1.0
-                                                        : controller.value);
+                                                        : controller.value);*/
                                                 setState(() {
-                                                  isPlaying = true;
+                                                  //isPlaying = true;
                                                   buttonState = !buttonState;
                                                   quesState = !quesState;
                                                 });
@@ -469,8 +485,20 @@ class _quizpageState extends State<quizpage> with TickerProviderStateMixin {
                                           ],
                                           onSelected: (i, selected) {
                                             debugPrint('Button #$i $selected');
-                                            answers.add(i.toString());
-                                            debugPrint(answers.toString());
+                                            //answers.add(i.toString());
+                                            //debugPrint(answers.toString());
+
+                                            data1 = que.data.questions[j].id.toString();
+                                            data2 = (i+1).toString();
+                                            data3 = que.data.questions[j].ans.toString();
+                                            if(i+1 == que.data.questions[j].ans)
+                                              data4 = 'true';
+                                            else
+                                              data4 = 'false';
+
+                                            //allQuizData.add(quizInputData);
+                                            //debugPrint(quizInputData.toString());
+                                            //debugPrint(allQuizData.toString());
                                           },
                                           selectedTextStyle: const TextStyle(
                                               fontFamily: "Candara",
@@ -493,6 +521,7 @@ class _quizpageState extends State<quizpage> with TickerProviderStateMixin {
                                           borderRadius: BorderRadius.circular(10.0)),
                                       SizedBox(height: 20),
                                       Container(
+
                                         child: Row(
                                           mainAxisAlignment:
                                           MainAxisAlignment.spaceBetween,
@@ -503,27 +532,91 @@ class _quizpageState extends State<quizpage> with TickerProviderStateMixin {
                                                     j -= 1;
                                                   else
                                                     debugPrint("No Previous Question");
+
+                                                  allQuizData.removeLast();
+                                                  debugPrint(allQuizData.toString());
+
+                                                  setState(() {
+                                                    if(j == 0)
+                                                      prevVis = false;
+                                                    else
+                                                      prevVis = true;
+
+                                                  });
                                                 },
-                                                child: Text("<< PREV",
-                                                    style: TextStyle(
-                                                        fontSize: 25,
-                                                        fontFamily: "Candara",
-                                                        color: Colors.grey))),
+                                                child: Visibility(
+                                                  visible: prevVis,
+                                                  child: Text("<< PREV",
+                                                      style: TextStyle(
+                                                          fontSize: 25,
+                                                          fontFamily: "Candara",
+                                                          color: Colors.grey)),
+                                                )),
                                             GestureDetector(
                                                 onTap: () {
                                                   if (j !=
-                                                      que.data.questions.length - 1)
+                                                      que.data.questions.length - 1){
                                                     j += 1;
+                                                    debugPrint('Question Number: ' + j.toString());
+
+                                                  }
+
                                                   else {
                                                     debugPrint(
                                                         "Max Number of Questions");
                                                   }
+
+                                                  quizInputData = [data1, data2, data3, data4];
+                                                  allQuizData[j-1] = quizInputData;
+
+                                                  debugPrint(quizInputData.toString());
+                                                  debugPrint(allQuizData.toString());
+
+                                                  /*quizInputData.add(data1);
+                                                  quizInputData.add(data2);
+                                                  quizInputData.add(data3);
+                                                  quizInputData.add(data4);*/
+
+                                                  //allQuizData.add(quizInputData);
+                                                  //debugPrint(allQuizData.toString());
+/*
+                                                  quizInputData.removeLast();
+                                                  quizInputData.removeLast();
+                                                  quizInputData.removeLast();
+                                                  quizInputData.removeLast();
+*/
+                                                  //debugPrint(allQuizData.toString());
+
+                                                  setState(() {
+                                                    if(j == 0)
+                                                      prevVis = false;
+                                                    else
+                                                      prevVis = true;
+
+                                                  });
+
+                                                  //debugPrint((j).toString() + '/' + (nof).toString());
+
+                                                  /*if(j+1 == nof+1){
+
+                                                    debugPrint((j+1).toString() + '/' + (nof+1).toString());
+
+                                                    Navigator.of(context).push(MaterialPageRoute(builder: (context) => trial(
+                                                      name: 'Kush',
+                                                      email: 'Kush',
+                                                      phone: '467874132465',
+                                                      quizAllData: allQuizData,
+                                                    )));
+                                                  }*/
                                                 },
-                                                child: Text("NEXT >>",
-                                                    style: TextStyle(
-                                                        fontSize: 25,
-                                                        fontFamily: "Candara",
-                                                        color: Colors.grey))),
+                                                child: Visibility(
+                                                  visible: nextVis,
+                                                  child: Text( que.data.questions.length == j+1 ? "SUBMIT >>" : "NEXT >>",
+                                                      style: TextStyle(
+                                                          fontSize: 25,
+                                                          fontFamily: "Candara",
+                                                          color: Colors.grey)),
+                                                )),
                                           ],
                                         ),
                                       )

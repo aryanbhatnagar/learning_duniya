@@ -53,12 +53,8 @@ class Data {
 
 class K12 {
   K12({
-    required this.id,
-    required this.boardId,
-    required this.subjectId,
-    required this.classId,
+
     required this.courseName,
-    required this.img,
     required this.formalName,
     required this.syllabus,
     required this.description,
@@ -66,45 +62,23 @@ class K12 {
     required this.language,
     required this.price,
     required this.salePrice,
-    required this.onSale,
-    required this.featured,
-    required this.status,
-    required this.school,
-    required this.createdBy,
-    required this.updatedBy,
-    required this.createdAt,
-    required this.updatedAt,
+
   });
 
-  int id;
-  int boardId;
-  int subjectId;
-  int classId;
-  String courseName;
-  String img;
-  String formalName;
-  String syllabus;
-  String description;
-  int lifespan;
-  String language;
-  int price;
-  int salePrice;
-  int onSale;
-  int featured;
-  String status;
-  int school;
-  int createdBy;
-  int updatedBy;
-  dynamic createdAt;
-  dynamic updatedAt;
+
+   String courseName;
+   String formalName;
+   String syllabus;
+   String description;
+   int lifespan;
+   String language;
+   int price;
+   int salePrice;
+
 
   factory K12.fromJson(Map<String, dynamic> json) => K12(
-    id: json["id"],
-    boardId: json["board_id"],
-    subjectId: json["subject_id"],
-    classId: json["class_id"],
+
     courseName: json["course_name"],
-    img: json["img"],
     formalName: json["formal_name"],
     syllabus: json["syllabus"],
     description: json["description"],
@@ -112,23 +86,12 @@ class K12 {
     language: json["language"],
     price: json["price"],
     salePrice: json["sale_price"],
-    onSale: json["on_sale"],
-    featured: json["featured"],
-    status: json["status"],
-    school: json["school"],
-    createdBy: json["created_by"],
-    updatedBy: json["updated_by"],
-    createdAt: json["created_at"],
-    updatedAt: json["updated_at"],
+
   );
 
   Map<String, dynamic> toJson() => {
-    "id": id,
-    "board_id": boardId,
-    "subject_id": subjectId,
-    "class_id": classId,
+
     "course_name": courseName,
-    "img": img,
     "formal_name": formalName,
     "syllabus": syllabus,
     "description": description,
@@ -136,14 +99,6 @@ class K12 {
     "language": language,
     "price": price,
     "sale_price": salePrice,
-    "on_sale": onSale,
-    "featured": featured,
-    "status": status,
-    "school": school,
-    "created_by": createdBy,
-    "updated_by": updatedBy,
-    "created_at": createdAt,
-    "updated_at": updatedAt,
   };
 }
 
@@ -311,7 +266,7 @@ class _k12detailState extends State<k12detail> {
                                             fontSize: 20,
                                             fontFamily: "Candara",
                                             color: Colors.black)),
-                                    Text(k12.data.k12.status,
+                                    Text(k12.data.k12.lifespan.toString(),
                                         style: TextStyle(
                                             fontSize: 20,
                                             fontFamily: "Candara",
@@ -322,7 +277,7 @@ class _k12detailState extends State<k12detail> {
                                             fontSize: 20,
                                             fontFamily: "Candara",
                                             color: Colors.black)),
-                                    Text(k12.data.k12.id.toString(),
+                                    Text(k12.data.k12.language.toString(),
                                         style: TextStyle(
                                             fontSize: 20,
                                             fontFamily: "Candara",
@@ -338,7 +293,7 @@ class _k12detailState extends State<k12detail> {
                                             fontSize: 20,
                                             fontFamily: "Candara",
                                             color: Colors.black)),
-                                    Text(k12.data.k12.classId.toString(),
+                                    Text(k12.data.k12.price.toString(),
                                         style: TextStyle(
                                             fontSize: 20,
                                             fontFamily: "Candara",
@@ -349,7 +304,7 @@ class _k12detailState extends State<k12detail> {
                                             fontSize: 20,
                                             fontFamily: "Candara",
                                             color: Colors.black)),
-                                    Text(k12.data.k12.boardId.toString(),
+                                    Text(k12.data.k12.salePrice.toString(),
                                         style: TextStyle(
                                             fontSize: 20,
                                             fontFamily: "Candara",

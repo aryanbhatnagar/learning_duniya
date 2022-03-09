@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:learning_duniya/Login.dart';
 import 'package:http/http.dart' as http;
 import 'main.dart';
+import 'globals.dart';
 
 
 

@@ -7,6 +7,9 @@ import 'package:learning_duniya/videoplayer.dart';
 import 'package:video_player/video_player.dart';
 import 'package:learning_duniya/quiz.dart';
 
+import 'Login.dart';
+import 'globals.dart';
+
 K12Chapter k12ChapterFromJson(String str) => K12Chapter.fromJson(json.decode(str));
 String chapid="";
 String k12ChapterToJson(K12Chapter data) => json.encode(data.toJson());
@@ -57,7 +60,7 @@ class Data {
 
 class ChapterDetails {
   ChapterDetails({
-    required this.id,
+     required this.id,
     required this.bookId,
     required this.chapterName,
     required this.mediaFile,
@@ -83,13 +86,13 @@ class ChapterDetails {
     required this.pdfFileName1,
   });
 
-  int id;
-  int bookId;
-  String chapterName;
-  String mediaFile;
-  dynamic fileName;
-  String about;
-  String syllabus;
+   int id;
+   int bookId;
+   String chapterName;
+   String mediaFile;
+   dynamic fileName;
+   String about;
+   String syllabus;
   String description;
   int lifespan;
   String language;
@@ -364,9 +367,14 @@ class _courseDescPageState extends State<courseDescPage> {
                                   for(int i=0; i<k12.data.videos.length; i++)
                                     GestureDetector(
                                       onTap: () {
+                                        if(token!="")
+                                          {
                                         Navigator.push(context, MaterialPageRoute(
                                             builder: (context) =>
-                                                video(k12.data.videos[i].url,k12.data.videos[i].title)));
+                                                video(k12.data.videos[i].url,k12.data.videos[i].title)));}
+                                        else
+                                          Navigator.push(
+                                              context, MaterialPageRoute(builder: (context) => Login()));
                                       },
                                       child: Card(
                                         elevation: 5,
