@@ -52,7 +52,7 @@ class Data {
 
   String educatorId;
   int userId;
-  String category;
+  var category;
   String modeCommunication;
   String message;
   dynamic updatedAt;
@@ -273,7 +273,11 @@ class _needHelpPageState extends State<need_help_page> {
                       //Icon(Icons.arrow_drop_down,color: Colors.black, size: 30),
                     ],
                   ),
-                  TextField(
+                  TextFormField(
+                    validator: (input) {
+                      if (input!.isEmpty)
+                        return 'Enter comment';
+                    },
                     controller: comment,
                     keyboardType: TextInputType.multiline,
                     minLines: 1,
@@ -307,7 +311,11 @@ class _needHelpPageState extends State<need_help_page> {
                     onPressed: () async {
                       print(selected);
                       print(123);
-                      Comm com = await createComm("1",curValue1!,comment.text.toString());
+                      Comm com;
+                      if(comment.text.isEmpty)
+                        com = await createComm("1",curValue1!,"No message");
+                      else
+                        com = await createComm("1",curValue1!,comment.text.toString());
                       setState(() {
                         _comm=com;
                       });

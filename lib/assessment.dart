@@ -6,6 +6,9 @@ import 'package:http/http.dart' as http;
 import 'package:learning_duniya/quiz.dart';
 import 'package:learning_duniya/test.dart';
 
+import 'Login.dart';
+import 'globals.dart';
+
 Assess assessFromJson(String str) => Assess.fromJson(json.decode(str));
 
 String assessToJson(Assess data) => json.encode(data.toJson());
@@ -312,10 +315,15 @@ class _assessmentState extends State<assessment> {
                               i++)
                                 GestureDetector(
                                   onTap: () {
-                                    Navigator.push(
+                                    if(token!=""){
+                                    Navigator.pushReplacement(
                                         context,
                                         MaterialPageRoute(
-                                            builder: (context) => quiz(1)));
+                                            builder: (context) => quiz(1)));}
+                                    else{
+                                      Navigator.push(
+                                          context, MaterialPageRoute(builder: (context) => Login()));
+                                    }
                                   },
                                   child: Card(
                                     child: Container(

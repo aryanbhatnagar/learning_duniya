@@ -1,7 +1,4 @@
-// ignore_for_file: deprecated_member_use
-
 import 'dart:io';
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_countdown_timer/countdown_timer_controller.dart';
@@ -11,16 +8,243 @@ import 'package:http/http.dart' as http;
 import 'dart:async';
 import 'package:flutter_countdown_timer/flutter_countdown_timer.dart';
 import 'package:group_button/group_button.dart';
+import 'package:learning_duniya/assessment.dart';
+import 'package:learning_duniya/landing.dart';
 import 'package:learning_duniya/trial.dart';
 import 'package:video_player/video_player.dart';
-
 import 'dart:convert';
+import 'globals.dart';
+import 'main.dart';
+
+ConvJson convJsonFromJson(String str) => ConvJson.fromJson(json.decode(str));
+
+String convJsonToJson(ConvJson data) => json.encode(data.toJson());
+
+class ConvJson {
+  ConvJson({
+    required this.assessmentId,
+    required this.startTime,
+    required this.endTime,
+    required this.ansSheet,
+    required this.result,
+    required this.status,
+  });
+
+  String assessmentId;
+  String startTime;
+  String endTime;
+  List<AnsSheet> ansSheet;
+  Result result;
+  String status;
+
+  factory ConvJson.fromJson(Map<String, dynamic> json) => ConvJson(
+    assessmentId: json["assessment_id"],
+    startTime: json["start_time"],
+    endTime: json["end_time"],
+    ansSheet: List<AnsSheet>.from(json["ans_sheet"].map((x) => AnsSheet.fromJson(x))),
+    result: Result.fromJson(json["result"]),
+    status: json["status"],
+  );
+
+  Map<String, dynamic> toJson() => {
+    "assessment_id": assessmentId,
+    "start_time": startTime,
+    "end_time": endTime,
+    "ans_sheet": List<dynamic>.from(ansSheet.map((x) => x.toJson())),
+    "result": result.toJson(),
+    "status": status,
+  };
+}
+
+class AnsSheet {
+  AnsSheet({
+    required this.que,
+    required this.ans,
+    required this.correctAnswer,
+    required this.result,
+  });
+
+  String que;
+  String ans;
+  int correctAnswer;
+  bool result;
+
+  factory AnsSheet.fromJson(Map<String, dynamic> json) => AnsSheet(
+    que: json["que"],
+    ans: json["ans"],
+    correctAnswer: json["correctAnswer"],
+    result: json["result"],
+  );
+
+  Map<String, dynamic> toJson() => {
+    "que": que,
+    "ans": ans,
+    "correctAnswer": correctAnswer,
+    "result": result,
+  };
+}
+
+class Result {
+  Result({
+    required this.total,
+    required this.correct,
+    required this.wrong,
+    required this.left,
+  });
+
+  int total;
+  int correct;
+  int wrong;
+  int left;
+
+  factory Result.fromJson(Map<String, dynamic> json) => Result(
+    total: json["total"],
+    correct: json["correct"],
+    wrong: json["wrong"],
+    left: json["left"],
+  );
+
+  Map<String, dynamic> toJson() => {
+    "total": total,
+    "correct": correct,
+    "wrong": wrong,
+    "left": left,
+  };
+}
+
+
+SendData sendDataFromJson(String str) => SendData.fromJson(json.decode(str));
+String sendDataToJson(SendData data) => json.encode(data.toJson());
 
 Questions questionsFromJson(String str) => Questions.fromJson(json.decode(str));
-
 String questionsToJson(Questions data) => json.encode(data.toJson());
 
 var quizId = "1";
+late List allQuestionData = [];
+late List quizInputData = [];
+late List assignQuizData = [];
+
+late String ass_id, start_time, end_time, status;
+late int total, correct = 0, wrong = 0, left = 0;
+
+late String que_id, ans;
+late String currentAns;
+late int correctAnswer;
+late bool result;
+late String quesStartTime;
+late String quesEndTime;
+late var noq;
+
+var allData = {};
+var quizAns = {};
+var quesResult = {};
+
+int j = 0;
+
+int ComCode=0;
+late SendData? _sendData;
+
+Future<SendData> createData(String assId, String startTime, String endTime) async {
+  //ConvJson con=new ConvJson(assessmentId: assId, startTime: startTime, endTime: endTime, ansSheet: ansdata, result: result, status: " ");
+  final String apiUrl = "http://ec2-13-234-116-155.ap-south-1.compute.amazonaws.com/api/assessmet/ansheet";
+
+  final response = await http.post(Uri.parse(apiUrl),
+      headers: <String, String> {
+      "Authorization": "Bearer $token",
+        //'Content-Type' : 'application/json'
+      },
+      body:<String, dynamic> {
+        "assessment_id" : "1",
+        "start_time" : "10:00:00",
+        "end_time" : "10:03:00",
+        "ans_sheet" : "",
+        "result" : "",
+        "status" : "submitted"
+      });
+
+  if(response.statusCode == 200) {
+    ComCode = 200;
+    debugPrint("Communication Code" + ComCode.toString());
+    final String responseString = response.body;
+    debugPrint(responseString.toString());
+    return sendDataFromJson(responseString);
+  }
+  if(response.statusCode == 401) {
+    ComCode=401;
+    print(ComCode);
+    throw Exception("failed");
+  }
+  else{
+    print(0);
+    throw Exception("failed");
+  }
+}
+class SendData {
+  SendData({
+    required this.data,
+    required this.message,
+    required this.status,
+  });
+
+  Data1 data;
+  String message;
+  int status;
+
+  factory SendData.fromJson(Map<String, dynamic> json) => SendData(
+    data: Data1.fromJson(json["data"]),
+    message: json["message"],
+    status: json["status"],
+  );
+
+  Map<String, dynamic> toJson() => {
+    "data": data.toJson(),
+    "message": message,
+    "status": status,
+  };
+}
+class Data1 {
+  Data1({
+    required this.assessmentId,
+    required this.userId,
+    required this.testToken,
+    required this.startTime,
+    required this.endTime,
+    required this.ansSheet,
+    required this.result,
+    required this.sheetStatus,
+  });
+
+  String assessmentId;
+  int userId;
+  String testToken;
+  String startTime;
+  String endTime;
+  String ansSheet;
+  String result;
+  String sheetStatus;
+
+  factory Data1.fromJson(Map<String, dynamic> json) => Data1(
+    assessmentId: json["assessment_id"],
+    userId: json["user_id"],
+    testToken: json["test_token"],
+    startTime: json["start_time"],
+    endTime: json["end_time"],
+    ansSheet: json["ans_sheet"],
+    result: json["result"],
+    sheetStatus: json["sheet_status"],
+  );
+
+  Map<String, dynamic> toJson() => {
+    "assessment_id": assessmentId,
+    "user_id": userId,
+    "test_token": testToken,
+    "start_time": startTime,
+    "end_time": endTime,
+    "ans_sheet": ansSheet,
+    "result": result,
+    "sheet_status": sheetStatus,
+  };
+}
 
 Future<Questions> createQuestions(String id) async {
   final String apiUrl =
@@ -35,7 +259,6 @@ Future<Questions> createQuestions(String id) async {
     throw Exception("failed");
   }
 }
-
 class Questions {
   Questions({
     required this.success,
@@ -44,12 +267,12 @@ class Questions {
   });
 
   bool success;
-  Data data;
+  Data2 data;
   String message;
 
   factory Questions.fromJson(Map<String, dynamic> json) => Questions(
     success: json["success"],
-    data: Data.fromJson(json["data"]),
+    data: Data2.fromJson(json["data"]),
     message: json["message"],
   );
 
@@ -59,9 +282,8 @@ class Questions {
     "message": message,
   };
 }
-
-class Data {
-  Data({
+class Data2 {
+  Data2({
     required this.assessment,
     required this.questions,
   });
@@ -69,7 +291,7 @@ class Data {
   Assessment assessment;
   List<Question> questions;
 
-  factory Data.fromJson(Map<String, dynamic> json) => Data(
+  factory Data2.fromJson(Map<String, dynamic> json) => Data2(
     assessment: Assessment.fromJson(json["assessment"]),
     questions: List<Question>.from(
         json["questions"].map((x) => Question.fromJson(x))),
@@ -80,7 +302,6 @@ class Data {
     "questions": List<dynamic>.from(questions.map((x) => x.toJson())),
   };
 }
-
 class Assessment {
   Assessment({
     required this.id,
@@ -132,7 +353,6 @@ class Assessment {
     "chapter": chapter,
   };
 }
-
 class Question {
   Question({
     required this.id,
@@ -247,9 +467,6 @@ class _quizpageState extends State<quizpage> with TickerProviderStateMixin {
   int qnum = 0;
   int score = 0;
 
-  //late AnimationController controller;
-  //bool isPlaying = false;
-
   bool buttonState = true;
   bool quesState = false;
   bool prevVis = false;
@@ -257,9 +474,6 @@ class _quizpageState extends State<quizpage> with TickerProviderStateMixin {
   bool submitVis = false;
 
   var answers = [];
-  int j = 0;
-
-  late String data1, data2, data3, data4, data5, data6, data7;
 
   /*
   String get countText {
@@ -270,35 +484,9 @@ class _quizpageState extends State<quizpage> with TickerProviderStateMixin {
   }*/
 
   double progress = 1.0;
-  /*
-  @override
-  void initState() {
-    super.initState();
-    controller = AnimationController(
-      vsync: this,
-      duration: Duration(seconds: 180),
-    );
-
-    controller.addListener(() {
-      //notify();
-      if (controller.isAnimating) {
-        setState(() {
-          progress = controller.value;
-        });
-      } else {
-        setState(() {
-          progress = 1.0;
-          isPlaying = false;
-        });
-      }
-    });
-  }
-  */
 
   @override
   Widget build(BuildContext context) {
-    List quizInputData = [];
-    List allQuizData = [];
 
     Size size = MediaQuery.of(context).size;
     final controllerr = GroupButtonController();
@@ -319,13 +507,8 @@ class _quizpageState extends State<quizpage> with TickerProviderStateMixin {
               Questions? que = snapshot.data;
               debugPrint(snapshot.data.toString());
 
-              var nof = que?.data.questions.length;
-              quizInputData = ['', '', '', ''];
-              for(var sampleIndex = 0; sampleIndex< nof!; sampleIndex) {
-                allQuizData.add(quizInputData);
-              }
-
-              debugPrint(nof.toString() + ' Number of questions');
+              noq = que?.data.questions.length;
+              debugPrint(noq.toString() + ' Number of questions');
 
               return Stack(
                 children: [
@@ -422,6 +605,9 @@ class _quizpageState extends State<quizpage> with TickerProviderStateMixin {
                                                 ),
                                               ),
                                               onPressed: () {
+                                                start_time = DateTime.now().toString();
+                                                ass_id = que.data.assessment.id.toString();
+                                                total = noq;
                                                 /*controller.reverse(
                                                     from: controller.value == 0
                                                         ? 1.0
@@ -476,52 +662,52 @@ class _quizpageState extends State<quizpage> with TickerProviderStateMixin {
                                         ),
                                       ),
                                       GroupButton(
-                                          controller: controllerr,
-                                          buttons: [
-                                            que.data.questions[j].opt1.toString(),
-                                            que.data.questions[j].opt2.toString(),
-                                            que.data.questions[j].opt3.toString(),
-                                            que.data.questions[j].opt4.toString()
-                                          ],
-                                          onSelected: (i, selected) {
-                                            debugPrint('Button #$i $selected');
-                                            //answers.add(i.toString());
-                                            //debugPrint(answers.toString());
+                                        controller: controllerr,
+                                        buttons: [
+                                          que.data.questions[j].opt1.toString(),
+                                          que.data.questions[j].opt2.toString(),
+                                          que.data.questions[j].opt3.toString(),
+                                          que.data.questions[j].opt4.toString()
+                                        ],
+                                        onSelected: (i, selected) {
+                                          debugPrint('Button #$i $selected');
 
-                                            data1 = que.data.questions[j].id.toString();
-                                            data2 = (i+1).toString();
-                                            data3 = que.data.questions[j].ans.toString();
-                                            if(i+1 == que.data.questions[j].ans)
-                                              data4 = 'true';
-                                            else
-                                              data4 = 'false';
-
-                                            //allQuizData.add(quizInputData);
-                                            //debugPrint(quizInputData.toString());
-                                            //debugPrint(allQuizData.toString());
-                                          },
-                                          selectedTextStyle: const TextStyle(
-                                              fontFamily: "Candara",
-                                              fontSize: 20,
-                                              color: Colors.white),
-                                          direction: Axis.vertical,
-                                          unselectedTextStyle: const TextStyle(
-                                              fontFamily: "Candara",
-                                              fontSize: 20,
-                                              color: Colors.black),
-                                          unselectedColor: Colors.transparent,
-                                          buttonWidth: size.width - 40,
-                                          selectedColor: Colors.lightGreen,
-                                          selectedShadow: const <BoxShadow>[
-                                            BoxShadow(color: Colors.transparent)
-                                          ],
-                                          unselectedShadow: const <BoxShadow>[
-                                            BoxShadow(color: Colors.transparent)
-                                          ],
-                                          borderRadius: BorderRadius.circular(10.0)),
+                                          que_id = que.data.questions[j].id.toString();
+                                          ans = ('x').toString();
+                                          currentAns = (i+1).toString();
+                                          correctAnswer = que.data.questions[j].ans;
+                                          if(i+1 == que.data.questions[j].ans){
+                                            result = true;
+                                            correct++;
+                                          }else{
+                                            result = false;
+                                            wrong++;
+                                          }
+                                        },
+                                        selectedTextStyle: const TextStyle(
+                                            fontFamily: "Candara",
+                                            fontSize: 20,
+                                            color: Colors.white),
+                                        direction: Axis.vertical,
+                                        unselectedTextStyle: const TextStyle(
+                                            fontFamily: "Candara",
+                                            fontSize: 20,
+                                            color: Colors.black),
+                                        unselectedColor: Colors.transparent,
+                                        buttonWidth: size.width - 40,
+                                        selectedColor: Colors.lightGreen,
+                                        selectedShadow: const <BoxShadow>[
+                                          BoxShadow(color: Colors.transparent)
+                                        ],
+                                        unselectedShadow: const <BoxShadow>[
+                                          BoxShadow(color: Colors.transparent)
+                                        ],
+                                        borderRadius: BorderRadius.circular(10.0),
+                                        enableDeselect: true,
+                                        isRadio: true,
+                                      ),
                                       SizedBox(height: 20),
                                       Container(
-
                                         child: Row(
                                           mainAxisAlignment:
                                           MainAxisAlignment.spaceBetween,
@@ -533,10 +719,16 @@ class _quizpageState extends State<quizpage> with TickerProviderStateMixin {
                                                   else
                                                     debugPrint("No Previous Question");
 
-                                                  allQuizData.removeLast();
-                                                  debugPrint(allQuizData.toString());
-
                                                   setState(() {
+                                                    if(j+1 == que.data.questions.length) {
+                                                      submitVis = true;
+                                                      nextVis = false;
+                                                    }
+                                                    else {
+                                                      submitVis = false;
+                                                      nextVis = true;
+                                                    }
+
                                                     if(j == 0)
                                                       prevVis = false;
                                                     else
@@ -557,35 +749,32 @@ class _quizpageState extends State<quizpage> with TickerProviderStateMixin {
                                                   if (j !=
                                                       que.data.questions.length - 1){
                                                     j += 1;
-                                                    debugPrint('Question Number: ' + j.toString());
 
-                                                  }
+                                                    debugPrint((j).toString());
 
-                                                  else {
+                                                    /*
+                                                    quizInputData.add(que_id);
+                                                    quizInputData.add(currentAns);
+                                                    quizInputData.add(correctAnswer);
+                                                    quizInputData.add(result);
+                                                    */
+
+                                                    quizAns = {
+                                                      "que" : que_id,
+                                                      "ans" : currentAns,
+                                                      "correctAnswer" : correctAnswer,
+                                                      "result" : result
+                                                    };
+
+                                                    allQuestionData.add(quizAns);
+
+                                                    debugPrint(quizInputData.toString());
+                                                  }else {
                                                     debugPrint(
                                                         "Max Number of Questions");
                                                   }
 
-                                                  quizInputData = [data1, data2, data3, data4];
-                                                  allQuizData[j-1] = quizInputData;
-
-                                                  debugPrint(quizInputData.toString());
-                                                  debugPrint(allQuizData.toString());
-
-                                                  /*quizInputData.add(data1);
-                                                  quizInputData.add(data2);
-                                                  quizInputData.add(data3);
-                                                  quizInputData.add(data4);*/
-
-                                                  //allQuizData.add(quizInputData);
-                                                  //debugPrint(allQuizData.toString());
-/*
-                                                  quizInputData.removeLast();
-                                                  quizInputData.removeLast();
-                                                  quizInputData.removeLast();
-                                                  quizInputData.removeLast();
-*/
-                                                  //debugPrint(allQuizData.toString());
+                                                  //quizInputData.clear();
 
                                                   setState(() {
                                                     if(j == 0)
@@ -593,31 +782,60 @@ class _quizpageState extends State<quizpage> with TickerProviderStateMixin {
                                                     else
                                                       prevVis = true;
 
+                                                    if(j+1 == que.data.questions.length) {
+                                                      submitVis = true;
+                                                      nextVis = false;
+                                                    }
+                                                    else {
+                                                      submitVis = false;
+                                                      nextVis = true;
+                                                    }
                                                   });
 
-                                                  //debugPrint((j).toString() + '/' + (nof).toString());
-
-                                                  /*if(j+1 == nof+1){
-
-                                                    debugPrint((j+1).toString() + '/' + (nof+1).toString());
-
-                                                    Navigator.of(context).push(MaterialPageRoute(builder: (context) => trial(
-                                                      name: 'Kush',
-                                                      email: 'Kush',
-                                                      phone: '467874132465',
-                                                      quizAllData: allQuizData,
-                                                    )));
-                                                  }*/
                                                 },
                                                 child: Visibility(
                                                   visible: nextVis,
-                                                  child: Text( que.data.questions.length == j+1 ? "SUBMIT >>" : "NEXT >>",
+                                                  //que.data.questions.length == j+1 ? "SUBMIT >>" :
+                                                  child: Text("NEXT >>",
                                                       style: TextStyle(
                                                           fontSize: 25,
                                                           fontFamily: "Candara",
                                                           color: Colors.grey)),
                                                 )),
                                           ],
+                                        ),
+                                      ),
+                                      SizedBox(height: 20),
+                                      Visibility(
+                                        visible: submitVis,
+                                        child: FlatButton(
+                                          shape: RoundedRectangleBorder(
+                                              borderRadius: BorderRadius.all(
+                                                  Radius.circular(10))),
+                                          padding: EdgeInsets.all(10),
+                                          textColor: Colors.white,
+                                          color: Colors.orange,
+                                          child: Text(
+                                            'Submit Quiz',
+                                            style: TextStyle(
+                                              color: Colors.white,
+                                              fontSize: 20.0,
+                                            ),
+                                          ),
+                                          onPressed: () async {
+                                            end_time = DateTime.now().toString();
+
+                                            debugPrint((j).toString());
+
+                                            quizAns = {
+                                              "que" : que_id,
+                                              "ans" : currentAns,
+                                              "correctAnswer" : correctAnswer,
+                                              "result" : result
+                                            };
+                                            allQuestionData.add(quizAns);
+                                            assignData(quizInputData);
+                                          },
                                         ),
                                       )
                                     ]),
@@ -639,4 +857,82 @@ class _quizpageState extends State<quizpage> with TickerProviderStateMixin {
           },
         ));
   }
+
+  Future<void> assignData(List quizInputData) async {
+
+    debugPrint(allQuestionData.toString());
+    debugPrint("From: " + start_time + " To: " + end_time);
+    quesResult = {
+      "total" : total,
+      "correct" : correct,
+      "wrong" : wrong,
+      "left" : left,
+    };
+
+    allData = {
+      "assessment_id" : ass_id,
+      "start_time" : start_time,
+      "end_time" : end_time,
+      "ans_sheet" : allQuestionData,
+      "result" : quesResult,
+      "status" : "successful"
+    };
+
+    debugPrint(allData.toString());
+
+    SendData sendData = await createData(quizId, start_time, end_time);
+    setState(() {
+      _sendData = sendData;
+    });
+
+    if(ComCode == 200) {
+      final Future<ConfirmActionQuiz?> action =
+      await _asyncConfirmDialog(context);
+      debugPrint("Confirm Action $action");
+    } if(ComCode==401)
+    {
+      showDialog<String>(
+        context: context,
+        builder: (BuildContext context) => AlertDialog(
+          title: const Text("Cant send request"),
+          content: Text("Unauthenticated"),
+          actions: <Widget>[
+            TextButton(
+                onPressed: () => Navigator.pop(context, 'OK'),
+                child: const Text('OK',style: TextStyle(color: Colors.teal))
+            ),
+          ],
+        ),
+      );
+    }
+  }
+}
+
+enum ConfirmActionQuiz {Accept}
+Future<Future<ConfirmActionQuiz?>> _asyncConfirmDialog(
+    BuildContext context) async {
+  return showDialog<ConfirmActionQuiz>
+    (context: context,
+    barrierDismissible: false,
+    builder: (BuildContext context) {
+      return AlertDialog(
+        title: Image.asset(
+          'images/tick.png',
+          height: 50,
+          width: 50,
+        ),
+        content: Text('Test Submitted Successfully'),
+        actions: <Widget>[
+          ElevatedButton(
+            child: const Text('Ok'),
+            onPressed: () {
+              Navigator.of(context).pop(ConfirmActionQuiz.Accept);
+              Navigator.pop(context);
+              Navigator.push(context,MaterialPageRoute(builder: (context) => landing()),);
+            },
+          )
+        ],
+      );
+    },
+  );
 }
