@@ -559,6 +559,7 @@ class _landingPageState extends State<landingPage> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.center,
                           children: <Widget>[
+                            SizedBox(height: 2.5),
                             ClipRRect(borderRadius: BorderRadius.circular(10),
                                 child: Image(
                                     image: AssetImage("images/hindiass.jpg"),

@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:group_button/group_button.dart';
 import 'package:http/http.dart' as http;
+import 'package:learning_duniya/Login2.dart';
 import 'package:learning_duniya/quiz.dart';
 import 'package:learning_duniya/test.dart';
 
@@ -12,7 +13,7 @@ import 'globals.dart';
 Assess assessFromJson(String str) => Assess.fromJson(json.decode(str));
 
 String assessToJson(Assess data) => json.encode(data.toJson());
-var assId = "1";
+var assId = "";
 
 Future<Assess> createAssess(String id) async {
   final String apiUrl =
@@ -319,10 +320,10 @@ class _assessmentState extends State<assessment> {
                                     Navigator.pushReplacement(
                                         context,
                                         MaterialPageRoute(
-                                            builder: (context) => quiz(1)));}
+                                            builder: (context) => quiz(snapshot.data!.data.chapters[i].id)));}
                                     else{
                                       Navigator.push(
-                                          context, MaterialPageRoute(builder: (context) => Login()));
+                                          context, MaterialPageRoute(builder: (context) => Login2()));
                                     }
                                   },
                                   child: Card(

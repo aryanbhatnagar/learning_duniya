@@ -3,6 +3,7 @@ import 'package:favorite_button/favorite_button.dart';
 import 'package:group_button/group_button.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:learning_duniya/Login2.dart';
 import 'package:learning_duniya/videoplayer.dart';
 import 'package:video_player/video_player.dart';
 import 'package:learning_duniya/quiz.dart';
@@ -374,7 +375,7 @@ class _courseDescPageState extends State<courseDescPage> {
                                                 video(k12.data.videos[i].url,k12.data.videos[i].title)));}
                                         else
                                           Navigator.push(
-                                              context, MaterialPageRoute(builder: (context) => Login()));
+                                              context, MaterialPageRoute(builder: (context) => Login2()));
                                       },
                                       child: Card(
                                         elevation: 5,

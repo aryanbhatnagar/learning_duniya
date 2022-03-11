@@ -10,6 +10,7 @@ import 'package:learning_duniya/mentor.dart';
 late List<String> moc;
 int ComCode=0;
 late Comm? _comm =null;
+var mentor;
 
 ConvJson1 convJson1FromJson(String str) => ConvJson1.fromJson(json.decode(str));
 
@@ -156,19 +157,20 @@ Future<Comm> createComm(String edu_id, String serv_id,String commm, String msg,L
 
 
 class need_help_page extends StatefulWidget {
-  need_help_page(this.serviceList,this.service_Id,this.educator_Id);
+  need_help_page(this.serviceList,this.service_Id,this.educator_Id,this.mentorname);
   List<String> serviceList;
-  var educator_Id,service_Id;
+  var educator_Id,service_Id,mentorname;
 
   @override
-  _needHelpPageState createState() => _needHelpPageState(serviceList,service_Id,educator_Id);
+  _needHelpPageState createState() => _needHelpPageState(serviceList,service_Id,educator_Id,mentorname);
 }
 
 class _needHelpPageState extends State<need_help_page> {
-  _needHelpPageState(this.serviceList,this.service_Id,this.educator_Id);
+  _needHelpPageState(this.serviceList,this.service_Id,this.educator_Id,this.mentor_name);
   List<String> serviceList;var educator_Id, service_Id;
   List <String> selected = [];
   String? curValue1, curValue2;
+  var mentor_name;
   String comun="";
   final TextEditingController comment = TextEditingController();
 
@@ -182,7 +184,7 @@ class _needHelpPageState extends State<need_help_page> {
   @override
   Widget build(BuildContext context) {
     // TODO: implement build
-
+    mentor=mentor_name;
     return Scaffold(
       appBar: AppBar(
         title: Text("Request Help",style: TextStyle(fontFamily: "Candara"),),
@@ -446,7 +448,7 @@ Future<Future<ConfirmAction?>> _asyncConfirmDialog(
           height: 50,
           width: 50,
         ),
-        content: Text('The request has been sent successfully to ${name}' +
+        content: Text('The request has been sent successfully to ${mentor}' +
             '\n\nHelp requested for: \n' +
             selected.join("\n")),
         actions: <Widget>[

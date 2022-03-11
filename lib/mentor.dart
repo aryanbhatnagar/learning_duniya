@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:favorite_button/favorite_button.dart';
 import 'package:http/http.dart' as http;
 import 'package:learning_duniya/Login.dart';
+import 'package:learning_duniya/Login2.dart';
 import 'globals.dart';
 import 'need_help_page.dart';
 
@@ -202,12 +203,13 @@ class _mentorpageState extends State<mentorpage> {
                 children: [
                   Container(
                     padding: EdgeInsets.all(25),
-                    height: (size.height) / 2.5,
+                    height: (size.height)/2.5,
                     width: (size.width),
                     decoration: BoxDecoration(
                         color: Colors.teal,
                         image: DecorationImage(
                             image: NetworkImage("${men1!.data.educator.img.toString()}"),
+
                             fit: BoxFit.fill)),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -397,7 +399,7 @@ class _mentorpageState extends State<mentorpage> {
                                                                     /*return trial(
                                                                 serviceList);*/
                                                                     return need_help_page(
-                                                                        serviceList,snapshot.data!.data.services[i].id,snapshot.data!.data.educator.id);
+                                                                        serviceList,snapshot.data!.data.services[i].id,snapshot.data!.data.educator.id,snapshot.data!.data.educator.eduName.toString());
                                                                     }
                                                                   ,
                                                                 ),
@@ -405,7 +407,7 @@ class _mentorpageState extends State<mentorpage> {
                                                             }
                                                               else
                                                                 Navigator.push(
-                                                                    context, MaterialPageRoute(builder: (context) => Login()));
+                                                                    context, MaterialPageRoute(builder: (context) => Login2()));
                                                             },
                                                             color: Colors.lightBlue,
                                                             child: (Text("Start",

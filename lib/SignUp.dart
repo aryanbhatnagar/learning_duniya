@@ -292,6 +292,7 @@ class _SignUpPageState extends State<SignUpPage> {
                             }
                             if(code==200)
                               {
+                                Navigator.pop(context);
                                 Navigator.push(context, MaterialPageRoute(
                                     builder: (context) => Login()));
                               }
@@ -355,10 +356,7 @@ class _SignUpPageState extends State<SignUpPage> {
                         ),
                       ),
                       SizedBox(height: 40),
-                      if (_user == null)
-                        Container()
-                      else if(code==200)
-                        Text("The user  is created successfully as ${_user!.data.token}")
+
                     ],
                   )
               ),

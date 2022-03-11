@@ -37,7 +37,6 @@ class Login1 {
     "status": status,
   };
 }
-
 class User {
   User({
     required this.id,
@@ -112,11 +111,11 @@ class User {
 
 
 
-class Login extends StatefulWidget {
-  const Login({Key? key}) : super(key: key);
+class Login2 extends StatefulWidget {
+  const Login2({Key? key}) : super(key: key);
 
   @override
-  _LoginPageState createState() => _LoginPageState();
+  _Login2PageState createState() => _Login2PageState();
 }
 
 
@@ -144,7 +143,7 @@ Future<Login1> createLogin(String email, String password) async{
   }
 }
 
-class _LoginPageState extends State<Login> {
+class _Login2PageState extends State<Login2> {
 
   @override
   void initState() {
@@ -274,16 +273,15 @@ class _LoginPageState extends State<Login> {
                                       });
 
                                       if(loginCode==200){
-                                        setState(() {
-                                          token=_log!.token;
-                                          userId=_log!.user.id;
-                                          userName=_log!.user.name;
-                                          userEmail=_log!.user.email;
-                                        });
+
+                                        token=log!.token;
+                                        userId=log!.user.id;
+                                        userName=log!.user.name;
+                                        userEmail=log!.user.email;
                                         SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
                                         sharedPreferences.setString('token', _log!.token);
                                         sharedPreferences.setString('name', _log!.user.name);
-                                        Navigator.push(context, MaterialPageRoute(builder: (context)=>Dashboard()));
+                                        Navigator.pop(context);
                                       }
 
                                       if(loginCode==401){
