@@ -568,12 +568,12 @@ class _landingPageState extends State<landingPage> {
                             Padding(
                               padding: const EdgeInsets.fromLTRB(5, 5, 5, 5),
                               child: Container(
-                                //width: 200,
+                                width: 205,
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Row(
-                                      mainAxisSize: MainAxisSize.min,
+                                      mainAxisSize: MainAxisSize.max,
                                       mainAxisAlignment: MainAxisAlignment
                                           .spaceBetween,
                                       children: [
@@ -701,8 +701,8 @@ class _landingPageState extends State<landingPage> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: <Widget>[
-                          Image(image: AssetImage("images/mentor1.PNG"),
-                              height: 250,
+                          Image(image: NetworkImage("${landApi.data.mentors[i].img.toString()}"),
+                              height: 150,
                               width: 120),
                           Padding(
                             padding: const EdgeInsets.fromLTRB(8, 5, 8, 5),

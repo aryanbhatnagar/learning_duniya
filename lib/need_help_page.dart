@@ -11,6 +11,43 @@ late List<String> moc;
 int ComCode=0;
 late Comm? _comm =null;
 
+ConvJson1 convJson1FromJson(String str) => ConvJson1.fromJson(json.decode(str));
+
+String convJson1ToJson(ConvJson1 data) => json.encode(data.toJson());
+
+class ConvJson1 {
+  ConvJson1({
+    required this.educatorId,
+    required this.serviceId,
+    required this.category,
+    required this.modeCommunication,
+    required this.message,
+  });
+
+  var educatorId;
+  var serviceId;
+  List<String> category;
+  var modeCommunication;
+  var message;
+
+  factory ConvJson1.fromJson(Map<String, dynamic> json) => ConvJson1(
+    educatorId: json["educator_id"],
+    serviceId: json["service_id"],
+    category: List<String>.from(json["category"].map((x) => x)),
+    modeCommunication: json["mode_communication"],
+    message: json["message"],
+  );
+
+  Map<String, dynamic> toJson() => {
+    "educator_id": educatorId,
+    "service_id": serviceId,
+    "category": List<dynamic>.from(category.map((x) => x)),
+    "mode_communication": modeCommunication,
+    "message": message,
+  };
+}
+
+
 Comm commFromJson(String str) => Comm.fromJson(json.decode(str));
 String commToJson(Comm data) => json.encode(data.toJson());
 
@@ -82,21 +119,16 @@ class Data {
   };
 }
 
-Future<Comm> createComm(String edu_id, String commm, String msg) async{
+Future<Comm> createComm(String edu_id, String serv_id,String commm, String msg,List<String> communication) async{
+  ConvJson1 convert=new ConvJson1(educatorId: edu_id,serviceId: serv_id, category: communication, modeCommunication: commm, message: msg);
   final String apiUrl = "http://ec2-13-234-116-155.ap-south-1.compute.amazonaws.com/api/add/communication";
 
   final response = await http.post(Uri.parse(apiUrl),
     headers: <String, String> {
       "Authorization": "Bearer $token",
-      //'Content-Type': 'application/json; charset=UTF-8',
+      'Content-Type': 'application/json; charset=UTF-8',
     },
-    body: <String,dynamic>{
-      "educator_id":edu_id,
-      "category": "",
-      "mode_communication":commm,
-      "message":msg
-
-    },
+    body: json.encode(convert.toJson())
   );
 
   if(response.statusCode == 200) {
@@ -108,12 +140,15 @@ Future<Comm> createComm(String edu_id, String commm, String msg) async{
     return commFromJson(responseString);
   }
   if(response.statusCode == 500) {
+    debugPrint(json.encode(convert.toJson()).toString());
     ComCode=500;
+    print(response.body.toString());
     print(ComCode);
     throw Exception("failed");
 
   }
   else{
+    debugPrint(json.encode(convert.toJson()).toString());
     print(0);
     throw Exception("failed");
   }
@@ -121,14 +156,17 @@ Future<Comm> createComm(String edu_id, String commm, String msg) async{
 
 
 class need_help_page extends StatefulWidget {
-  need_help_page(List<String> serviceList);
+  need_help_page(this.serviceList,this.service_Id,this.educator_Id);
+  List<String> serviceList;
+  var educator_Id,service_Id;
 
   @override
-  _needHelpPageState createState() => _needHelpPageState(serviceList);
+  _needHelpPageState createState() => _needHelpPageState(serviceList,service_Id,educator_Id);
 }
 
 class _needHelpPageState extends State<need_help_page> {
-  _needHelpPageState(List<String> serviceList);
+  _needHelpPageState(this.serviceList,this.service_Id,this.educator_Id);
+  List<String> serviceList;var educator_Id, service_Id;
   List <String> selected = [];
   String? curValue1, curValue2;
   String comun="";
@@ -313,9 +351,9 @@ class _needHelpPageState extends State<need_help_page> {
                       print(123);
                       Comm com;
                       if(comment.text.isEmpty)
-                        com = await createComm("1",curValue1!,"No message");
+                        com = await createComm(educator_Id.toString(),service_Id.toString(),curValue1!,"No message",selected);
                       else
-                        com = await createComm("1",curValue1!,comment.text.toString());
+                        com = await createComm(educator_Id.toString(),service_Id.toString(),curValue1!,comment.text.toString(),selected);
                       setState(() {
                         _comm=com;
                       });

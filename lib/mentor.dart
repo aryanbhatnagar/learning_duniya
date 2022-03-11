@@ -85,25 +85,21 @@ class Educator {
     required this.reviews,
     required this.likes,
     required this.img,
-    required this.createdAt,
-    required this.updatedAt,
-    required this.status,
+
   });
 
-  int id;
-  String eduName;
-  String specilization;
-  String aboutUs;
-  String phone;
-  String country;
-  String state;
-  String city;
-  int reviews;
-  int likes;
-  String img;
-  dynamic createdAt;
-  DateTime updatedAt;
-  String status;
+  var id;
+  var eduName;
+  var specilization;
+  var aboutUs;
+  var phone;
+  var country;
+  var state;
+  var city;
+  var reviews;
+  var likes;
+  var img;
+
 
   factory Educator.fromJson(Map<String, dynamic> json) => Educator(
     id: json["id"],
@@ -117,9 +113,7 @@ class Educator {
     reviews: json["reviews"],
     likes: json["likes"],
     img: json["img"],
-    createdAt: json["created_at"],
-    updatedAt: DateTime.parse(json["updated_at"]),
-    status: json["status"],
+
   );
 
   Map<String, dynamic> toJson() => {
@@ -134,9 +128,7 @@ class Educator {
     "reviews": reviews,
     "likes": likes,
     "img": img,
-    "created_at": createdAt,
-    "updated_at": updatedAt.toIso8601String(),
-    "status": status,
+
   };
 }
 
@@ -210,12 +202,12 @@ class _mentorpageState extends State<mentorpage> {
                 children: [
                   Container(
                     padding: EdgeInsets.all(25),
-                    height: (size.height) / 3,
+                    height: (size.height) / 2.5,
                     width: (size.width),
                     decoration: BoxDecoration(
                         color: Colors.teal,
                         image: DecorationImage(
-                            image: AssetImage("images/mentor1.PNG"),
+                            image: NetworkImage("${men1!.data.educator.img.toString()}"),
                             fit: BoxFit.fill)),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -226,7 +218,7 @@ class _mentorpageState extends State<mentorpage> {
                     alignment: Alignment.bottomCenter,
                     child: Container(
                       padding: EdgeInsets.only(left: 20, right: 20, top: 20),
-                      height: (size.height) - (size.height) / 4,
+                      height: (size.height) - (size.height) / 3,
                       width: (size.width),
                       decoration: BoxDecoration(
                           color: Colors.white,
@@ -239,7 +231,7 @@ class _mentorpageState extends State<mentorpage> {
                                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: [
                                   Flexible(
-                                    child: Text(men1!.data.educator.eduName,
+                                    child: Text(men1!.data.educator.eduName.toString(),
                                         style: TextStyle(
                                             fontSize: 35,
                                             fontFamily: "Candara",
@@ -254,7 +246,7 @@ class _mentorpageState extends State<mentorpage> {
                                   )
                                 ],
                               ),
-                              Text(men1.data.educator.specilization,
+                              Text(men1.data.educator.specilization.toString(),
                                   style: TextStyle(
                                       fontSize: 25,
                                       fontFamily: "Candara",
@@ -286,7 +278,7 @@ class _mentorpageState extends State<mentorpage> {
                                       fontFamily: "Candara",
                                       color: Colors.black)),
                               SizedBox(height: 10),
-                              Text(men1.data.educator.aboutUs,
+                              Text(men1.data.educator.aboutUs.toString(),
                                   style: TextStyle(
                                       fontSize: 17,
                                       fontFamily: "Candara",
@@ -405,7 +397,7 @@ class _mentorpageState extends State<mentorpage> {
                                                                     /*return trial(
                                                                 serviceList);*/
                                                                     return need_help_page(
-                                                                        serviceList);
+                                                                        serviceList,snapshot.data!.data.services[i].id,snapshot.data!.data.educator.id);
                                                                     }
                                                                   ,
                                                                 ),

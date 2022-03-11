@@ -33,7 +33,7 @@ class ConvJson {
   String assessmentId;
   String startTime;
   String endTime;
-  List<AnsSheet> ansSheet;
+  List<dynamic> ansSheet;
   Result result;
   String status;
 
@@ -46,12 +46,12 @@ class ConvJson {
     status: json["status"],
   );
 
-  Map<String, dynamic> toJson() => {
+  Map<String, dynamic> toJson() => <String,dynamic>{
     "assessment_id": assessmentId,
     "start_time": startTime,
     "end_time": endTime,
     "ans_sheet": List<dynamic>.from(ansSheet.map((x) => x.toJson())),
-    "result": result.toJson(),
+  "result": jsonEncode(this.result) ,
     "status": status,
   };
 }
@@ -133,34 +133,29 @@ late int correctAnswer;
 late bool result;
 late String quesStartTime;
 late String quesEndTime;
-late var noq;
 
-var allData = {};
+
+Map <String,dynamic>allData = {};
 var quizAns = {};
-var quesResult = {};
+Map<String,dynamic> quesResult = {};
 
 int j = 0;
 
 int ComCode=0;
 late SendData? _sendData;
 
-Future<SendData> createData(String assId, String startTime, String endTime) async {
-  //ConvJson con=new ConvJson(assessmentId: assId, startTime: startTime, endTime: endTime, ansSheet: ansdata, result: result, status: " ");
+Future<SendData> createData(String startTime,String endTime,List ansdata,Result result) async {
+  //ConvJson con=new ConvJson(assessmentId: assId, startTime: startTime, endTime: endTime, ansSheet: ansdata, result: result, status: "successful");
   final String apiUrl = "http://ec2-13-234-116-155.ap-south-1.compute.amazonaws.com/api/assessmet/ansheet";
+  //debugPrint(allData.toString());
 
   final response = await http.post(Uri.parse(apiUrl),
       headers: <String, String> {
       "Authorization": "Bearer $token",
-        //'Content-Type' : 'application/json'
+        'Content-Type' : 'application/json'
       },
-      body:<String, dynamic> {
-        "assessment_id" : "1",
-        "start_time" : "10:00:00",
-        "end_time" : "10:03:00",
-        "ans_sheet" : "",
-        "result" : "",
-        "status" : "submitted"
-      });
+      body:jsonEncode(allData)
+  );
 
   if(response.statusCode == 200) {
     ComCode = 200;
@@ -175,10 +170,13 @@ Future<SendData> createData(String assId, String startTime, String endTime) asyn
     throw Exception("failed");
   }
   else{
+    debugPrint(allData.toString());
     print(0);
     throw Exception("failed");
   }
 }
+
+
 class SendData {
   SendData({
     required this.data,
@@ -186,12 +184,12 @@ class SendData {
     required this.status,
   });
 
-  Data1 data;
+  Data data;
   String message;
   int status;
 
   factory SendData.fromJson(Map<String, dynamic> json) => SendData(
-    data: Data1.fromJson(json["data"]),
+    data: Data.fromJson(json["data"]),
     message: json["message"],
     status: json["status"],
   );
@@ -202,8 +200,8 @@ class SendData {
     "status": status,
   };
 }
-class Data1 {
-  Data1({
+class Data {
+  Data({
     required this.assessmentId,
     required this.userId,
     required this.testToken,
@@ -219,18 +217,18 @@ class Data1 {
   String testToken;
   String startTime;
   String endTime;
-  String ansSheet;
-  String result;
+  List<AnsSheet> ansSheet;
+  Result result;
   String sheetStatus;
 
-  factory Data1.fromJson(Map<String, dynamic> json) => Data1(
+  factory Data.fromJson(Map<String, dynamic> json) => Data(
     assessmentId: json["assessment_id"],
     userId: json["user_id"],
     testToken: json["test_token"],
     startTime: json["start_time"],
     endTime: json["end_time"],
-    ansSheet: json["ans_sheet"],
-    result: json["result"],
+    ansSheet: List<AnsSheet>.from(json["ans_sheet"].map((x) => AnsSheet.fromJson(x))),
+    result: Result.fromJson(json["result"]),
     sheetStatus: json["sheet_status"],
   );
 
@@ -240,11 +238,12 @@ class Data1 {
     "test_token": testToken,
     "start_time": startTime,
     "end_time": endTime,
-    "ans_sheet": ansSheet,
-    "result": result,
+    "ans_sheet": List<dynamic>.from(ansSheet.map((x) => x.toJson())),
+    "result": result.toJson(),
     "sheet_status": sheetStatus,
   };
 }
+
 
 Future<Questions> createQuestions(String id) async {
   final String apiUrl =
@@ -503,11 +502,12 @@ class _quizpageState extends State<quizpage> with TickerProviderStateMixin {
         body: FutureBuilder(
           future: createQuestions(quizId),
           builder: (context, AsyncSnapshot<Questions> snapshot) {
+            int noq=0;
             if (snapshot.hasData) {
               Questions? que = snapshot.data;
               debugPrint(snapshot.data.toString());
 
-              noq = que?.data.questions.length;
+              noq = que!.data.questions.length;
               debugPrint(noq.toString() + ' Number of questions');
 
               return Stack(
@@ -871,16 +871,18 @@ class _quizpageState extends State<quizpage> with TickerProviderStateMixin {
 
     allData = {
       "assessment_id" : ass_id,
-      "start_time" : start_time,
-      "end_time" : end_time,
-      "ans_sheet" : allQuestionData,
-      "result" : quesResult,
-      "status" : "successful"
+    "start_time" : start_time,
+    "end_time" : end_time,
+      "ans_sheet":allQuestionData,
+      "result":quesResult,
+      "status":"successful"
     };
 
-    debugPrint(allData.toString());
 
-    SendData sendData = await createData(quizId, start_time, end_time);
+
+    debugPrint(allData.toString());
+    Result R=new Result(total: quesResult["total"], correct: quesResult["correct"], wrong: quesResult["wrong"], left: quesResult["left"]);
+    SendData sendData = await createData(start_time,end_time,allQuestionData,R);
     setState(() {
       _sendData = sendData;
     });

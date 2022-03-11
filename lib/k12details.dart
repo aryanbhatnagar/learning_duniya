@@ -16,7 +16,7 @@ class K12Api {
 
   bool success;
   Data data;
-  String message;
+  var message;
 
   factory K12Api.fromJson(Map<String, dynamic> json) => K12Api(
     success: json["success"],
@@ -66,14 +66,14 @@ class K12 {
   });
 
 
-   String courseName;
-   String formalName;
-   String syllabus;
-   String description;
-   int lifespan;
-   String language;
-   int price;
-   int salePrice;
+   var courseName;
+   var formalName;
+   var syllabus;
+   var description;
+   var lifespan;
+   var language;
+   var price;
+   var salePrice;
 
 
   factory K12.fromJson(Map<String, dynamic> json) => K12(
@@ -111,11 +111,11 @@ class K12Detail {
     required this.video_count,
   });
 
-  int id;
-  String chapterName;
-  dynamic about;
-  String quiztime;
-  int video_count;
+  var id;
+  var chapterName;
+  var about;
+  var quiztime;
+  var video_count;
 
   factory K12Detail.fromJson(Map<String, dynamic> json) => K12Detail(
     id: json["id"],
@@ -215,7 +215,7 @@ class _k12detailState extends State<k12detail> {
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
                                 Flexible(
-                                  child: Text(k12!.data.k12.courseName,
+                                  child: Text(k12!.data.k12.courseName.toString(),
                                       style: TextStyle(
                                           fontSize: 35,
                                           fontFamily: "Candara",
@@ -227,14 +227,14 @@ class _k12detailState extends State<k12detail> {
                               mainAxisAlignment: MainAxisAlignment.start,
                               children: [
                                 Icon(Icons.book, color: Colors.teal, size: 25),
-                                Text("hii",
+                                Text("test",
                                     style: TextStyle(
                                         fontSize: 20,
                                         fontFamily: "Candara",
                                         color: Colors.teal)),
                                 SizedBox(width: 30),
                                 Icon(Icons.people, color: Colors.yellow, size: 30),
-                                Text("hola",
+                                Text("test",
                                     style: TextStyle(
                                         fontSize: 20,
                                         fontFamily: "Candara",
@@ -249,7 +249,7 @@ class _k12detailState extends State<k12detail> {
                                     fontFamily: "Candara",
                                     color: Colors.black)),
                             SizedBox(height: 10),
-                            Text(k12.data.k12.description,
+                            Text(k12.data.k12.description.toString(),
                                 style: TextStyle(
                                     fontSize: 17,
                                     fontFamily: "Candara",
@@ -336,7 +336,7 @@ class _k12detailState extends State<k12detail> {
                                             children: <Widget>[
                                               Align(
                                                 alignment: Alignment.topLeft,
-                                                child: Text(k12.data.k12Details[i].chapterName,
+                                                child: Text(k12.data.k12Details[i].chapterName.toString(),
                                                   style: TextStyle(fontFamily: "Candara",
                                                       fontSize: 15),
                                                 ),

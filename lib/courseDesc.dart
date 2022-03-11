@@ -86,30 +86,30 @@ class ChapterDetails {
     required this.pdfFileName1,
   });
 
-   int id;
-   int bookId;
-   String chapterName;
-   String mediaFile;
+   var id;
+   var bookId;
+   var chapterName;
+   var mediaFile;
    dynamic fileName;
-   String about;
-   String syllabus;
-  String description;
-  int lifespan;
-  String language;
-  int price;
-  int salePrice;
-  int onSale;
-  int featured;
-  String status;
-  int school;
-  int createdBy;
-  int updatedBy;
-  DateTime createdAt;
-  DateTime updatedAt;
+   var about;
+   var syllabus;
+  var description;
+  var lifespan;
+  var language;
+  var price;
+  var salePrice;
+  var onSale;
+  var featured;
+  var status;
+  var school;
+  var createdBy;
+  var updatedBy;
+  var createdAt;
+  var updatedAt;
   dynamic pdfFile;
   dynamic pdfFileName;
-  String pdfFile1;
-  String pdfFileName1;
+  var pdfFile1;
+  var pdfFileName1;
 
   factory ChapterDetails.fromJson(Map<String, dynamic> json) => ChapterDetails(
     id: json["id"],
@@ -130,8 +130,8 @@ class ChapterDetails {
     school: json["school"],
     createdBy: json["created_by"],
     updatedBy: json["updated_by"],
-    createdAt: DateTime.parse(json["created_at"]),
-    updatedAt: DateTime.parse(json["updated_at"]),
+    createdAt: json["created_at"],
+    updatedAt: json["updated_at"],
     pdfFile: json["pdf_file"],
     pdfFileName: json["pdf_file_name"],
     pdfFile1: json["pdf_file1"],
@@ -290,7 +290,7 @@ class _courseDescPageState extends State<courseDescPage> {
                             SizedBox(height: 20),
                             Text("Description",style: TextStyle(fontSize: 22,fontFamily: "Candara",color: Colors.black)),
                             SizedBox(height: 10),
-                            Text(k12!.data.chapterDetails.description,style: TextStyle(fontSize:17,fontFamily: "Candara",color: Colors.grey)),
+                            Text(k12!.data.chapterDetails.description.toString(),style: TextStyle(fontSize:17,fontFamily: "Candara",color: Colors.grey)),
                             SizedBox(height: 25),
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -299,10 +299,10 @@ class _courseDescPageState extends State<courseDescPage> {
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: <Widget>[
                                     Text("Price",style: TextStyle(fontSize: 20,fontFamily: "Candara",color: Colors.black)),
-                                    Text("${k12.data.chapterDetails.price}",style: TextStyle(fontSize: 20,fontFamily: "Candara",color: Colors.grey)),
+                                    Text("${k12.data.chapterDetails.price.toString()}",style: TextStyle(fontSize: 20,fontFamily: "Candara",color: Colors.grey)),
                                     SizedBox(height: 15),
                                     Text("Sale Price",style: TextStyle(fontSize: 20,fontFamily: "Candara",color: Colors.black)),
-                                    Text("${k12.data.chapterDetails.salePrice}",style: TextStyle(fontSize: 20,fontFamily: "Candara",color: Colors.grey)),
+                                    Text("${k12.data.chapterDetails.salePrice.toString()}",style: TextStyle(fontSize: 20,fontFamily: "Candara",color: Colors.grey)),
                                   ],
                                 ),
                                 SizedBox(width: 30),
@@ -310,10 +310,10 @@ class _courseDescPageState extends State<courseDescPage> {
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: <Widget>[
                                     Text("Language",style: TextStyle(fontSize: 20,fontFamily: "Candara",color: Colors.black)),
-                                    Text("${k12.data.chapterDetails.language}",style: TextStyle(fontSize: 20,fontFamily: "Candara",color: Colors.grey)),
+                                    Text("${k12.data.chapterDetails.language.toString()}",style: TextStyle(fontSize: 20,fontFamily: "Candara",color: Colors.grey)),
                                     SizedBox(height: 15),
                                     Text("Status",style: TextStyle(fontSize:20,fontFamily: "Candara",color: Colors.black)),
-                                    Text("${k12.data.chapterDetails.status}",style: TextStyle(fontSize: 20,fontFamily: "Candara",color: Colors.grey)),
+                                    Text("${k12.data.chapterDetails.status.toString()}",style: TextStyle(fontSize: 20,fontFamily: "Candara",color: Colors.grey)),
                                   ],
                                 )
                               ],
@@ -389,7 +389,7 @@ class _courseDescPageState extends State<courseDescPage> {
                                                   children: <Widget>[
                                                     Align(
                                                       alignment: Alignment.topLeft,
-                                                      child: Text(k12.data.videos[i].title,
+                                                      child: Text(k12.data.videos[i].title.toString(),
                                                         style: TextStyle(fontFamily: "Candara",
                                                             fontSize: 15),
                                                       ),
