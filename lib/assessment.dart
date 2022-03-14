@@ -14,7 +14,7 @@ Assess assessFromJson(String str) => Assess.fromJson(json.decode(str));
 
 String assessToJson(Assess data) => json.encode(data.toJson());
 var assId = "";
-
+var Image="";
 Future<Assess> createAssess(String id) async {
   final String apiUrl =
       "http://ec2-13-234-116-155.ap-south-1.compute.amazonaws.com/api/assessment";
@@ -139,10 +139,12 @@ class Chapter {
 
 class assess extends StatelessWidget {
   late int id;
-  assess(this.id); //const assess({Key? key}) : super(key: key);
+  var image;
+  assess(this.id,this.image); //const assess({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    Image=image;
     assId = id.toString();
     return MaterialApp(
       home: assessment(),

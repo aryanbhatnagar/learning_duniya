@@ -477,7 +477,7 @@ class _landingPageState extends State<landingPage> {
                           ClipRRect(borderRadius: BorderRadius.circular(10),
                               child: Center(
                                   child: Image(
-                                      image: AssetImage("images/sci.jfif"),
+                                      image: NetworkImage("${landApi.data.popularCourses[i].img.toString()}"),
                                       height: 120,
                                       width: 150))),
                           Padding(
@@ -510,25 +510,6 @@ class _landingPageState extends State<landingPage> {
                                       )
                                     ],
                                   ),
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.start,
-                                    children: [
-                                      IconButton(padding: EdgeInsets.zero,
-                                          onPressed: () {},
-                                          icon: Icon(Icons.person, size: 20,
-                                              color: Colors.grey)),
-                                      Text(
-                                          "Name", style: TextStyle(fontSize: 17,
-                                          fontFamily: "Candara",
-                                          color: Colors.grey))
-                                    ],
-
-                                  ),
-                                  Text("\$1234", style: TextStyle(
-                                      fontSize: 20,
-                                      fontFamily: "Candara",
-                                      color: Colors
-                                          .red))
                                 ],
                               ),
                             ),
@@ -547,7 +528,7 @@ class _landingPageState extends State<landingPage> {
                     onTap: () {
                       Navigator.push(
                           context, MaterialPageRoute(builder: (context) =>
-                          assess(landApi!.data.assessments[i].id)));
+                          assess(landApi!.data.assessments[i].id,landApi.data.assessments[i].img.toString())));
                     },
                     child: Container(
                       //width: 220,
@@ -562,10 +543,10 @@ class _landingPageState extends State<landingPage> {
                             SizedBox(height: 2.5),
                             ClipRRect(borderRadius: BorderRadius.circular(10),
                                 child: Image(
-                                    image: AssetImage("images/hindiass.jpg"),
-                                    height: 120,
+                                    image: NetworkImage("${landApi.data.assessments[i].img.toString()}"),
+                                    height: 160,
                                     width: 200,
-                                    fit: BoxFit.fitWidth)),
+                                    fit: BoxFit.fill)),
                             Padding(
                               padding: const EdgeInsets.fromLTRB(5, 5, 5, 5),
                               child: Container(
@@ -628,7 +609,7 @@ class _landingPageState extends State<landingPage> {
                               child: ClipRRect(
                                   borderRadius: BorderRadius.circular(10),
                                   child: Image(
-                                      image: AssetImage("images/hindiass.jpg"),
+                                      image: NetworkImage("${landApi.data.competitiveExams[i].img.toString()}"),
                                       height: 120,
                                       width: 150))),
                           Padding(
@@ -956,7 +937,7 @@ class _landingPageState extends State<landingPage> {
                                               Center(child: ClipRRect(borderRadius: BorderRadius
                                                   .circular(10),
                                                   child: Image(
-                                                      image: AssetImage("images/hindiass.jpg"),
+                                                      image: AssetImage("images/english.png"),
                                                       height: 150,
                                                       width: 150))),
                                               Padding(
