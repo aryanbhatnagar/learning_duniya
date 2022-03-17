@@ -14,7 +14,7 @@ Assess assessFromJson(String str) => Assess.fromJson(json.decode(str));
 
 String assessToJson(Assess data) => json.encode(data.toJson());
 var assId = "";
-var Image="";
+var ass_Image="";
 Future<Assess> createAssess(String id) async {
   final String apiUrl =
       "http://ec2-13-234-116-155.ap-south-1.compute.amazonaws.com/api/assessment";
@@ -144,7 +144,7 @@ class assess extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Image=image;
+    ass_Image=image;
     assId = id.toString();
     return MaterialApp(
       home: assessment(),
@@ -177,12 +177,12 @@ class _assessmentState extends State<assessment> {
                 children: [
                   Container(
                     padding: EdgeInsets.all(25),
-                    height: (size.height) / 3,
+                    height: (size.height) / 2.5,
                     width: (size.width),
                     decoration: BoxDecoration(
                         color: Colors.teal,
                         image: DecorationImage(
-                            image: AssetImage("images/hindiass.jpg"),
+                            image: NetworkImage("${ass_Image}"),
                             fit: BoxFit.fill)),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -197,7 +197,7 @@ class _assessmentState extends State<assessment> {
                     alignment: Alignment.bottomCenter,
                     child: Container(
                       padding: EdgeInsets.only(left: 20, right: 20, top: 20),
-                      height: (size.height) - (size.height) / 4,
+                      height: (size.height) - (size.height) / 3,
                       width: (size.width),
                       decoration: BoxDecoration(
                           color: Colors.white,
@@ -212,7 +212,7 @@ class _assessmentState extends State<assessment> {
                                   Flexible(
                                     child: Text(ass!.data.assessment.assessmentName,
                                         style: TextStyle(
-                                            fontSize: 35,
+                                            fontSize: 28,
                                             fontFamily: "Candara",
                                             color: Colors.black)),
                                   ),
@@ -227,14 +227,14 @@ class _assessmentState extends State<assessment> {
                                   Icon(Icons.book, color: Colors.teal, size: 25),
                                   Text(ass.data.assessment.book,
                                       style: TextStyle(
-                                          fontSize: 20,
+                                          fontSize: 17,
                                           fontFamily: "Candara",
                                           color: Colors.teal)),
                                   SizedBox(width: 30),
                                   Icon(Icons.people, color: Colors.yellow, size: 30),
                                   Text(ass.data.assessment.assessmentClass,
                                       style: TextStyle(
-                                          fontSize: 20,
+                                          fontSize: 17,
                                           fontFamily: "Candara",
                                           color: Colors.grey))
                                   //IconButton(onPressed: (){  }, icon: Icon(Icons.favorite_outline,size: 25),color: Colors.grey,)
@@ -243,10 +243,10 @@ class _assessmentState extends State<assessment> {
                               SizedBox(height: 20),
                               Text("Assessment Description",
                                   style: TextStyle(
-                                      fontSize: 22,
+                                      fontSize: 18,
                                       fontFamily: "Candara",
                                       color: Colors.black)),
-                              SizedBox(height: 10),
+                              //SizedBox(height: 10),
                               Text(ass.data.assessment.book,
                                   style: TextStyle(
                                       fontSize: 17,
@@ -261,23 +261,23 @@ class _assessmentState extends State<assessment> {
                                     children: <Widget>[
                                       Text("Subject",
                                           style: TextStyle(
-                                              fontSize: 20,
+                                              fontSize: 18,
                                               fontFamily: "Candara",
                                               color: Colors.black)),
                                       Text(ass.data.assessment.subject,
                                           style: TextStyle(
-                                              fontSize: 20,
+                                              fontSize: 18,
                                               fontFamily: "Candara",
                                               color: Colors.grey)),
                                       SizedBox(height: 15),
                                       Text("Subject ID",
                                           style: TextStyle(
-                                              fontSize: 20,
+                                              fontSize: 18,
                                               fontFamily: "Candara",
                                               color: Colors.black)),
                                       Text(ass.data.assessment.subjectId.toString(),
                                           style: TextStyle(
-                                              fontSize: 20,
+                                              fontSize: 18,
                                               fontFamily: "Candara",
                                               color: Colors.grey)),
                                     ],
@@ -288,23 +288,23 @@ class _assessmentState extends State<assessment> {
                                     children: <Widget>[
                                       Text("Class",
                                           style: TextStyle(
-                                              fontSize: 20,
+                                              fontSize: 18,
                                               fontFamily: "Candara",
                                               color: Colors.black)),
                                       Text(ass.data.assessment.assessmentClass,
                                           style: TextStyle(
-                                              fontSize: 20,
+                                              fontSize: 18,
                                               fontFamily: "Candara",
                                               color: Colors.grey)),
                                       SizedBox(height: 15),
                                       Text("Book",
                                           style: TextStyle(
-                                              fontSize: 20,
+                                              fontSize: 18,
                                               fontFamily: "Candara",
                                               color: Colors.black)),
                                       Text(ass.data.assessment.book,
                                           style: TextStyle(
-                                              fontSize: 20,
+                                              fontSize: 18,
                                               fontFamily: "Candara",
                                               color: Colors.grey)),
                                     ],

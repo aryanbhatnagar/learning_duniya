@@ -444,7 +444,13 @@ class _quizpageState extends State<quizpage> with TickerProviderStateMixin {
     final controllerr = GroupButtonController();
 
     List<Widget> vid_pho = <Widget>[
-      Image(image: AssetImage("images/hindiass.jpg"), fit: BoxFit.fill),
+      Container(
+        height: 150,
+        width: 120,
+        decoration: BoxDecoration(
+          image: DecorationImage(image:AssetImage("images/hindiass.jpg"), fit: BoxFit.fill),
+        ),
+      ),
     ];
 
     return Scaffold(
@@ -876,11 +882,14 @@ Future<Future<ConfirmActionQuiz?>> _asyncConfirmDialog(
     barrierDismissible: false,
     builder: (BuildContext context) {
       return AlertDialog(
-        title: Image.asset(
-          'images/tick.png',
+        title:
+          Container(
           height: 50,
           width: 50,
-        ),
+          decoration: BoxDecoration(
+          image: DecorationImage(image:AssetImage('images/tick.png') ,fit: BoxFit.fill),
+      ),
+      ),
         content: Text('Test Submitted Successfully'),
         actions: <Widget>[
           ElevatedButton(
