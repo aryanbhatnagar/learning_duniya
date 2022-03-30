@@ -7,6 +7,7 @@ import 'package:learning_duniya/assessment.dart';
 import 'package:learning_duniya/courseDesc.dart';
 import 'package:learning_duniya/k12details.dart';
 import 'package:learning_duniya/mentor.dart';
+import 'package:learning_duniya/profile.dart';
 import 'package:learning_duniya/quiz.dart';
 import 'package:group_button/group_button.dart';
 import 'package:learning_duniya/seeall.dart';
@@ -197,7 +198,7 @@ class Assessment {
   int id;
   String assessmentName;
   String img;
-  String price;
+  var price;
 
 
   factory Assessment.fromJson(Map<String, dynamic> json) => Assessment(
@@ -270,22 +271,26 @@ class Mentor {
     required this.id,
     required this.eduName,
     required this.img,
+    required this.specilization
   });
 
   int id;
   String eduName;
   String img;
+  var specilization;
 
   factory Mentor.fromJson(Map<String, dynamic> json) => Mentor(
     id: json["id"],
     eduName: json["edu_name"],
-    img: json["img"]
+    img: json["img"],
+    specilization: json["specilization"]
   );
 
   Map<String, dynamic> toJson() => {
     "id": id,
     "edu_name": eduName,
-    "img": img
+    "img": img,
+    "specilization": specilization
   };
 }
 
@@ -396,7 +401,8 @@ class _landingPageState extends State<landingPage> {
   int _selectedIndex = 0;
   String sub="Chemistry";
   List<Widget> add = [];
-  List<bool> isSelected = List.generate(10, (index) => false);
+  List<int> butind=[];
+
 
   //list for views
   List <Widget> pop_c= <Widget>[];
@@ -420,27 +426,6 @@ class _landingPageState extends State<landingPage> {
     });
   }
 
- /* void update_k12(int i) {
-    switch (i) {
-      case 0:
-          k12 = sci;
-          break;
-      case 1:
-          k12 = hin;
-          break;
-      case 2:
-        setState(() {
-          k12 = eng;
-        });
-        break;
-      case 3:
-        setState(() {
-          k12 = comp;
-        });
-        break;
-    }
-  }*/
-
   @override
   void initState()  {
     super.initState();
@@ -449,6 +434,7 @@ class _landingPageState extends State<landingPage> {
   @override
   Widget build(BuildContext context) {
 
+    //isSelected[0]=true;
       final controller = GroupButtonController();
       List<Widget> _widgetOptions = <Widget>[
 
@@ -465,7 +451,7 @@ class _landingPageState extends State<landingPage> {
                     onTap: () {
                       Navigator.push(
                           context, MaterialPageRoute(
-                          builder: (context) => k12_det(landApi!.data.popularCourses[i].id.toString())));
+                          builder: (context) => k12_det(landApi!.data.popularCourses[i].id.toString(),landApi!.data.popularCourses[i].img.toString())));
                     },
                     child: Card(
                       elevation: 5,
@@ -474,12 +460,13 @@ class _landingPageState extends State<landingPage> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: <Widget>[
-                          ClipRRect(borderRadius: BorderRadius.circular(10),
-                              child: Center(
-                                  child: Image(
-                                      image: NetworkImage("${landApi.data.popularCourses[i].img.toString()}"),
-                                      height: 120,
-                                      width: 150))),
+                          Container(
+                            height: 120,
+                            width: 150,
+                            decoration: BoxDecoration(
+                              image: DecorationImage(image: NetworkImage("${landApi!.data.popularCourses[i].img}"),fit: BoxFit.fill),
+                            ),
+                          ),
                           Padding(
                             padding: const EdgeInsets.fromLTRB(8, 5, 8, 5),
                             child: Container(
@@ -493,8 +480,9 @@ class _landingPageState extends State<landingPage> {
                                     children: [
                                       Flexible(
                                         child: Text(
-                                            landApi.data.popularCourses[i]
-                                                .subjectName,
+                                            "${landApi.data.popularCourses[i]
+                                                .subjectName}     .",
+                                            maxLines: 2,
                                             style: TextStyle(fontSize: 15,
                                                 fontFamily: "Candara",
                                                 color: Colors.black)),
@@ -541,16 +529,17 @@ class _landingPageState extends State<landingPage> {
                           crossAxisAlignment: CrossAxisAlignment.center,
                           children: <Widget>[
                             SizedBox(height: 2.5),
-                            ClipRRect(borderRadius: BorderRadius.circular(10),
-                                child: Image(
-                                    image: NetworkImage("${landApi.data.assessments[i].img.toString()}"),
-                                    height: 160,
-                                    width: 200,
-                                    fit: BoxFit.fill)),
+                            Container(
+                              height: 180,
+                              width: 180,
+                              decoration: BoxDecoration(
+                                image: DecorationImage(image: NetworkImage("${landApi!.data.assessments[i].img}"),fit: BoxFit.fill),
+                              ),
+                            ),
                             Padding(
                               padding: const EdgeInsets.fromLTRB(5, 5, 5, 5),
                               child: Container(
-                                width: 205,
+                                width: 190,
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
@@ -561,15 +550,25 @@ class _landingPageState extends State<landingPage> {
                                       children: [
                                         Flexible(
                                           child: Text(
-                                              landApi!.data.assessments[i]
-                                                  .assessmentName,
+                                              "${landApi!.data.assessments[i]
+                                                  .assessmentName}                 .",
                                               overflow: TextOverflow.clip,
-                                              style: TextStyle(fontSize: 17,
+                                              maxLines: 2,
+                                              style: TextStyle(fontSize: 16,
                                                   fontFamily: "Candara",
                                                   color: Colors.black)),
                                         ),
-                                        //IconButton(onPressed: (){  }, icon: Icon(Icons.favorite_outline,size: 25),color: Colors.grey,)
-                                        SizedBox(width: 5),
+                                        //SizedBox(width: 5),
+                                      ],
+                                    ),
+                                    SizedBox(height: 10),
+                                    Row(
+                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Text(
+                                            "\$1234", style: TextStyle(fontSize: 20,
+                                            fontFamily: "Candara",
+                                            color: Colors.red)),
                                         FavoriteButton(
                                           iconSize: 30,
                                           isFavorite: false,
@@ -579,12 +578,7 @@ class _landingPageState extends State<landingPage> {
                                           },
                                         )
                                       ],
-                                    ),
-                                    SizedBox(height: 10),
-                                    Text(
-                                        "\$1234", style: TextStyle(fontSize: 20,
-                                        fontFamily: "Candara",
-                                        color: Colors.red))
+                                    )
                                   ],
                                 ),
                               ),
@@ -605,13 +599,13 @@ class _landingPageState extends State<landingPage> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: <Widget>[
-                          Center(
-                              child: ClipRRect(
-                                  borderRadius: BorderRadius.circular(10),
-                                  child: Image(
-                                      image: NetworkImage("${landApi.data.competitiveExams[i].img.toString()}"),
-                                      height: 120,
-                                      width: 150))),
+                          Container(
+                            height: 135,
+                            width: 150,
+                            decoration: BoxDecoration(
+                              image: DecorationImage(image: NetworkImage("${landApi!.data.competitiveExams[i].img.toString()}"),fit: BoxFit.fill),
+                            ),
+                          ),
                           Padding(
                             padding: const EdgeInsets.fromLTRB(8, 5, 8, 5),
                             child: Container(
@@ -625,7 +619,7 @@ class _landingPageState extends State<landingPage> {
                                     children: [
                                       Text(landApi.data.competitiveExams[i]
                                           .subjectName,
-                                          style: TextStyle(fontSize: 17,
+                                          style: TextStyle(fontSize: 16,
                                               fontFamily: "Candara",
                                               color: Colors.black)),
                                       //IconButton(onPressed: (){  }, icon: Icon(Icons.favorite_outline,size: 25),color: Colors.grey,)
@@ -639,22 +633,10 @@ class _landingPageState extends State<landingPage> {
                                       )
                                     ],
                                   ),
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.start,
-                                    children: [
-                                      IconButton(padding: EdgeInsets.zero,
-                                          onPressed: () {},
-                                          icon: Icon(Icons.person, size: 20,
-                                              color: Colors.grey)),
-                                      Text(
-                                          "Name", style: TextStyle(fontSize: 17,
-                                          fontFamily: "Candara",
-                                          color: Colors.grey))
-                                    ],
 
-                                  ),
-                                  Text("\$1234", style: TextStyle(
-                                      fontSize: 20,
+                                  Text(landApi.data.competitiveExams[i]
+                                      .price.toString(), style: TextStyle(
+                                      fontSize: 14,
                                       fontFamily: "Candara",
                                       color: Colors
                                           .red))
@@ -683,9 +665,13 @@ class _landingPageState extends State<landingPage> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: <Widget>[
-                          Image(image: NetworkImage("${landApi.data.mentors[i].img.toString()}"),
-                              height: 150,
-                              width: 120),
+                          Container(
+                            height: 120,
+                            width: 120,
+                            decoration: BoxDecoration(
+                              image: DecorationImage(image: NetworkImage("${landApi!.data.mentors[i].img.toString()}"),fit: BoxFit.fill),
+                            ),
+                          ),
                           Padding(
                             padding: const EdgeInsets.fromLTRB(8, 5, 8, 5),
                             child: Container(
@@ -698,7 +684,7 @@ class _landingPageState extends State<landingPage> {
                                         .spaceBetween,
                                     children: [
                                       Text(landApi!.data.mentors[i].eduName,
-                                          style: TextStyle(fontSize: 20,
+                                          style: TextStyle(fontSize: 16,
                                               fontFamily: "Candara",
                                               color: Colors.black)),
                                       //IconButton(onPressed: (){  }, icon: Icon(Icons.favorite_outline,size: 25),color: Colors.grey,)
@@ -707,7 +693,7 @@ class _landingPageState extends State<landingPage> {
                                   Row(
                                     mainAxisAlignment: MainAxisAlignment.start,
                                     children: [
-                                      Text("Specialisation", style: TextStyle(
+                                      Text(snapshot.data!.data.mentors[i].specilization.toString(), style: TextStyle(
                                           fontSize: 15,
                                           fontFamily: "Candara",
                                           color: Colors.grey))
@@ -723,11 +709,14 @@ class _landingPageState extends State<landingPage> {
 
                     ),
                   ));
+
+                for(int j=0;j<snapshot.data!.data.subjects.length;j++)
+                  butind.add(snapshot.data!.data.subjects[j].id.toInt());
               }
+              List<bool> isSelected = List.generate(snapshot.data!.data.subjects.length, (index) => false);
               return SingleChildScrollView(
               child: Column(
                 children: [
-
                   Container(
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.only(
@@ -735,34 +724,21 @@ class _landingPageState extends State<landingPage> {
                           bottomRight: Radius.circular(20)),
                       color: Colors.white,
                     ),
-                    padding: EdgeInsets.fromLTRB(15, 30, 15, 15),
+                    padding: EdgeInsets.fromLTRB(15, 15, 15, 15),
                     width: double.infinity,
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: <Widget>[
-                        Text("Let's Start Learning", style: TextStyle(
-                            fontSize: 25,
-                            fontFamily: "Candara",
-                            color: Colors.teal),),
-                        SizedBox(height: 30),
+                        SizedBox(height: 10),
 
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: <Widget>[
                             Text("Popular Courses", style: TextStyle(
                                 fontFamily: "Candara",
-                                fontSize: 22,
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
                                 color: Colors.black)),
-                            GestureDetector(
-                              child: Text("See all", style: TextStyle(
-                                  fontSize: 20,
-                                  color: Colors.blue,
-                                  fontFamily: "Candara")),
-                              onTap: () {
-                                Navigator.push(context, MaterialPageRoute(
-                                    builder: (context) =>
-                                        seeallpage("Popular Courses", 1)));
-                              },)
                           ],
                         ),
                         SizedBox(height: 20),
@@ -773,7 +749,7 @@ class _landingPageState extends State<landingPage> {
 
                             )
                         ),
-                        SizedBox(height: 30),
+                        SizedBox(height: 15),
 
 
                       ],
@@ -782,7 +758,7 @@ class _landingPageState extends State<landingPage> {
 
                   ),
                   Container(
-                    padding: EdgeInsets.fromLTRB(15, 30, 15, 15),
+                    padding: EdgeInsets.fromLTRB(15, 15, 15, 15),
                     color: Colors.teal,
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.center,
@@ -793,11 +769,12 @@ class _landingPageState extends State<landingPage> {
                           children: <Widget>[
                             Text("Assessment", style: TextStyle(
                                 fontFamily: "Candara",
-                                fontSize: 22,
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
                                 color: Colors.white)),
                             GestureDetector(
                               child: Text("See all", style: TextStyle(
-                                  fontSize: 20,
+                                  fontSize: 18,
                                   color: Colors.lightBlueAccent,
                                   fontFamily: "Candara")),
                               onTap: () {
@@ -814,7 +791,7 @@ class _landingPageState extends State<landingPage> {
                                 children: asses
                             )
                         ),
-                        SizedBox(height: 30),
+                        SizedBox(height: 15),
 
                       ],
                     ),
@@ -823,7 +800,7 @@ class _landingPageState extends State<landingPage> {
                     decoration: BoxDecoration(
                         borderRadius: BorderRadius.all(Radius.circular(20)),
                         color: Colors.white),
-                    padding: EdgeInsets.fromLTRB(15, 30, 15, 15),
+                    padding: EdgeInsets.fromLTRB(15, 15, 15, 15),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: <Widget>[
@@ -831,60 +808,24 @@ class _landingPageState extends State<landingPage> {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: <Widget>[
                             Text("K12", style: TextStyle(fontFamily: "Candara",
-                                fontSize: 22,
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
                                 color: Colors.black)),
                             //GestureDetector(child: Text("See all",style: TextStyle(fontSize: 20,color: Colors.blue,fontFamily: "Candara")))
                           ],
                         ),
-                        SizedBox(height: 20),
+                        SizedBox(height: 10),
                         SingleChildScrollView(
                           scrollDirection: Axis.horizontal,
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                             children: <Widget>[
-                              /*GroupButton(
-                                  controller: controller,
-                                  buttons: [
-                                    'Science',
-                                    'Hindi',
-                                    'English',
-                                    'Computer',
-                                    'SST'
-                                  ],
-
-                                  onSelected: (i, selected) {
-                                    if(i==0)
-                                      {
-                                        setState(() {
-                                          hin_vis=true;
-                                          eng_vis=false;
-                                        });
-
-                                      }
-                                  },
-                                  selectedTextStyle: const TextStyle(
-                                      fontFamily: "Candara",
-                                      fontSize: 16,
-                                      color: Colors.white),
-                                  unselectedTextStyle: const TextStyle(
-                                      fontFamily: "Candara",
-                                      fontSize: 16,
-                                      color: Colors.black),
-                                  unselectedColor: Colors.transparent,
-                                  selectedColor: Colors.teal,
-                                  selectedShadow: const <BoxShadow>[BoxShadow(
-                                      color: Colors.transparent)
-                                  ],
-                                  unselectedShadow: const <BoxShadow>[BoxShadow(
-                                      color: Colors.transparent)
-                                  ],
-                                  borderRadius: BorderRadius.circular(5.0)
-                              ),*/
                               ToggleButtons(
                                   children: <Widget>[
                                     for(int j=0;j<snapshot.data!.data.subjects.length;j++)
                                       Text(" ${snapshot.data!.data.subjects[j].subjectName}  ",style: TextStyle(fontFamily: "Candara",fontSize: 17),)
                                 ],
+
                                 selectedBorderColor: Colors.teal,
                                 selectedColor: Colors.white,
                                 borderColor: Colors.transparent,
@@ -901,8 +842,8 @@ class _landingPageState extends State<landingPage> {
                                       } else {
                                         isSelected[buttonIndex] = false;
                                       }
-                                      k12_pos=index+1;
                                     }
+                                    k12_pos=butind[index];
                                   });
                                 },
                                 isSelected: isSelected,
@@ -924,7 +865,7 @@ class _landingPageState extends State<landingPage> {
                                       GestureDetector(
                                         onTap: () {
                                           Navigator.push(context, MaterialPageRoute(
-                                              builder: (context) => k12_det(k12_obj!.data1.k12[i].id.toString())));
+                                              builder: (context) => k12_det(k12_obj!.data1.k12[i].id.toString(),landApi!.data.popularCourses[i].img)));
                                         },
                                         child: Card(
                                           shape: RoundedRectangleBorder(
@@ -934,16 +875,17 @@ class _landingPageState extends State<landingPage> {
                                             mainAxisAlignment: MainAxisAlignment.start,
                                             crossAxisAlignment: CrossAxisAlignment.center,
                                             children: <Widget>[
-                                              Center(child: ClipRRect(borderRadius: BorderRadius
-                                                  .circular(10),
-                                                  child: Image(
-                                                      image: AssetImage("images/english.png"),
-                                                      height: 150,
-                                                      width: 150))),
+                                              Container(
+                                                height: 150,
+                                                width: 150,
+                                                decoration: BoxDecoration(
+                                                  image: DecorationImage(image: NetworkImage("${k12_obj!.data1.k12[i].img.toString()}"),fit: BoxFit.fill),
+                                                ),
+                                              ),
                                               Padding(
                                                 padding: const EdgeInsets.fromLTRB(5, 5, 5, 5),
                                                 child: Container(
-                                                  height: 130,
+                                                  height: 100,
                                                   width: 150,
                                                   child: Column(
                                                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -965,24 +907,18 @@ class _landingPageState extends State<landingPage> {
 
                                                         ],
                                                       ),
+                                                      SizedBox(height: 8),
+                                                      Text("${k12_obj.data1.k12[i].chapter} Chapters", style: TextStyle(
+                                                          fontSize: 14,
+                                                          fontFamily: "Candara",
+                                                          color: Colors
+                                                              .grey)),
                                                       Text("${k12_obj.data1.k12[i].chapter} Chapters", style: TextStyle(
                                                           fontSize: 14,
                                                           fontFamily: "Candara",
                                                           color: Colors
                                                               .grey)),
                                                       SizedBox(height: 5),
-                                                      Center(
-                                                        child: RaisedButton(
-                                                          padding: EdgeInsets.zero,
-                                                          onPressed: () {},
-                                                          color: Colors.indigo,
-                                                          child: (Text(
-                                                              "Subscribe", style: TextStyle(
-                                                              fontSize: 12,
-                                                              fontFamily: "Candara",
-                                                              color: Colors.white))),
-                                                        ),
-                                                      )
                                                     ],
                                                   ),
                                                 ),
@@ -1004,7 +940,7 @@ class _landingPageState extends State<landingPage> {
                             }
                             ),
 
-                        SizedBox(height: 30),
+                        SizedBox(height: 15),
 
 
                       ],
@@ -1015,7 +951,7 @@ class _landingPageState extends State<landingPage> {
                     decoration: BoxDecoration(borderRadius: BorderRadius.only(
                         topLeft: Radius.circular(20),
                         topRight: Radius.circular(20)), color: Colors.teal),
-                    padding: EdgeInsets.fromLTRB(15, 30, 15, 15),
+                    padding: EdgeInsets.fromLTRB(15, 15, 15, 15),
                     width: double.infinity,
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.center,
@@ -1026,11 +962,12 @@ class _landingPageState extends State<landingPage> {
                           children: <Widget>[
                             Text("Competitive Exam", style: TextStyle(
                                 fontFamily: "Candara",
-                                fontSize: 22,
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
                                 color: Colors.white)),
                             GestureDetector(
                                 child: Text("See all", style: TextStyle(
-                                    fontSize: 20,
+                                    fontSize: 18,
                                     color: Colors.lightBlueAccent,
                                     fontFamily: "Candara")),
                                 onTap: () {
@@ -1047,16 +984,14 @@ class _landingPageState extends State<landingPage> {
                                 children: comp_e
                             )
                         ),
-                        SizedBox(height: 30),
-
-
+                        SizedBox(height: 15),
                       ],
                     ),
 
 
                   ),
                   Container(
-                    padding: EdgeInsets.fromLTRB(15, 30, 15, 15),
+                    padding: EdgeInsets.fromLTRB(15, 15, 15, 15),
                     decoration: BoxDecoration(borderRadius: BorderRadius.only(
                         topLeft: Radius.circular(20),
                         topRight: Radius.circular(20)), color: Colors.white),
@@ -1066,13 +1001,14 @@ class _landingPageState extends State<landingPage> {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: <Widget>[
-                            Text("MENTORS", style: TextStyle(
+                            Text("Mentor", style: TextStyle(
                                 fontFamily: "Candara",
-                                fontSize: 25,
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
                                 color: Colors.black)),
                             GestureDetector(
                                 child: Text("See all", style: TextStyle(
-                                    fontSize: 20,
+                                    fontSize: 18,
                                     color: Colors.lightBlueAccent,
                                     fontFamily: "Candara")),
                                 onTap: () {
@@ -1083,6 +1019,11 @@ class _landingPageState extends State<landingPage> {
                           ],
                         ),
                         SizedBox(height: 20),
+                        ElevatedButton(onPressed: (){
+                          Navigator.push(context, MaterialPageRoute(
+                              builder: (context) =>profile()));
+                        },
+                          child: Text("Mentor profile"),),
                         SingleChildScrollView(
                             scrollDirection: Axis.horizontal,
                             child: Row(
@@ -1373,7 +1314,7 @@ class _landingPageState extends State<landingPage> {
       return Scaffold(
         backgroundColor: Colors.teal,
         appBar: AppBar(
-          toolbarHeight: 100,
+          toolbarHeight: 70,
           backgroundColor: Colors.white70,
           //leading:
           //Icon(Icons.menu, color: Colors.black, size: 30,),
@@ -1389,40 +1330,10 @@ class _landingPageState extends State<landingPage> {
                     context, MaterialPageRoute(builder: (context) => Dashboard()));}
             }, icon: Icon(Icons.person, color: Colors.white, size: 30))
           ],
-          title: Container(
-            //height: 40,
-            decoration: BoxDecoration(
-                color: Colors.transparent,
-                borderRadius: BorderRadius.circular(5)),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: <Widget>[
-                //Text("Let's Start Learning",style: TextStyle(fontSize: 25,fontFamily: "Candara" ,color: Colors.white)),
-                TextFormField(
-                  decoration: InputDecoration(
-                    fillColor: Colors.white,
-
-                    enabledBorder: OutlineInputBorder(
-                        borderSide: const BorderSide(
-                            color: Colors.white, width: 2.0),
-                        borderRadius: BorderRadius.circular(15)),
-                    focusedBorder: OutlineInputBorder(
-                        borderSide: const BorderSide(
-                            color: Colors.white, width: 2.0),
-                        borderRadius: BorderRadius.circular(15)
-                    ),
-                    labelText: 'Search',
-                    labelStyle: TextStyle(
-                        fontFamily: "Candara", color: Colors.white),
-                    prefixIcon: Icon(Icons.search, color: Colors.white),
-                    //fillColor: Colors.grey,
-                    focusColor: Colors.white,
-                  ),
-                )
-
-              ],
-            ),
-          ),
+          title: Text("Let's Start Learning", style: TextStyle(
+              fontSize: 20,
+              fontFamily: "Candara",
+              color: Colors.white),)
 
         ),
         drawer: Drawer(
@@ -1464,22 +1375,22 @@ class _landingPageState extends State<landingPage> {
             items: const <BottomNavigationBarItem>[
               BottomNavigationBarItem(
                   icon: Icon(Icons.home_outlined, size: 30),
-                  title: Text('Dashboard'),
+                  label: 'Dashboard',
                   backgroundColor: Colors.white),
               BottomNavigationBarItem(
                 icon: Icon(Icons.favorite_outline, size: 30),
-                title: Text('Favourites'),
+                label: 'Favourites',
               ),
               BottomNavigationBarItem(
                 icon: Icon(
                   Icons.school_outlined,
                   size: 30,
                 ),
-                title: Text('Scholarship'),
+                label: 'Scholarship',
               ),
               BottomNavigationBarItem(
                   icon: Icon(Icons.notifications_active_outlined, size: 30),
-                  title: Text('Exam Alert')),
+                  label: 'Exam Alert'),
             ],
             type: BottomNavigationBarType.shifting,
             currentIndex: _selectedIndex,

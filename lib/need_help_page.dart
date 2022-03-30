@@ -313,11 +313,30 @@ class _needHelpPageState extends State<need_help_page> {
                       //Icon(Icons.arrow_drop_down,color: Colors.black, size: 30),
                     ],
                   ),
+                  SizedBox(height: 10,),
                   TextFormField(
                     validator: (input) {
                       if (input!.isEmpty)
                         return 'Enter comment';
                     },
+                    decoration: InputDecoration(
+                      fillColor: Colors.white,
+
+                      enabledBorder: OutlineInputBorder(
+                          borderSide: const BorderSide(
+                              color: Colors.grey, width: 2.0),
+                          borderRadius: BorderRadius.circular(15)),
+                      focusedBorder: OutlineInputBorder(
+                          borderSide: const BorderSide(
+                              color: Colors.teal, width: 2.0),
+                          borderRadius: BorderRadius.circular(15)
+                      ),
+                      labelText: 'Comment',
+                      labelStyle: TextStyle(
+                          fontFamily: "Candara", color: Colors.grey),
+                      //fillColor: Colors.grey,
+                      focusColor: Colors.teal,
+                    ),
                     controller: comment,
                     keyboardType: TextInputType.multiline,
                     minLines: 1,
@@ -327,9 +346,10 @@ class _needHelpPageState extends State<need_help_page> {
               ),
             ),
             const SizedBox(
-              height: 10,
+              height: 150,
             ),
             Container(
+              padding: EdgeInsets.all(15),
                 margin: const EdgeInsets.symmetric(horizontal: 10.0),
                 child: Align(
                   alignment: Alignment.centerRight,

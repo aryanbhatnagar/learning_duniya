@@ -5,6 +5,7 @@ import 'package:group_button/group_button.dart';
 import 'package:http/http.dart' as http;
 import 'package:learning_duniya/Login2.dart';
 import 'package:learning_duniya/quiz.dart';
+import 'package:learning_duniya/quiz_assessment.dart';
 import 'package:learning_duniya/test.dart';
 
 import 'Login.dart';
@@ -212,7 +213,7 @@ class _assessmentState extends State<assessment> {
                                   Flexible(
                                     child: Text(ass!.data.assessment.assessmentName,
                                         style: TextStyle(
-                                            fontSize: 28,
+                                            fontSize: 22,
                                             fontFamily: "Candara",
                                             color: Colors.black)),
                                   ),
@@ -224,17 +225,17 @@ class _assessmentState extends State<assessment> {
                               Row(
                                 mainAxisAlignment: MainAxisAlignment.start,
                                 children: [
-                                  Icon(Icons.book, color: Colors.teal, size: 25),
+                                  Icon(Icons.book, color: Colors.teal, size: 22),
                                   Text(ass.data.assessment.book,
                                       style: TextStyle(
-                                          fontSize: 17,
+                                          fontSize: 15,
                                           fontFamily: "Candara",
                                           color: Colors.teal)),
                                   SizedBox(width: 30),
-                                  Icon(Icons.people, color: Colors.yellow, size: 30),
+                                  Icon(Icons.people, color: Colors.yellow, size: 25),
                                   Text(ass.data.assessment.assessmentClass,
                                       style: TextStyle(
-                                          fontSize: 17,
+                                          fontSize: 15,
                                           fontFamily: "Candara",
                                           color: Colors.grey))
                                   //IconButton(onPressed: (){  }, icon: Icon(Icons.favorite_outline,size: 25),color: Colors.grey,)
@@ -249,7 +250,7 @@ class _assessmentState extends State<assessment> {
                               //SizedBox(height: 10),
                               Text(ass.data.assessment.book,
                                   style: TextStyle(
-                                      fontSize: 17,
+                                      fontSize: 15,
                                       fontFamily: "Candara",
                                       color: Colors.grey)),
                               SizedBox(height: 25),
@@ -259,52 +260,74 @@ class _assessmentState extends State<assessment> {
                                   Column(
                                     crossAxisAlignment: CrossAxisAlignment.start,
                                     children: <Widget>[
-                                      Text("Subject",
+                                      Row(
+                                        children: [
+
+                                          Icon(Icons.sticky_note_2,color: Colors.orange,size: 20),
+                                          Text(" Subject",
+                                              style: TextStyle(
+                                                  fontSize: 16,
+                                                  fontFamily: "Candara",
+                                                  color: Colors.black)),
+                                        ],
+                                      ),
+                                      Text("      ${ass.data.assessment.subject}",
                                           style: TextStyle(
-                                              fontSize: 18,
-                                              fontFamily: "Candara",
-                                              color: Colors.black)),
-                                      Text(ass.data.assessment.subject,
-                                          style: TextStyle(
-                                              fontSize: 18,
+                                              fontSize: 16,
                                               fontFamily: "Candara",
                                               color: Colors.grey)),
                                       SizedBox(height: 15),
-                                      Text("Subject ID",
+                                      Row(
+                                        children: [
+
+                                          Icon(Icons.content_paste,color: Colors.teal,size: 20),
+                                          Text(" Chapters",
+                                              style: TextStyle(
+                                                  fontSize: 16,
+                                                  fontFamily: "Candara",
+                                                  color: Colors.black)),
+                                        ],
+                                      ),
+                                      Text("      ${ass.data.chapters.length.toString()}",
                                           style: TextStyle(
-                                              fontSize: 18,
-                                              fontFamily: "Candara",
-                                              color: Colors.black)),
-                                      Text(ass.data.assessment.subjectId.toString(),
-                                          style: TextStyle(
-                                              fontSize: 18,
+                                              fontSize: 16,
                                               fontFamily: "Candara",
                                               color: Colors.grey)),
                                     ],
                                   ),
-                                  SizedBox(width: 30),
+                                  SizedBox(width: 20),
                                   Column(
                                     crossAxisAlignment: CrossAxisAlignment.start,
                                     children: <Widget>[
-                                      Text("Class",
+                                      Row(
+                                        children: [
+                                          Icon(Icons.class_,color: Colors.teal,size: 20),
+                                          Text(" Class",
+                                              style: TextStyle(
+                                                  fontSize: 16,
+                                                  fontFamily: "Candara",
+                                                  color: Colors.black)),
+                                        ],
+                                      ),
+                                      Text("      ${ass.data.assessment.assessmentClass}",
                                           style: TextStyle(
-                                              fontSize: 18,
-                                              fontFamily: "Candara",
-                                              color: Colors.black)),
-                                      Text(ass.data.assessment.assessmentClass,
-                                          style: TextStyle(
-                                              fontSize: 18,
+                                              fontSize: 16,
                                               fontFamily: "Candara",
                                               color: Colors.grey)),
                                       SizedBox(height: 15),
-                                      Text("Book",
+                                      Row(
+                                        children: [
+                                          Icon(Icons.menu_book,color: Colors.teal,size: 20),
+                                          Text(" Book",
+                                              style: TextStyle(
+                                                  fontSize: 16,
+                                                  fontFamily: "Candara",
+                                                  color: Colors.black)),
+                                        ],
+                                      ),
+                                      Text("      ${ass.data.assessment.book}",
                                           style: TextStyle(
-                                              fontSize: 18,
-                                              fontFamily: "Candara",
-                                              color: Colors.black)),
-                                      Text(ass.data.assessment.book,
-                                          style: TextStyle(
-                                              fontSize: 18,
+                                              fontSize: 16,
                                               fontFamily: "Candara",
                                               color: Colors.grey)),
                                     ],
@@ -322,7 +345,7 @@ class _assessmentState extends State<assessment> {
                                     Navigator.pushReplacement(
                                         context,
                                         MaterialPageRoute(
-                                            builder: (context) => quiz(snapshot.data!.data.chapters[i].id)));}
+                                            builder: (context) => quiz_assessment(snapshot.data!.data.chapters[i].id,snapshot.data!.data.assessment.id)));}
                                     else{
                                       Navigator.push(
                                           context, MaterialPageRoute(builder: (context) => Login2()));

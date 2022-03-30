@@ -1,22 +1,91 @@
+import 'dart:convert';
+import 'package:http/http.dart' as http;
+import 'package:favorite_button/favorite_button.dart';
 import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
 import 'package:flutter/cupertino.dart';
+import 'globals.dart';
 
+Videolike videolikeFromJson(String str) => Videolike.fromJson(json.decode(str));
+String videolikeToJson(Videolike data) => json.encode(data.toJson());
+
+var like=0;
+var video_id="";
+class Videolike {
+  Videolike({
+    required this.message,
+    required this.status,
+  });
+
+  String message;
+  int status;
+
+  factory Videolike.fromJson(Map<String, dynamic> json) => Videolike(
+    message: json["message"],
+    status: json["status"],
+  );
+
+  Map<String, dynamic> toJson() => {
+    "message": message,
+    "status": status,
+  };
+}
+Future<Videolike> createVideovisit(String id) async {
+  final String apiUrl =
+      "http://ec2-13-234-116-155.ap-south-1.compute.amazonaws.com/api/book_video/like";
+
+  final response = await http.post(Uri.parse(apiUrl),headers: <String, String> {
+    "Authorization": "Bearer $token",
+  },
+      body: {"id":id});
+
+  if (response.statusCode == 200) {
+    like=1;
+    final String responseString = response.body;
+    return videolikeFromJson(responseString);
+  } else {
+    print(id.toString());
+    print(response.statusCode.toString());
+    throw Exception("failed");
+  }
+}
+Future<Videolike> createVideolike(String id) async {
+  final String apiUrl =
+      "http://ec2-13-234-116-155.ap-south-1.compute.amazonaws.com/api/book_video/like";
+
+  final response = await http.post(Uri.parse(apiUrl),headers: <String, String> {
+    "Authorization": "Bearer $token",
+  },
+      body: {"id":id});
+
+  if (response.statusCode == 200) {
+    like=1;
+    final String responseString = response.body;
+    return videolikeFromJson(responseString);
+  } else {
+    print(id.toString());
+    print(response.statusCode.toString());
+    throw Exception("failed");
+  }
+}
 
 class video extends StatefulWidget {
   late String  url;
   late String name;
-
-  video(this.url,this.name); //const video({Key? key}) : super(key: key);
+  late String vid;
+  late String description;
+  video(this.url,this.name,this.description,this.vid); //const video({Key? key}) : super(key: key);
 
   @override
-  _videoState createState() => _videoState(url,name);
+  _videoState createState() => _videoState(url,name,description,vid);
 }
 
 class _videoState extends State<video> {
   late String _url;
   late String _name;
-  _videoState(this._url,this._name);
+  late String _vid;
+  late String _description;
+  _videoState(this._url,this._name,this._description,this._vid);
 
 
   late VideoPlayerController _controller;
@@ -24,11 +93,11 @@ class _videoState extends State<video> {
   @override
   void initState() {
     super.initState();
-    _controller = VideoPlayerController.network(
-        'https://www.videolinks.com/pub/media/videolinks/video/hero10.mp4');
-    _controller.addListener(() {
+    _controller = VideoPlayerController.network(_url);
+        _controller.addListener(() {
       setState(() {});
     });
+
     _controller.setLooping(true);
     _controller.initialize().then((_) => setState(() {}));
     _controller.play();
@@ -37,6 +106,9 @@ class _videoState extends State<video> {
 
   @override
   Widget build(BuildContext context) {
+    video_id=_vid;
+    createVideovisit(video_id);
+    Future.delayed(Duration(seconds: 10));
     return MaterialApp(
       title: 'Video Demo',
       home: Scaffold(
@@ -76,10 +148,45 @@ class _videoState extends State<video> {
                 ),
               ),
               SizedBox(height: 10),
+              Container(
+                padding: EdgeInsets.all(10),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Flexible(child: Text(_name,style: TextStyle(fontFamily: "Candara",fontSize: 20),maxLines: 2,overflow: TextOverflow.ellipsis)),
+                    FavoriteButton(
+                      iconSize: 40,
+                      isFavorite: false,
+                      valueChanged: (_isFavorite) async {
+                        Videolike Abc=await createVideolike(video_id);
+                        if(like==1)
+                          print("video like successfull");
+                        setState(() {
+
+                        });
+                        print('Is Favorite : $_isFavorite');
+                      },
+                    )
+                  ],
+                ),
+              ),
               Padding(
-                padding: const EdgeInsets.all(10.0),
-                child: Text(_name,style: TextStyle(fontFamily: "Candara",fontSize: 25),maxLines: 2,overflow: TextOverflow.ellipsis),
-              )
+                padding: const EdgeInsets.all(10),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    Icon(Icons.favorite,color: Colors.red,size: 22),
+                    Text(" Academy",style: TextStyle(fontSize:15,fontFamily: "Candara",color: Colors.teal)),
+                    SizedBox(width: 30),
+                    Icon(Icons.play_arrow_rounded,color: Colors.blue,size: 27),
+                    Text(" 4.8",style: TextStyle(fontSize:15,fontFamily: "Candara",color: Colors.grey))
+                  ],
+                ),
+              ),
+              Padding(padding: EdgeInsets.fromLTRB(10,10,10,0),
+                child: Text("Description",style: TextStyle(fontFamily: "Candara",fontSize: 22,color: Colors.grey),maxLines: 2,overflow: TextOverflow.ellipsis),),
+              Padding(padding: EdgeInsets.fromLTRB(10,10,10,0),
+              child: Text(_description,style: TextStyle(fontFamily: "Candara",fontSize: 16,color: Colors.grey),maxLines: 2,overflow: TextOverflow.ellipsis),),
             ],
           ),
         ),

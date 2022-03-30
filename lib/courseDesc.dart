@@ -171,26 +171,26 @@ class Video {
   Video({
     required this.id,
     required this.title,
-    required this.url,
+    required this.description,
     required this.fileName,
   });
 
   int id;
   String title;
-  String url;
+  String description;
   String fileName;
 
   factory Video.fromJson(Map<String, dynamic> json) => Video(
     id: json["id"],
     title: json["title"],
-    url: json["url"],
+    description: json["description"],
     fileName: json["file_name"],
   );
 
   Map<String, dynamic> toJson() => {
     "id": id,
     "title": title,
-    "url": url,
+    "description": description,
     "file_name": fileName,
   };
 }
@@ -212,13 +212,17 @@ Future<K12Chapter> createK12(String id) async {
   }
 }
 
+String img2="";
+
 class courseDesc extends StatelessWidget {
   String Chap;
+  String Img2;
 
-  courseDesc(this.Chap); //const courseDesc({Key? key}) : super(key: key);
+  courseDesc(this.Chap,this.Img2); //const courseDesc({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    img2=Img2;
     chapid=Chap;
     return MaterialApp(
       home: courseDescPage(),
@@ -253,18 +257,18 @@ class _courseDescPageState extends State<courseDescPage> {
               children: [
                 Container(
                   padding: EdgeInsets.all(25),
-                  height: (size.height)/3,
+                  height: (size.height)/2.70,
                   width: (size.width),
                   decoration: BoxDecoration(
                       color: Colors.teal,
-                      image: DecorationImage(image: AssetImage("images/hindiass.jpg"),fit: BoxFit.fill)
+                      image: DecorationImage(image: NetworkImage(img2),fit: BoxFit.fill)
                   ),
                 ),
                 Align(
                   alignment: Alignment.bottomCenter,
                   child: Container(
                     padding: EdgeInsets.only(left: 20,right: 20,top: 20),
-                    height: (size.height)-(size.height)/4,
+                    height: (size.height)-(size.height)/3,
                     width: (size.width),
                     decoration: BoxDecoration(color: Colors.white,borderRadius: BorderRadius.circular(34)),
                     child: SingleChildScrollView(
@@ -274,24 +278,24 @@ class _courseDescPageState extends State<courseDescPage> {
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                Flexible(child: Text(k12!.data.chapterDetails.chapterName,style: TextStyle(fontSize: 35,fontFamily: "Candara",color: Colors.black))),
+                                Flexible(child: Text(k12!.data.chapterDetails.chapterName,style: TextStyle(fontSize: 22,fontFamily: "Candara",color: Colors.black))),
                               ],
                             ),
 
                             Row(
                               mainAxisAlignment: MainAxisAlignment.start,
                               children: [
-                                Icon(Icons.person,color: Colors.teal,size: 25),
-                                Text("Academy",style: TextStyle(fontSize:20,fontFamily: "Candara",color: Colors.teal)),
+                                Icon(Icons.person,color: Colors.teal,size: 22),
+                                Text("Academy",style: TextStyle(fontSize:15,fontFamily: "Candara",color: Colors.teal)),
                                 SizedBox(width: 30),
-                                Icon(Icons.star,color: Colors.yellow,size: 30),
-                                Text("4.8",style: TextStyle(fontSize:20,fontFamily: "Candara",color: Colors.grey))
+                                Icon(Icons.star,color: Colors.yellow,size: 25),
+                                Text("4.8",style: TextStyle(fontSize:15,fontFamily: "Candara",color: Colors.grey))
                            ],
                             ),
                             SizedBox(height: 20),
-                            Text("Description",style: TextStyle(fontSize: 22,fontFamily: "Candara",color: Colors.black)),
+                            Text("Description",style: TextStyle(fontSize: 18,fontFamily: "Candara",color: Colors.black)),
                             SizedBox(height: 10),
-                            Text(k12!.data.chapterDetails.description.toString(),style: TextStyle(fontSize:17,fontFamily: "Candara",color: Colors.grey)),
+                            Text(k12!.data.chapterDetails.description.toString(),style: TextStyle(fontSize:15,fontFamily: "Candara",color: Colors.grey)),
                             SizedBox(height: 25),
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -299,22 +303,42 @@ class _courseDescPageState extends State<courseDescPage> {
                                 Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: <Widget>[
-                                    Text("Price",style: TextStyle(fontSize: 20,fontFamily: "Candara",color: Colors.black)),
-                                    Text("${k12.data.chapterDetails.price.toString()}",style: TextStyle(fontSize: 20,fontFamily: "Candara",color: Colors.grey)),
+                                    Row(
+                                      children: [
+                                        Icon(Icons.monetization_on,color: Colors.orange,size: 20),
+                                        Text(" Price",style: TextStyle(fontSize: 16,fontFamily: "Candara",color: Colors.black)),
+                                      ],
+                                    ),
+                                    Text("     ${k12.data.chapterDetails.price.toString()}",style: TextStyle(fontSize: 16,fontFamily: "Candara",color: Colors.grey)),
                                     SizedBox(height: 15),
-                                    Text("Sale Price",style: TextStyle(fontSize: 20,fontFamily: "Candara",color: Colors.black)),
-                                    Text("${k12.data.chapterDetails.salePrice.toString()}",style: TextStyle(fontSize: 20,fontFamily: "Candara",color: Colors.grey)),
+                                    Row(
+                                      children: [
+                                        Icon(Icons.money_off_csred_rounded,color: Colors.green,size: 20),
+                                        Text(" Sale Price",style: TextStyle(fontSize: 16,fontFamily: "Candara",color: Colors.black)),
+                                      ],
+                                    ),
+                                    Text("     ${k12.data.chapterDetails.salePrice.toString()}",style: TextStyle(fontSize: 16,fontFamily: "Candara",color: Colors.grey)),
                                   ],
                                 ),
-                                SizedBox(width: 30),
+                                SizedBox(width: 20),
                                 Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: <Widget>[
-                                    Text("Language",style: TextStyle(fontSize: 20,fontFamily: "Candara",color: Colors.black)),
-                                    Text("${k12.data.chapterDetails.language.toString()}",style: TextStyle(fontSize: 20,fontFamily: "Candara",color: Colors.grey)),
+                                    Row(
+                                      children: [
+                                        Icon(Icons.language,color: Colors.teal,size: 20),
+                                        Text("  Language",style: TextStyle(fontSize: 16,fontFamily: "Candara",color: Colors.black)),
+                                      ],
+                                    ),
+                                    Text("      ${k12.data.chapterDetails.language.toString()}",style: TextStyle(fontSize: 16,fontFamily: "Candara",color: Colors.grey)),
                                     SizedBox(height: 15),
-                                    Text("Status",style: TextStyle(fontSize:20,fontFamily: "Candara",color: Colors.black)),
-                                    Text("${k12.data.chapterDetails.status.toString()}",style: TextStyle(fontSize: 20,fontFamily: "Candara",color: Colors.grey)),
+                                    Row(
+                                      children: [
+                                        Icon(Icons.network_check,color: Colors.teal,size: 20),
+                                        Text(" Status",style: TextStyle(fontSize:16,fontFamily: "Candara",color: Colors.black)),
+                                      ],
+                                    ),
+                                    Text("      ${k12.data.chapterDetails.status.toString()}",style: TextStyle(fontSize: 16,fontFamily: "Candara",color: Colors.grey)),
                                   ],
                                 )
                               ],
@@ -323,13 +347,14 @@ class _courseDescPageState extends State<courseDescPage> {
                             SizedBox(height: 25),
                             Center(
                               child: ToggleButtons(
+
                                 children: <Widget>[
-                                  Text(" Curriculum ",style: TextStyle(fontSize: 27,fontFamily: "Candara",color: Colors.black)),
-                                  Text(" MCQ ",style: TextStyle(fontSize: 27,fontFamily: "Candara",color: Colors.black)),
+                                  Text(" Curriculum ",style: TextStyle(fontSize: 20,fontFamily: "Candara",color: Colors.black)),
+                                  Text("      MCQ      ",style: TextStyle(fontSize: 20,fontFamily: "Candara",color: Colors.black)),
                                 ],
                                 selectedBorderColor: Colors.teal,
                                 selectedColor: Colors.white,
-                                borderColor: Colors.transparent,
+                                borderColor: Colors.grey,
                                 borderRadius: BorderRadius.circular(10),
                                 disabledColor: Colors.transparent,
                                 disabledBorderColor: Colors.transparent,
@@ -372,7 +397,7 @@ class _courseDescPageState extends State<courseDescPage> {
                                           {
                                         Navigator.push(context, MaterialPageRoute(
                                             builder: (context) =>
-                                                video(k12.data.videos[i].url,k12.data.videos[i].title)));}
+                                                video(k12.data.videos[i].fileName,k12.data.videos[i].title,k12.data.videos[i].description,k12.data.videos[i].id.toString())));}
                                         else
                                           Navigator.push(
                                               context, MaterialPageRoute(builder: (context) => Login2()));
@@ -422,7 +447,7 @@ class _courseDescPageState extends State<courseDescPage> {
                                     Navigator.push(
                                         context,
                                         MaterialPageRoute(
-                                            builder: (context) => quiz(1)));
+                                            builder: (context) => quiz(snapshot1.data!.data.chapterDetails.id)));
                                   },
                                   child: Text('MCQ',
                                       style: TextStyle(

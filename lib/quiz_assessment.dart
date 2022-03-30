@@ -17,9 +17,7 @@ import 'globals.dart';
 import 'main.dart';
 
 ConvJson convJsonFromJson(String str) => ConvJson.fromJson(json.decode(str));
-
 String convJsonToJson(ConvJson data) => json.encode(data.toJson());
-
 class ConvJson {
   ConvJson({
     required this.assessmentId,
@@ -55,7 +53,6 @@ class ConvJson {
     "status": status,
   };
 }
-
 class AnsSheet {
   AnsSheet({
     required this.que,
@@ -83,7 +80,6 @@ class AnsSheet {
     "result": result,
   };
 }
-
 class Result {
   Result({
     required this.total,
@@ -120,13 +116,12 @@ Questions questionsFromJson(String str) => Questions.fromJson(json.decode(str));
 String questionsToJson(Questions data) => json.encode(data.toJson());
 
 var quizId = "";
+var ASSid="";
 late List allQuestionData = [];
 late List quizInputData = [];
 late List assignQuizData = [];
-
 late String ass_id, start_time, end_time, status;
 late int total, correct = 0, wrong = 0, left = 0;
-
 late String que_id, ans;
 late String currentAns;
 late int correctAnswer;
@@ -142,7 +137,6 @@ var quizAns = {};
 Map<String,dynamic> quesResult = {};
 
 int j = 0;
-
 int ComCode=0;
 late SendData? _sendData;
 
@@ -177,8 +171,6 @@ Future<SendData> createData(String startTime,String endTime,List ansdata,Result 
     throw Exception("failed");
   }
 }
-
-
 class SendData {
   SendData({
     required this.data,
@@ -247,11 +239,12 @@ class Data {
 }
 
 
-Future<Questions> createQuestions(String id) async {
+Future<Questions> createQuestions(String id,String assID) async {
   final String apiUrl =
-      "http://ec2-13-234-116-155.ap-south-1.compute.amazonaws.com/api/chapter/questions";
+      "http://ec2-13-234-116-155.ap-south-1.compute.amazonaws.com/api/question";
 
-  final response = await http.post(Uri.parse(apiUrl), body: {"chapter_id": id});
+  final response = await http.post(Uri.parse(apiUrl), body: {"assessment_id":assID,
+    "chapter_id":id});
 
   if (response.statusCode == 200) {
     final String responseString = response.body;
@@ -285,20 +278,72 @@ class Questions {
 }
 class Data2 {
   Data2({
-
+    required this.assessment,
     required this.questions,
   });
 
-
+  Assessment assessment;
   List<Question> questions;
 
   factory Data2.fromJson(Map<String, dynamic> json) => Data2(
-    questions: List<Question>.from(
-        json["questions"].map((x) => Question.fromJson(x))),
+    assessment: Assessment.fromJson(json["assessment"]),
+    questions: List<Question>.from(json["questions"].map((x) => Question.fromJson(x))),
   );
 
   Map<String, dynamic> toJson() => {
+    "assessment": assessment.toJson(),
     "questions": List<dynamic>.from(questions.map((x) => x.toJson())),
+  };
+}
+class Assessment {
+  Assessment({
+    required this.id,
+    required this.assessmentName,
+    required this.subjectId,
+    required this.subject,
+    required this.classId,
+    required this.assessmentClass,
+    required this.bookId,
+    required this.book,
+    required this.chapterId,
+    required this.chapter,
+  });
+
+  var id;
+  var assessmentName;
+  var subjectId;
+  var subject;
+  var classId;
+  var assessmentClass;
+  var bookId;
+  var book;
+  var chapterId;
+  var chapter;
+
+  factory Assessment.fromJson(Map<String, dynamic> json) => Assessment(
+    id: json["id"],
+    assessmentName: json["assessment_name"],
+    subjectId: json["subject_id"],
+    subject: json["subject"],
+    classId: json["class_id"],
+    assessmentClass: json["class"],
+    bookId: json["book_id"],
+    book: json["book"],
+    chapterId: json["chapter_id"],
+    chapter: json["chapter"],
+  );
+
+  Map<String, dynamic> toJson() => {
+    "id": id,
+    "assessment_name": assessmentName,
+    "subject_id": subjectId,
+    "subject": subject,
+    "class_id": classId,
+    "class": assessmentClass,
+    "book_id": bookId,
+    "book": book,
+    "chapter_id": chapterId,
+    "chapter": chapter,
   };
 }
 class Question {
@@ -324,23 +369,23 @@ class Question {
     required this.updatedAt,
   });
 
-  int id;
-  int assessChapterId;
-  int assessmentId;
-  String que;
-  String mediaType;
+  var id;
+  var assessChapterId;
+  var assessmentId;
+  var que;
+  var mediaType;
   var media;
   var opt1;
   var opt2;
   var opt3;
   var opt4;
   dynamic opt5;
-  int ans;
-  String tags;
-  String status;
-  int school;
-  int createdBy;
-  int updatedBy;
+  var ans;
+  var tags;
+  var status;
+  var school;
+  var createdBy;
+  var updatedBy;
   var createdAt;
   var updatedAt;
 
@@ -362,7 +407,7 @@ class Question {
     school: json["school"],
     createdBy: json["created_by"],
     updatedBy: json["updated_by"],
-    createdAt: json["created_at"],
+    createdAt:json["created_at"],
     updatedAt: json["updated_at"],
   );
 
@@ -385,18 +430,24 @@ class Question {
     "created_by": createdBy,
     "updated_by": updatedBy,
     "created_at": createdAt,
-    "updated_at": updatedAt
+    "updated_at": updatedAt,
   };
 }
 
-class quiz extends StatelessWidget {
+
+
+class quiz_assessment extends StatelessWidget {
   //const quiz({Key? key}) : super(key: key);
   late int id;
-  quiz(this.id);
+  late int asid;
+  quiz_assessment(this.id,this.asid);
+
 
   @override
   Widget build(BuildContext context) {
     quizId = id.toString();
+    ASSid=asid.toString();
+    print(quizId);
     return MaterialApp(
       home: quizpage(id),
     );
@@ -406,7 +457,6 @@ class quiz extends StatelessWidget {
 class quizpage extends StatefulWidget {
   //const quizpage({Key? key}) : super(key: key);
   int quiz_id;
-
   quizpage(this.quiz_id);
 
   @override
@@ -446,13 +496,7 @@ class _quizpageState extends State<quizpage> with TickerProviderStateMixin {
     final controllerr = GroupButtonController();
 
     List<Widget> vid_pho = <Widget>[
-      Container(
-        height: 150,
-        width: 120,
-        decoration: BoxDecoration(
-          image: DecorationImage(image:AssetImage("images/hindiass.jpg"), fit: BoxFit.fill),
-        ),
-      ),
+
     ];
 
     return Scaffold(
@@ -461,14 +505,15 @@ class _quizpageState extends State<quizpage> with TickerProviderStateMixin {
           centerTitle: true,
         ),*/
         body: FutureBuilder(
-          future: createQuestions(quizId),
+          future: createQuestions(quizId,ASSid),
           builder: (context, AsyncSnapshot<Questions> snapshot) {
             int noq=0;
+            late VideoPlayerController _controller;
             if (snapshot.hasData) {
               print(quizId);
               Questions? que = snapshot.data;
               debugPrint(snapshot.data.toString());
-              late VideoPlayerController _controller;
+
               noq = que!.data.questions.length;
               debugPrint(noq.toString() + ' Number of questions');
 
@@ -493,14 +538,14 @@ class _quizpageState extends State<quizpage> with TickerProviderStateMixin {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text("test",
+                          Text("${que.data.assessment.assessmentName.toString()}",
                               style: TextStyle(
-                                  fontSize: 25,
+                                  fontSize: 22,
                                   fontFamily: "Candara",
                                   color: Colors.white)),
-                          Text("chapter name",
+                          Text("${que.data.assessment.subject.toString()}",
                               style: TextStyle(
-                                  fontSize: 20,
+                                  fontSize: 18,
                                   fontFamily: "Candara",
                                   color: Colors.black)),
                           SizedBox(height: 10),
@@ -576,7 +621,7 @@ class _quizpageState extends State<quizpage> with TickerProviderStateMixin {
                                                 ),
                                                 onPressed: () {
                                                   start_time = DateTime.now().toString();
-                                                  ass_id = que.data.questions[0].assessChapterId.toString();
+                                                  ass_id = que.data.assessment.id.toString();
                                                   total = noq;
 
                                                   quesStartTime = DateTime.now().second + (DateTime.now().minute * 60);
@@ -612,33 +657,33 @@ class _quizpageState extends State<quizpage> with TickerProviderStateMixin {
                                   child: Column(
                                     children: [
                                       Builder(
-                                          builder: (context) {
-                                            if(snapshot.data!.data.questions[j].mediaType=="Image")
-                                              return Container(
-                                                height: 150,
-                                                width: 120,
-                                                decoration: BoxDecoration(
-                                                  image: DecorationImage(image:NetworkImage("${snapshot.data!.data.questions[j].media.toString()}"), fit: BoxFit.fill),
-                                                ),
-                                              );
-                                            if(snapshot.data!.data.questions[j].mediaType=="video")
+                                        builder: (context) {
+                                          if(snapshot.data!.data.questions[j].mediaType=="Image")
+                                          return Container(
+                                            height: 150,
+                                            width: 120,
+                                            decoration: BoxDecoration(
+                                              image: DecorationImage(image:NetworkImage("${snapshot.data!.data.questions[j].media.toString()}"), fit: BoxFit.fill),
+                                            ),
+                                          );
+                                          if(snapshot.data!.data.questions[j].mediaType=="video")
                                             {
-                                              _controller = VideoPlayerController.network('https://flutter.github.io/assets-for-api-docs/assets/videos/butterfly.mp4',);
-                                              _controller.play();
-                                              _controller.setLooping(true);
-                                              return Container(
-                                                  height: 150,
-                                                  width: 120,
-                                                  child: AspectRatio(
-                                                      aspectRatio: _controller.value.aspectRatio,
-                                                      child: VideoPlayer(_controller)
-                                                  )
-                                              );
+                                          _controller = VideoPlayerController.network('https://flutter.github.io/assets-for-api-docs/assets/videos/butterfly.mp4',);
+                                          _controller.play();
+                                          _controller.setLooping(true);
+                                          return Container(
+                                            height: 150,
+                                                width: 120,
+                                                child: AspectRatio(
+                                                    aspectRatio: _controller.value.aspectRatio,
+                                                    child: VideoPlayer(_controller)
+                                                )
+                                          );
                                             }
 
-                                            else
-                                              return Container();
-                                          }
+                                              else
+                                            return Container();
+                                        }
                                       ),
                                     ],
                                   ),
@@ -712,6 +757,7 @@ class _quizpageState extends State<quizpage> with TickerProviderStateMixin {
                                             BoxShadow(color: Colors.transparent)
                                           ],
                                           borderRadius: BorderRadius.circular(10.0),
+                                          textPadding: EdgeInsets.all(10),
                                           enableDeselect: true,
                                           isRadio: true,
                                         ),

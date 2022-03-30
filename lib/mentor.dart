@@ -9,9 +9,10 @@ import 'globals.dart';
 import 'need_help_page.dart';
 
 Mentor mentorFromJson(String str) => Mentor.fromJson(json.decode(str));
-
 String mentorToJson(Mentor data) => json.encode(data.toJson());
+
 var memId = "3";
+var like=0;
 List<String> serviceList = <String>[];
 
 Future<Mentor> createMentor(String id) async {
@@ -28,6 +29,48 @@ Future<Mentor> createMentor(String id) async {
   }
 }
 
+Future<Mentorlike> createMentorlike(String id) async {
+  final String apiUrl =
+      "http://ec2-13-234-116-155.ap-south-1.compute.amazonaws.com/api/mentor/liked";
+
+  final response = await http.post(Uri.parse(apiUrl),headers: <String, String> {
+    "Authorization": "Bearer $token",
+  },
+      body: {"id":id});
+
+  if (response.statusCode == 200) {
+    like=1;
+    final String responseString = response.body;
+    return mentorlikeFromJson(responseString);
+  } else {
+    print(id.toString());
+    print(response.statusCode.toString());
+    throw Exception("failed");
+  }
+}
+
+Mentorlike mentorlikeFromJson(String str) => Mentorlike.fromJson(json.decode(str));
+String mentorlikeToJson(Mentorlike data) => json.encode(data.toJson());
+
+class Mentorlike {
+  Mentorlike({
+    required this.message,
+    required this.status,
+  });
+
+  String message;
+  int status;
+
+  factory Mentorlike.fromJson(Map<String, dynamic> json) => Mentorlike(
+    message: json["message"],
+    status: json["status"],
+  );
+
+  Map<String, dynamic> toJson() => {
+    "message": message,
+    "status": status,
+  };
+}
 class Mentor {
   Mentor({
     required this.success,
@@ -51,7 +94,6 @@ class Mentor {
     "message": message,
   };
 }
-
 class Data {
   Data({
     required this.educator,
@@ -72,7 +114,6 @@ class Data {
     "services": List<dynamic>.from(services.map((x) => x.toJson())),
   };
 }
-
 class Educator {
   Educator({
     required this.id,
@@ -132,7 +173,6 @@ class Educator {
 
   };
 }
-
 class Service {
   Service({
     required this.id,
@@ -235,14 +275,20 @@ class _mentorpageState extends State<mentorpage> {
                                   Flexible(
                                     child: Text(men1!.data.educator.eduName.toString(),
                                         style: TextStyle(
-                                            fontSize: 35,
+                                            fontSize: 28,
                                             fontFamily: "Candara",
                                             color: Colors.black)),
                                   ),
                                   FavoriteButton(
                                     iconSize: 50,
                                     isFavorite: false,
-                                    valueChanged: (_isFavorite) {
+                                    valueChanged: (_isFavorite) async {
+                                      Mentorlike Abc=await createMentorlike(memId);
+                                      if(like==1)
+                                        print("video like successfull");
+                                      setState(() {
+
+                                      });
                                       print('Is Favorite : $_isFavorite');
                                     },
                                   )
@@ -250,25 +296,25 @@ class _mentorpageState extends State<mentorpage> {
                               ),
                               Text(men1.data.educator.specilization.toString(),
                                   style: TextStyle(
-                                      fontSize: 25,
+                                      fontSize: 20,
                                       fontFamily: "Candara",
                                       color: Colors.teal)),
                               SizedBox(height: 10),
                               Row(
                                 mainAxisAlignment: MainAxisAlignment.start,
                                 children: [
-                                  Icon(Icons.favorite, color: Colors.red, size: 25),
+                                  Icon(Icons.favorite, color: Colors.red, size: 22),
                                   Text(men1.data.educator.likes.toString(),
                                       style: TextStyle(
-                                          fontSize: 20,
+                                          fontSize: 18,
                                           fontFamily: "Candara",
                                           color: Colors.grey)),
                                   SizedBox(width: 30),
                                   Icon(Icons.play_arrow,
-                                      color: Colors.lightBlueAccent, size: 30),
+                                      color: Colors.lightBlueAccent, size: 25),
                                   Text(men1.data.educator.reviews.toString(),
                                       style: TextStyle(
-                                          fontSize: 20,
+                                          fontSize: 18,
                                           fontFamily: "Candara",
                                           color: Colors.grey))
                                 ],
@@ -276,13 +322,13 @@ class _mentorpageState extends State<mentorpage> {
                               SizedBox(height: 20),
                               Text("About Mentor",
                                   style: TextStyle(
-                                      fontSize: 25,
+                                      fontSize: 20,
                                       fontFamily: "Candara",
                                       color: Colors.black)),
                               SizedBox(height: 10),
                               Text(men1.data.educator.aboutUs.toString(),
                                   style: TextStyle(
-                                      fontSize: 17,
+                                      fontSize: 18,
                                       fontFamily: "Candara",
                                       color: Colors.grey)),
                               SizedBox(height: 10),
@@ -292,7 +338,7 @@ class _mentorpageState extends State<mentorpage> {
                                   Text("Services by mentor",
                                       style: TextStyle(
                                           fontFamily: "Candara",
-                                          fontSize: 25,
+                                          fontSize: 20,
                                           color: Colors.black)),
                                 ],
                               ),
