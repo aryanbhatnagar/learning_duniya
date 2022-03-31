@@ -11,6 +11,7 @@ String videolikeToJson(Videolike data) => json.encode(data.toJson());
 
 var like=0;
 var video_id="";
+var count =0;
 class Videolike {
   Videolike({
     required this.message,
@@ -51,7 +52,7 @@ Future<Videolike> createVideovisit(String id) async {
 }
 Future<Videolike> createVideolike(String id) async {
   final String apiUrl =
-      "http://ec2-13-234-116-155.ap-south-1.compute.amazonaws.com/api/book_video/like";
+      "http://ec2-13-234-116-155.ap-south-1.compute.amazonaws.com/api/book_video/visitor";
 
   final response = await http.post(Uri.parse(apiUrl),headers: <String, String> {
     "Authorization": "Bearer $token",
@@ -74,10 +75,12 @@ class video extends StatefulWidget {
   late String name;
   late String vid;
   late String description;
-  video(this.url,this.name,this.description,this.vid); //const video({Key? key}) : super(key: key);
+  late String like;
+  late String visit;
+  video(this.url,this.name,this.description,this.vid,this.like,this.visit); //const video({Key? key}) : super(key: key);
 
   @override
-  _videoState createState() => _videoState(url,name,description,vid);
+  _videoState createState() => _videoState(url,name,description,vid,like,visit);
 }
 
 class _videoState extends State<video> {
@@ -85,7 +88,9 @@ class _videoState extends State<video> {
   late String _name;
   late String _vid;
   late String _description;
-  _videoState(this._url,this._name,this._description,this._vid);
+  late String _like;
+  late String _visit;
+  _videoState(this._url,this._name,this._description,this._vid,this._like,this._visit);
 
 
   late VideoPlayerController _controller;
@@ -107,7 +112,11 @@ class _videoState extends State<video> {
   @override
   Widget build(BuildContext context) {
     video_id=_vid;
-    createVideovisit(video_id);
+    if (count==0) {
+      createVideolike(video_id);
+      count++;
+
+    }
     Future.delayed(Duration(seconds: 10));
     return MaterialApp(
       title: 'Video Demo',
@@ -158,7 +167,7 @@ class _videoState extends State<video> {
                       iconSize: 40,
                       isFavorite: false,
                       valueChanged: (_isFavorite) async {
-                        Videolike Abc=await createVideolike(video_id);
+                        Videolike Abc=await createVideovisit(video_id);
                         if(like==1)
                           print("video like successfull");
                         setState(() {
@@ -176,10 +185,10 @@ class _videoState extends State<video> {
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: [
                     Icon(Icons.favorite,color: Colors.red,size: 22),
-                    Text(" Academy",style: TextStyle(fontSize:15,fontFamily: "Candara",color: Colors.teal)),
+                    Text(_like.toString(),style: TextStyle(fontSize:15,fontFamily: "Candara",color: Colors.teal)),
                     SizedBox(width: 30),
                     Icon(Icons.play_arrow_rounded,color: Colors.blue,size: 27),
-                    Text(" 4.8",style: TextStyle(fontSize:15,fontFamily: "Candara",color: Colors.grey))
+                    Text(_visit.toString(),style: TextStyle(fontSize:15,fontFamily: "Candara",color: Colors.grey))
                   ],
                 ),
               ),

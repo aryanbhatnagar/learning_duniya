@@ -173,18 +173,24 @@ class Video {
     required this.title,
     required this.description,
     required this.fileName,
+    required this.visitors,
+    required this.likes,
   });
 
   int id;
   String title;
   String description;
   String fileName;
+  var visitors;
+  var likes;
 
   factory Video.fromJson(Map<String, dynamic> json) => Video(
     id: json["id"],
     title: json["title"],
     description: json["description"],
     fileName: json["file_name"],
+    visitors: json["visitors"],
+    likes: json["likes"]
   );
 
   Map<String, dynamic> toJson() => {
@@ -192,6 +198,8 @@ class Video {
     "title": title,
     "description": description,
     "file_name": fileName,
+    "visitors": visitors,
+    "likes": likes
   };
 }
 
@@ -397,7 +405,13 @@ class _courseDescPageState extends State<courseDescPage> {
                                           {
                                         Navigator.push(context, MaterialPageRoute(
                                             builder: (context) =>
-                                                video(k12.data.videos[i].fileName,k12.data.videos[i].title,k12.data.videos[i].description,k12.data.videos[i].id.toString())));}
+                                                video(k12.data.videos[i].fileName,
+                                                    k12.data.videos[i].title,
+                                                    k12.data.videos[i].description,
+                                                    k12.data.videos[i].id.toString(),
+                                                  k12.data.videos[i].likes.toString(),
+                                                  k12.data.videos[i].visitors.toString()
+                                                )));}
                                         else
                                           Navigator.push(
                                               context, MaterialPageRoute(builder: (context) => Login2()));
