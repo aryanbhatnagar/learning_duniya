@@ -7,10 +7,14 @@ import 'package:learning_duniya/SignUp.dart';
 import 'package:http/http.dart' as http;
 import 'package:learning_duniya/forgot_password.dart';
 import 'package:learning_duniya/main.dart';
+import 'package:learning_duniya/profile.dart';
 import 'globals.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'landing.dart';
+
 late Login1? _log =null;
+late Map x;
 Login1 login1FromJson(String str) => Login1.fromJson(json.decode(str));
 String login1ToJson(Login1 data) => json.encode(data.toJson());
 
@@ -18,23 +22,28 @@ class Login1 {
   Login1({
     required this.token,
     required this.user,
+    required this.role,
     required this.status,
   });
 
   String token;
   User user;
+  var role;
   int status;
 
   factory Login1.fromJson(Map<String, dynamic> json) => Login1(
     token: json["token"],
     user: User.fromJson(json["user"]),
+    role: json["role"],
     status: json["status"],
   );
 
   Map<String, dynamic> toJson() => {
     "token": token,
     "user": user.toJson(),
+    "role": role,
     "status": status,
+
   };
 }
 
@@ -57,21 +66,21 @@ class User {
     required this.updatedAt,
   });
 
-  int id;
-  String name;
+  var id;
+  var name;
   dynamic lastName;
-  String email;
+  var email;
   dynamic contactNo;
   dynamic emailVerifiedAt;
   dynamic preference;
   dynamic registerFrom;
   dynamic registerRegion;
   dynamic registerCity;
-  String role;
+  var role;
   dynamic school;
-  String status;
-  DateTime createdAt;
-  DateTime updatedAt;
+  var status;
+  var createdAt;
+  var updatedAt;
 
   factory User.fromJson(Map<String, dynamic> json) => User(
     id: json["id"],
@@ -87,8 +96,8 @@ class User {
     role: json["role"],
     school: json["school"],
     status: json["status"],
-    createdAt: DateTime.parse(json["created_at"]),
-    updatedAt: DateTime.parse(json["updated_at"]),
+    createdAt: json["created_at"],
+    updatedAt: json["updated_at"],
   );
 
   Map<String, dynamic> toJson() => {
@@ -105,8 +114,8 @@ class User {
     "role": role,
     "school": school,
     "status": status,
-    "created_at": createdAt.toIso8601String(),
-    "updated_at": updatedAt.toIso8601String(),
+    "created_at": createdAt,
+    "updated_at": updatedAt,
   };
 }
 
@@ -130,13 +139,25 @@ Future<Login1> createLogin(String email, String password) async{
 
   if(response.statusCode == 200) {
     loginCode=200;
-    final String responseString = response.body;
-    return login1FromJson(responseString);
+    x=jsonDecode(response.body);
+    token=x["token"];
+    if(x["role"]=="2")
+      {
+        print("2");
+        Login1 b=new Login1(
+            token: "", user: new User(id: 0, name: "", email: "", role: "", status: "", createdAt: DateTime.now(), updatedAt: DateTime.now()),role: "999", status:0);
+        return b;
+      }
+    else{
+      final String responseString = response.body;
+      return login1FromJson(responseString);
+    }
+
   }
   if(response.statusCode == 401) {
     loginCode=401;
     Login1 b=new Login1(
-        token: "", user: new User(id: 0, name: "", email: "", role: "", status: "", createdAt: DateTime.now(), updatedAt: DateTime.now()), status:0);
+        token: "", user: new User(id: 0, name: "", email: "", role: "", status: "", createdAt: DateTime.now(), updatedAt: DateTime.now()),role: "999", status:0);
     return b;
   }
   else{
@@ -151,11 +172,11 @@ class _LoginPageState extends State<Login> {
     super.initState();
     if(token!=""){
       print(userName);
-      Navigator.push(context, MaterialPageRoute(builder: (context)=>Dashboard()));
+      //Navigator.push(context, MaterialPageRoute(builder: (context)=>Dashboard(classId)));
       //Navigator.push(context,MaterialPageRoute(builder: (context)=>Dashboard()));
     }
-    else
-      build(context);
+    //lse
+      //build(context);
   }
 
 
@@ -273,21 +294,22 @@ class _LoginPageState extends State<Login> {
                                         _log=log;
                                       });
 
-                                      if(loginCode==200){
+                                      if(loginCode==200) {
                                         setState(() {
-                                          token=_log!.token;
-                                          userId=_log!.user.id;
-                                          userName=_log!.user.name;
-                                          userEmail=_log!.user.email;
+                                          token = _log!.token;
+                                          userId = _log!.user.id;
+                                          userName = _log!.user.name;
+                                          userEmail = _log!.user.email;
                                         });
-                                        SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
-                                        sharedPreferences.setString('token', _log!.token);
-                                        sharedPreferences.setString('name', _log!.user.name);
-                                        if(classId!="")
-                                        Navigator.push(context, MaterialPageRoute(builder: (context)=>Dashboard()));
-                                        else
-                                          {
-                                            final Future<ConfirmAction?> action =
+                                        if (_log!.role == "1") {
+                                          if (classId != "")
+                                            Navigator.push(context,
+                                                MaterialPageRoute(
+                                                    builder: (context) =>
+                                                        Dashboard(classId)));
+                                          else {
+                                            final Future<
+                                                ConfirmAction?> action =
                                             await _asyncConfirmDialog(
                                                 context,
                                                 'Mentor Name',
@@ -296,6 +318,15 @@ class _LoginPageState extends State<Login> {
                                                 [],
                                                 'None');
                                           }
+                                        }
+                                        else if(x["role"]=="2"){
+                                          setState(() {
+                                            token=x["token"];
+                                          });
+                                          Navigator.pushReplacement(context,
+                                              MaterialPageRoute(
+                                                  builder: (context) =>
+                                                      profile()));}
                                       }
 
                                       if(loginCode==401){
@@ -465,10 +496,15 @@ Future<Future<ConfirmAction?>> _asyncConfirmDialog(
                     {
                       classId=classController.text.toString();
                       if(classId!="")
-                        Navigator.push(
-                            context, MaterialPageRoute(builder: (context) => Dashboard()));
+                        {
+                          Navigator.of(context).pop(ConfirmAction.Confirm);
+                          Navigator.pushReplacement(
+                              context, MaterialPageRoute(builder: (context) => landing()));
+
+                        }
+
                     }
-                    //Navigator.of(context).pop(ConfirmAction.Confirm);
+
                   },
                 ),
               ],

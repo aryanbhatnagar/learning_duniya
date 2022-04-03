@@ -7,6 +7,7 @@ import 'package:learning_duniya/assessment.dart';
 import 'package:learning_duniya/courseDesc.dart';
 import 'package:learning_duniya/k12details.dart';
 import 'package:learning_duniya/mentor.dart';
+import 'package:learning_duniya/mentor_profile.dart';
 import 'package:learning_duniya/profile.dart';
 import 'package:learning_duniya/quiz.dart';
 import 'package:group_button/group_button.dart';
@@ -14,11 +15,187 @@ import 'package:learning_duniya/seeall.dart';
 import 'package:toggle_switch/toggle_switch.dart';
 import 'Login.dart';
 import 'package:http/http.dart' as http;
-
 import 'globals.dart';
 
+
+var CLASSid;
+StuDashboard stuDashboardFromJson(String str) => StuDashboard.fromJson(json.decode(str));
+String stuDashboardToJson(StuDashboard data) => json.encode(data.toJson());
+
+class StuDashboard {
+  StuDashboard({
+    required this.data2,
+    required this.message,
+    required this.status,
+  });
+
+  Data3 data2;
+  String message;
+  int status;
+
+  factory StuDashboard.fromJson(Map<String, dynamic> json) => StuDashboard(
+    data2: Data3.fromJson(json["data"]),
+    message: json["message"],
+    status: json["status"],
+  );
+
+  Map<String, dynamic> toJson() => {
+    "data": data2.toJson(),
+    "message": message,
+    "status": status,
+  };
+}
+class Data3 {
+  Data3({
+    required this.subjects2,
+    required this.assessments1,
+    required this.results,
+    required this.mentors,
+  });
+
+  List<Subject2> subjects2;
+  List<AssessmentElement> assessments1;
+  Results results;
+  List<Mentor> mentors;
+
+  factory Data3.fromJson(Map<String, dynamic> json) => Data3(
+    subjects2: List<Subject2>.from(json["subjects"].map((x) => Subject2.fromJson(x))),
+    assessments1: List<AssessmentElement>.from(json["assessments"].map((x) => AssessmentElement.fromJson(x))),
+    results: Results.fromJson(json["results"]),
+    mentors: List<Mentor>.from(json["mentors"].map((x) => Mentor.fromJson(x))),
+  );
+
+  Map<String, dynamic> toJson() => {
+    "subjects": List<dynamic>.from(subjects2.map((x) => x.toJson())),
+    "assessments": List<dynamic>.from(assessments1.map((x) => x.toJson())),
+    "results": results.toJson(),
+    "mentors": List<dynamic>.from(mentors.map((x) => x.toJson())),
+  };
+}
+class AssessmentElement {
+  AssessmentElement({
+    required this.id,
+    required this.assessmentName,
+    required this.img,
+    required this.price,
+  });
+
+  int id;
+  String assessmentName;
+  String img;
+  int price;
+
+  factory AssessmentElement.fromJson(Map<String, dynamic> json) => AssessmentElement(
+    id: json["id"],
+    assessmentName: json["assessment_name"],
+    img: json["img"],
+    price: json["price"],
+  );
+
+  Map<String, dynamic> toJson() => {
+    "id": id,
+    "assessment_name": assessmentName,
+    "img": img,
+    "price": price,
+  };
+}
+class Results {
+  Results({
+    required this.assessment,
+    required this.k12,
+  });
+
+  K12Class assessment;
+  K12Class k12;
+
+  factory Results.fromJson(Map<String, dynamic> json) => Results(
+    assessment: K12Class.fromJson(json["assessment"]),
+    k12: K12Class.fromJson(json["k12"]),
+  );
+
+  Map<String, dynamic> toJson() => {
+    "assessment": assessment.toJson(),
+    "k12": k12.toJson(),
+  };
+}
+class K12Class {
+  K12Class({
+    required this.total,
+    required this.totalQuestions,
+    required this.correctAnswer,
+    required this.wrongAnswer,
+  });
+
+  var total;
+  var totalQuestions;
+  var correctAnswer;
+  var wrongAnswer;
+
+  factory K12Class.fromJson(Map<String, dynamic> json) => K12Class(
+    total: json["total"],
+    totalQuestions: json["total_questions"],
+    correctAnswer: json["correct_answer"],
+    wrongAnswer: json["wrong_answer"],
+  );
+
+  Map<String, dynamic> toJson() => {
+    "total": total,
+    "total_questions": totalQuestions,
+    "correct_answer": correctAnswer,
+    "wrong_answer": wrongAnswer,
+  };
+}
+class Subject2 {
+  Subject2({
+    required this.id,
+    required this.subjectName,
+    required this.icon
+  });
+
+  int id;
+  String subjectName;
+  var icon;
+
+  factory Subject2.fromJson(Map<String, dynamic> json) => Subject2(
+      id: json["id"],
+      subjectName: json["subject_name"],
+      icon: json["icon"]
+  );
+
+  Map<String, dynamic> toJson() => {
+    "id": id,
+    "subject_name": subjectName,
+    "icon": icon
+  };
+}
+
+Future<StuDashboard> createDash(String id) async {
+  final String apiUrl =
+      "http://ec2-13-234-116-155.ap-south-1.compute.amazonaws.com/api/mentee/dashboard";
+
+  final response = await http.post(Uri.parse(apiUrl),
+      headers: <String, String> {
+        "Authorization": "Bearer $token",
+      },
+      body: {
+        "class_id": id
+      }
+  );
+
+  if (response.statusCode == 200) {
+    final String responseString = response.body;
+    return stuDashboardFromJson(responseString);
+  } else {
+    throw Exception("failed");
+  }
+}
+
+
+var sublen;
 K12Card k12CardFromJson(String str) => K12Card.fromJson(json.decode(str));
 String k12CardToJson(K12Card data) => json.encode(data.toJson());
+LandingApi landingApiFromJson(String str) => LandingApi.fromJson(json.decode(str));
+String landingApiToJson(LandingApi data) => json.encode(data.toJson());
 
 class K12Card {
   K12Card({
@@ -43,7 +220,6 @@ class K12Card {
     "message": message,
   };
 }
-
 class Data1 {
   Data1({
     required this.k12,
@@ -59,7 +235,6 @@ class Data1 {
     "k12": List<dynamic>.from(k12.map((x) => x.toJson())),
   };
 }
-
 class K12_c {
   K12_c({
     required this.id,
@@ -87,8 +262,6 @@ class K12_c {
     "chapter": chapter,
     };
 }
-
-
 Future<K12Card> createK12card(String id) async {
   final String apiUrl =
       "http://ec2-13-234-116-155.ap-south-1.compute.amazonaws.com/api/getk12";
@@ -119,8 +292,6 @@ Future<LandingApi> getLanding() async {
     }
   }
 
-LandingApi landingApiFromJson(String str) => LandingApi.fromJson(json.decode(str));
-String landingApiToJson(LandingApi data) => json.encode(data.toJson());
 
 class LandingApi {
   LandingApi({
@@ -145,7 +316,6 @@ class LandingApi {
     "message": message,
   };
 }
-
 class Data {
   Data({
     required this.subjects,
@@ -185,7 +355,6 @@ class Data {
     "popular_courses": List<dynamic>.from(popularCourses.map((x) => x.toJson())),
   };
 }
-
 class Assessment {
   Assessment({
     required this.id,
@@ -217,7 +386,6 @@ class Assessment {
 
   };
 }
-
 class Class {
   Class({
     required this.id,
@@ -237,7 +405,6 @@ class Class {
     "class_name": className,
   };
 }
-
 class K12 {
   K12({
     required this.id,
@@ -265,7 +432,6 @@ class K12 {
     "chapter": chapter,
   };
 }
-
 class Mentor {
   Mentor({
     required this.id,
@@ -293,7 +459,6 @@ class Mentor {
     "specilization": specilization
   };
 }
-
 class Subject {
   Subject({
     required this.id,
@@ -313,7 +478,6 @@ class Subject {
     "subject_name": subjectName,
   };
 }
-
 class Compete{
   Compete({
     required this.id,
@@ -342,7 +506,6 @@ class Compete{
     "subject_name": subjectName
   };
 }
-
 class popular{
   popular({
     required this.id,
@@ -410,6 +573,7 @@ class _landingPageState extends State<landingPage> {
   List <Widget> k12= <Widget>[];
   List <Widget> k12_copy= <Widget>[];
   int k12_pos=1;
+  List<bool> isSelected =List.generate(5, (index) => false);
   List <Widget> comp_e= <Widget>[];
   List <Widget> mento= <Widget>[];
 
@@ -419,11 +583,33 @@ class _landingPageState extends State<landingPage> {
   List <Widget> eng= <Widget>[];
   List <Widget> comp= <Widget>[];
 
-
-  void _onItemTapped(int index) {
+  void indexSelect(int i){
     setState(() {
-      _selectedIndex = index;
+      _selectedIndex=i;
     });
+  }
+
+
+  Future<void> _onItemTapped(int index) async {
+    if(index==1)
+      {
+        if (token!="")
+          if(classId=="")
+            {
+              Future<ConfirmAction?> action =
+                  await _asyncConfirmDialog(
+                  context,
+                  'Mentor Name',
+                  'Mentor Bio',
+                  'Communication',
+                  [],
+                  'None');
+            }
+      }
+    if(index==1 && classId!="")
+    indexSelect(index);
+    else
+      indexSelect(index);
   }
 
   @override
@@ -446,6 +632,7 @@ class _landingPageState extends State<landingPage> {
             {
               LandingApi? landApi=snapshot.data;
               if(pop_c.isEmpty) {
+                isSelected[0]=true;
                 for (var i = 0; i < landApi!.data.popularCourses.length; i++)
                   pop_c.add(GestureDetector(
                     onTap: () {
@@ -481,7 +668,7 @@ class _landingPageState extends State<landingPage> {
                                       Flexible(
                                         child: Text(
                                             "${landApi.data.popularCourses[i]
-                                                .subjectName}     .",
+                                                .subjectName}\n",
                                             maxLines: 2,
                                             style: TextStyle(fontSize: 15,
                                                 fontFamily: "Candara",
@@ -489,7 +676,7 @@ class _landingPageState extends State<landingPage> {
                                       ),
                                       //IconButton(onPressed: (){  }, icon: Icon(Icons.favorite_outline,size: 25),color: Colors.grey,)
                                       FavoriteButton(
-                                        iconSize: 30,
+                                        iconSize: 24,
                                         isFavorite: false,
                                         // iconDisabledColor: Colors.white,
                                         valueChanged: (_isFavorite) {
@@ -530,8 +717,8 @@ class _landingPageState extends State<landingPage> {
                           children: <Widget>[
                             SizedBox(height: 2.5),
                             Container(
-                              height: 180,
-                              width: 180,
+                              height: 125,
+                              width: 125,
                               decoration: BoxDecoration(
                                 image: DecorationImage(image: NetworkImage("${landApi!.data.assessments[i].img}"),fit: BoxFit.fill),
                               ),
@@ -539,7 +726,7 @@ class _landingPageState extends State<landingPage> {
                             Padding(
                               padding: const EdgeInsets.fromLTRB(5, 5, 5, 5),
                               child: Container(
-                                width: 190,
+                                width: 135,
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
@@ -551,7 +738,7 @@ class _landingPageState extends State<landingPage> {
                                         Flexible(
                                           child: Text(
                                               "${landApi!.data.assessments[i]
-                                                  .assessmentName}                 .",
+                                                  .assessmentName}\n",
                                               overflow: TextOverflow.clip,
                                               maxLines: 2,
                                               style: TextStyle(fontSize: 16,
@@ -566,11 +753,12 @@ class _landingPageState extends State<landingPage> {
                                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                       children: [
                                         Text(
-                                            "\$1234", style: TextStyle(fontSize: 20,
+                                            "${landApi!.data.assessments[i].price}",
+                                            style: TextStyle(fontSize: 18,
                                             fontFamily: "Candara",
                                             color: Colors.red)),
                                         FavoriteButton(
-                                          iconSize: 30,
+                                          iconSize: 24,
                                           isFavorite: false,
                                           // iconDisabledColor: Colors.white,
                                           valueChanged: (_isFavorite) {
@@ -712,180 +900,876 @@ class _landingPageState extends State<landingPage> {
 
                 for(int j=0;j<snapshot.data!.data.subjects.length;j++)
                   butind.add(snapshot.data!.data.subjects[j].id.toInt());
+               // isSelected = List.generate(snapshot.data!.data.subjects.length, (index) => false);
+
               }
-              List<bool> isSelected = List.generate(snapshot.data!.data.subjects.length, (index) => false);
-              return SingleChildScrollView(
-              child: Column(
-                children: [
-                  Container(
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.only(
-                          bottomLeft: Radius.circular(20),
-                          bottomRight: Radius.circular(20)),
-                      color: Colors.white,
-                    ),
-                    padding: EdgeInsets.fromLTRB(15, 15, 15, 15),
-                    width: double.infinity,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: <Widget>[
-                        SizedBox(height: 10),
+              return Container(
+                color: Colors.teal,
+                child: SingleChildScrollView(
+                child: Column(
+                  children: [
+                    Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.only(
+                            bottomLeft: Radius.circular(20),
+                            bottomRight: Radius.circular(20)),
+                        color: Colors.white,
+                      ),
+                      padding: EdgeInsets.fromLTRB(15, 15, 15, 15),
+                      width: double.infinity,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: <Widget>[
+                          SizedBox(height: 10),
 
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: <Widget>[
-                            Text("Popular Courses", style: TextStyle(
-                                fontFamily: "Candara",
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.black)),
-                          ],
-                        ),
-                        SizedBox(height: 20),
-                        SingleChildScrollView(
-                            scrollDirection: Axis.horizontal,
-                            child: Row(
-                              children: pop_c,
-
-                            )
-                        ),
-                        SizedBox(height: 15),
-
-
-                      ],
-                    ),
-
-
-                  ),
-                  Container(
-                    padding: EdgeInsets.fromLTRB(15, 15, 15, 15),
-                    color: Colors.teal,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: <Widget>[
-
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: <Widget>[
-                            Text("Assessment", style: TextStyle(
-                                fontFamily: "Candara",
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white)),
-                            GestureDetector(
-                              child: Text("See all", style: TextStyle(
-                                  fontSize: 18,
-                                  color: Colors.lightBlueAccent,
-                                  fontFamily: "Candara")),
-                              onTap: () {
-                                Navigator.push(context, MaterialPageRoute(
-                                    builder: (context) =>
-                                        seeallpage("Assessment", 2)));
-                              },)
-                          ],
-                        ),
-                        SizedBox(height: 20),
-                        SingleChildScrollView(
-                            scrollDirection: Axis.horizontal,
-                            child: Row(
-                                children: asses
-                            )
-                        ),
-                        SizedBox(height: 15),
-
-                      ],
-                    ),
-                  ),
-                  Container(
-                    decoration: BoxDecoration(
-                        borderRadius: BorderRadius.all(Radius.circular(20)),
-                        color: Colors.white),
-                    padding: EdgeInsets.fromLTRB(15, 15, 15, 15),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: <Widget>[
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: <Widget>[
-                            Text("K12", style: TextStyle(fontFamily: "Candara",
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.black)),
-                            //GestureDetector(child: Text("See all",style: TextStyle(fontSize: 20,color: Colors.blue,fontFamily: "Candara")))
-                          ],
-                        ),
-                        SizedBox(height: 10),
-                        SingleChildScrollView(
-                          scrollDirection: Axis.horizontal,
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: <Widget>[
-                              ToggleButtons(
-                                  children: <Widget>[
-                                    for(int j=0;j<snapshot.data!.data.subjects.length;j++)
-                                      Text(" ${snapshot.data!.data.subjects[j].subjectName}  ",style: TextStyle(fontFamily: "Candara",fontSize: 17),)
-                                ],
-
-                                selectedBorderColor: Colors.teal,
-                                selectedColor: Colors.white,
-                                borderColor: Colors.transparent,
-                                borderRadius: BorderRadius.circular(10),
-                                disabledColor: Colors.transparent,
-                                disabledBorderColor: Colors.transparent,
-                                focusColor: Colors.teal,
-                                fillColor: Colors.teal,
-                                onPressed: (int index) {
-                                  setState(() {
-                                    for (int buttonIndex = 0; buttonIndex < isSelected.length; buttonIndex++) {
-                                      if (buttonIndex == index) {
-                                        isSelected[buttonIndex] = true;
-                                      } else {
-                                        isSelected[buttonIndex] = false;
-                                      }
-                                    }
-                                    k12_pos=butind[index];
-                                  });
-                                },
-                                isSelected: isSelected,
-                              )
+                              Text("Popular Courses", style: TextStyle(
+                                  fontFamily: "Candara",
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.black)),
                             ],
                           ),
-                        ),
-                        SizedBox(height: 10),
-                        FutureBuilder(
-                            future: createK12card(k12_pos.toString()),
-                            builder: (context,AsyncSnapshot<K12Card> snapshot2){
-                              if(snapshot2.hasData){
-                                K12Card? k12_obj = snapshot2.data;
-                                return SingleChildScrollView(
+                          SizedBox(height: 20),
+                          SingleChildScrollView(
+                              scrollDirection: Axis.horizontal,
+                              child: Row(
+                                children: pop_c,
+
+                              )
+                          ),
+                          SizedBox(height: 15),
+
+
+                        ],
+                      ),
+
+
+                    ),
+                    Container(
+                      padding: EdgeInsets.fromLTRB(15, 15, 15, 15),
+                      color: Colors.teal,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: <Widget>[
+
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: <Widget>[
+                              Text("Assessment", style: TextStyle(
+                                  fontFamily: "Candara",
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white)),
+                              GestureDetector(
+                                child: Text("See all", style: TextStyle(
+                                    fontSize: 18,
+                                    color: Colors.lightBlueAccent,
+                                    fontFamily: "Candara")),
+                                onTap: () {
+                                  Navigator.push(context, MaterialPageRoute(
+                                      builder: (context) =>
+                                          seeallpage("Assessment", 2)));
+                                },)
+                            ],
+                          ),
+                          SizedBox(height: 20),
+                          SingleChildScrollView(
+                              scrollDirection: Axis.horizontal,
+                              child: Row(
+                                  children: asses
+                              )
+                          ),
+                          SizedBox(height: 15),
+
+                        ],
+                      ),
+                    ),
+                    Container(
+                      decoration: BoxDecoration(
+                          borderRadius: BorderRadius.all(Radius.circular(20)),
+                          color: Colors.white),
+                      padding: EdgeInsets.fromLTRB(15, 15, 15, 15),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: <Widget>[
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: <Widget>[
+                              Text("K12", style: TextStyle(fontFamily: "Candara",
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.black)),
+                              //GestureDetector(child: Text("See all",style: TextStyle(fontSize: 20,color: Colors.blue,fontFamily: "Candara")))
+                            ],
+                          ),
+                          SizedBox(height: 10),
+                          SingleChildScrollView(
+                            scrollDirection: Axis.horizontal,
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              children: <Widget>[
+                                ToggleButtons(
+                                    children: <Widget>[
+                                      for(int j=0;j<snapshot.data!.data.subjects.length;j++)
+                                        Text(" ${snapshot.data!.data.subjects[j].subjectName}  ",style: TextStyle(fontFamily: "Candara",fontSize: 17),)
+                                  ],
+
+                                  selectedBorderColor: Colors.teal,
+                                  selectedColor: Colors.white,
+                                  borderColor: Colors.transparent,
+                                  borderRadius: BorderRadius.circular(10),
+                                  disabledColor: Colors.transparent,
+                                  disabledBorderColor: Colors.transparent,
+                                  focusColor: Colors.teal,
+                                  fillColor: Colors.teal,
+                                  onPressed: (int index) {
+                                    setState(() {
+                                      for (int buttonIndex = 0; buttonIndex < isSelected.length; buttonIndex++) {
+                                        if (buttonIndex == index) {
+                                          isSelected[buttonIndex] = true;
+                                        } else {
+                                          isSelected[buttonIndex] = false;
+                                        }
+                                      }
+                                      k12_pos=butind[index];
+                                    });
+                                  },
+                                  isSelected: isSelected,
+                                )
+                              ],
+                            ),
+                          ),
+                          SizedBox(height: 10),
+                          FutureBuilder(
+                              future: createK12card(k12_pos.toString()),
+                              builder: (context,AsyncSnapshot<K12Card> snapshot2){
+                                if(snapshot2.hasData){
+                                  K12Card? k12_obj = snapshot2.data;
+                                  return SingleChildScrollView(
+                                  scrollDirection: Axis.horizontal,
+                                  child: Row(
+                                    children: <Widget>[
+                                      for (var i = 0; i <k12_obj!.data1.k12.length; i++)
+                                        GestureDetector(
+                                          onTap: () {
+                                            Navigator.push(context, MaterialPageRoute(
+                                                builder: (context) => k12_det(k12_obj!.data1.k12[i].id.toString(),landApi!.data.popularCourses[i].img)));
+                                          },
+                                          child: Card(
+                                            shape: RoundedRectangleBorder(
+                                                borderRadius: BorderRadius.all(Radius.circular(10))),
+                                            elevation: 5,
+                                            child: Column(
+                                              mainAxisAlignment: MainAxisAlignment.start,
+                                              crossAxisAlignment: CrossAxisAlignment.center,
+                                              children: <Widget>[
+                                                Container(
+                                                  height: 150,
+                                                  width: 150,
+                                                  decoration: BoxDecoration(
+                                                    image: DecorationImage(image: NetworkImage("${k12_obj!.data1.k12[i].img.toString()}"),fit: BoxFit.fill),
+                                                  ),
+                                                ),
+                                                Padding(
+                                                  padding: const EdgeInsets.fromLTRB(5, 5, 5, 5),
+                                                  child: Container(
+                                                    height: 100,
+                                                    width: 150,
+                                                    child: Column(
+                                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                                      children: [
+                                                        Row(
+                                                          mainAxisAlignment: MainAxisAlignment
+                                                              .spaceBetween,
+                                                          children: [
+                                                            Flexible(
+                                                              child: Text("${k12_obj!.data1.k12[i].courseName}\n",
+                                                                  style: TextStyle(fontSize: 15,
+                                                                      fontFamily: "Candara",
+                                                                      color: Colors.black),
+                                                                maxLines: 2,
+                                                                overflow: TextOverflow.ellipsis,
+                                                              ),
+                                                            ),
+                                                            //IconButton(onPressed: (){  }, icon: Icon(Icons.favorite_outline,size: 15),color: Colors.grey,)
+
+                                                          ],
+                                                        ),
+                                                        SizedBox(height: 8),
+                                                        Text("${k12_obj.data1.k12[i].chapter} Chapters", style: TextStyle(
+                                                            fontSize: 14,
+                                                            fontFamily: "Candara",
+                                                            color: Colors
+                                                                .grey)),
+                                                        Text("${k12_obj.data1.k12[i].chapter} Chapters", style: TextStyle(
+                                                            fontSize: 14,
+                                                            fontFamily: "Candara",
+                                                            color: Colors
+                                                                .grey)),
+                                                        SizedBox(height: 5),
+                                                      ],
+                                                    ),
+                                                  ),
+                                                )
+                                              ],
+                                            ),
+
+                                          ),
+                                        )
+
+                                    ],
+
+
+                                  )
+                              );
+                                }
+                                else
+                                  return Container(child: Center(child: CircularProgressIndicator()));
+                              }
+                              ),
+
+                          SizedBox(height: 15),
+
+
+                        ],
+                      ),
+
+                    ),
+                    Container(
+                      decoration: BoxDecoration(borderRadius: BorderRadius.only(
+                          topLeft: Radius.circular(20),
+                          topRight: Radius.circular(20)), color: Colors.teal),
+                      padding: EdgeInsets.fromLTRB(15, 15, 15, 15),
+                      width: double.infinity,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: <Widget>[
+
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: <Widget>[
+                              Text("Competitive Exam", style: TextStyle(
+                                  fontFamily: "Candara",
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white)),
+                              GestureDetector(
+                                  child: Text("See all", style: TextStyle(
+                                      fontSize: 18,
+                                      color: Colors.lightBlueAccent,
+                                      fontFamily: "Candara")),
+                                  onTap: () {
+                                    Navigator.push(context, MaterialPageRoute(
+                                        builder: (context) =>
+                                            seeallpage("Competitive Exam", 3)));
+                                  })
+                            ],
+                          ),
+                          SizedBox(height: 20),
+                          SingleChildScrollView(
+                              scrollDirection: Axis.horizontal,
+                              child: Row(
+                                  children: comp_e
+                              )
+                          ),
+                          SizedBox(height: 15),
+                        ],
+                      ),
+
+
+                    ),
+                    Container(
+                      padding: EdgeInsets.fromLTRB(15, 15, 15, 15),
+                      decoration: BoxDecoration(borderRadius: BorderRadius.only(
+                          topLeft: Radius.circular(20),
+                          topRight: Radius.circular(20)), color: Colors.white),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: <Widget>[
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: <Widget>[
+                              Text("Mentor", style: TextStyle(
+                                  fontFamily: "Candara",
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.black)),
+                              GestureDetector(
+                                  child: Text("See all", style: TextStyle(
+                                      fontSize: 18,
+                                      color: Colors.lightBlueAccent,
+                                      fontFamily: "Candara")),
+                                  onTap: () {
+                                    Navigator.push(context, MaterialPageRoute(
+                                        builder: (context) =>
+                                            seeallpage("Mentors", 4)));
+                                  })
+                            ],
+                          ),
+                          SizedBox(height: 20),
+                          ElevatedButton(onPressed: (){
+                            Navigator.push(context, MaterialPageRoute(
+                                builder: (context) =>mentorProfile()));
+                          },
+                            child: Text("Become a mentor"),),
+                          SingleChildScrollView(
+                              scrollDirection: Axis.horizontal,
+                              child: Row(
+                                  children: mento
+                              )
+                          ),
+                          SizedBox(height: 30)
+                        ],
+                      ),
+                    )
+                  ],
+                )
+          ),
+              );
+            }
+            else
+              return Container(child: CircularProgressIndicator());
+          }
+        ),
+        FutureBuilder(
+          future: getLanding(),
+          builder: (context,AsyncSnapshot<LandingApi> snapshot1) {
+            if (token=="")
+              return Column(
+                children: [
+                  Container(
+                    height: 250,
+                    width: 250,
+                    decoration: BoxDecoration(
+                      image: DecorationImage(image: AssetImage("images/login.jpg"),fit: BoxFit.fill),
+                    ),
+                  ),
+                  Center(child: Text("Please Login to view Dashboard", style: TextStyle(
+                      fontSize: 20,
+                      fontFamily: "Candara",
+                      color: Colors.teal),),),
+                  SizedBox(height: 15,),
+                  Center(
+                    child:  RaisedButton(
+                      onPressed: (){
+                        Navigator.pushReplacement(
+                            context, MaterialPageRoute(builder: (context) => Login()));
+                      },
+                      child: Text('LOGIN',
+                          style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 15.0,
+                              fontFamily: "Candara")),
+                      color: Colors.deepOrange,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(5.0),
+                      ),
+                    )
+            ),
+                ],
+              );
+            else
+              return FutureBuilder(
+                  future: createDash(classId),
+                  builder: (context,AsyncSnapshot<StuDashboard> snapshot) {
+                    //print(snapshot.data!.data.toString());
+                    if (snapshot.hasData)
+                    {
+                      print(snapshot.data!.message.toString());
+                      //LandingApi? landApi=snapshot.data;
+                      List<bool> isSelected = List.generate(snapshot.data!.data2.subjects2.length, (index) => false);
+                      return SingleChildScrollView(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            Container(
+                              padding: EdgeInsets.only(left: 25, top: 10),
+                              child: Text(
+                                'Hi $userName',
+                                style: TextStyle(
+                                    fontSize: 17.5, color: Colors.black, fontFamily: "Candara"),
+                              ),
+                            ),
+                            Container(
+                              padding: EdgeInsets.only(left: 25, bottom: 10),
+                              child: Text(
+                                "Choose your courses",
+                                style: TextStyle(
+                                    fontFamily: "Candara", fontSize: 12.5, color: Colors.grey),
+                              ),
+                            ),
+                            Container(
+                              //height: 100,
+                              padding: EdgeInsets.only(left: 1, right: 1, top: 10),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.stretch,
+                                children: <Widget>[
+                                  GridView.count(
+                                    shrinkWrap: true,
+                                    primary: false,
+                                    padding: const EdgeInsets.all(20),
+                                    crossAxisSpacing: 10,
+                                    mainAxisSpacing: 10,
+                                    crossAxisCount: 3,
+                                    children: <Widget>[
+                                      for(var i=0;i<snapshot.data!.data2.subjects2.length.toInt();i++)
+                                        GestureDetector(
+                                          onTap:(){
+                                            Navigator.push(context, MaterialPageRoute(
+                                                builder: (context) => k12_det(snapshot.data!.data2.subjects2[i].id.toString(),"images/english.png")));
+
+                                          },
+                                          child: Container(
+                                            child: Column(
+                                              crossAxisAlignment: CrossAxisAlignment.center,
+                                              children: [
+                                                CircleAvatar(
+                                                    radius: 35,
+                                                    backgroundImage:
+                                                    NetworkImage('${snapshot.data!.data2.subjects2[i].icon.toString()}')),
+                                                SizedBox(height: 10),
+                                                Text(
+                                                  "${snapshot.data!.data2.subjects2[i].subjectName}",
+                                                  style: TextStyle(
+                                                      color: Colors.black,
+                                                      fontSize: 15,
+                                                      fontFamily: "Candara"),
+                                                )
+                                              ],
+                                            ),
+                                          ),
+
+                                        ),
+
+                                    ],
+                                  ),
+
+                                ],
+                              ),
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.only(left: 20.0),
+                              child: Text("Assessments", style: TextStyle(
+                                  fontFamily: "Candara",
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.black)),
+                            ),
+                            Container(
+                              child: SingleChildScrollView(
+                                padding: EdgeInsets.all(20),
+                                  scrollDirection: Axis.horizontal,
+                                  child: Row(
+                                      children: <Widget>[
+                                        for (var i = 0; i < snapshot.data!.data2.assessments1.length; i++)
+                                          GestureDetector(
+                                            onTap: () {
+                                              Navigator.push(
+                                                  context, MaterialPageRoute(builder: (context) =>
+                                                  assess(snapshot.data!.data2.assessments1[i].id,snapshot.data!.data2.assessments1[i].img.toString())));
+                                            },
+                                            child: Container(
+//width: 220,
+                                              child: Card(
+                                                elevation: 5,
+                                                shape: RoundedRectangleBorder(
+                                                    borderRadius: BorderRadius.all(Radius.circular(
+                                                        10))),
+                                                child: Column(
+                                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                                  children: <Widget>[
+                                                    SizedBox(height: 2.5),
+                                                    Container(
+                                                      height: 120,
+                                                      width: 120,
+                                                      decoration: BoxDecoration(
+                                                        image: DecorationImage(image: NetworkImage("${snapshot.data!.data2.assessments1[i].img}"),fit: BoxFit.fill),
+                                                      ),
+                                                    ),
+                                                    Padding(
+                                                      padding: const EdgeInsets.fromLTRB(5, 5, 5, 5),
+                                                      child: Container(
+                                                        width: 130,
+                                                        child: Column(
+                                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                                          children: [
+                                                            Row(
+                                                              mainAxisSize: MainAxisSize.max,
+                                                              mainAxisAlignment: MainAxisAlignment
+                                                                  .spaceBetween,
+                                                              children: [
+                                                                Flexible(
+                                                                  child: Text(
+                                                                      "${snapshot.data!.data2.assessments1[i]
+                                                                          .assessmentName}\n",
+                                                                      overflow: TextOverflow.clip,
+                                                                      maxLines: 2,
+                                                                      style: TextStyle(fontSize: 16,
+                                                                          fontFamily: "Candara",
+                                                                          color: Colors.black)),
+                                                                ),
+//SizedBox(width: 5),
+                                                              ],
+                                                            ),
+                                                            SizedBox(height: 10),
+                                                            Row(
+                                                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                              children: [
+                                                                Text(
+                                                                    "${snapshot.data!.data2.assessments1[i].price.toString()}", style: TextStyle(fontSize:18,
+                                                                    fontFamily: "Candara",
+                                                                    color: Colors.red)),
+                                                                FavoriteButton(
+                                                                  iconSize: 24,
+                                                                  isFavorite: false,
+// iconDisabledColor: Colors.white,
+                                                                  valueChanged: (_isFavorite) {
+                                                                    print('Is Favorite : $_isFavorite');
+                                                                  },
+                                                                )
+                                                              ],
+                                                            )
+                                                          ],
+                                                        ),
+                                                      ),
+                                                    )
+                                                  ],
+                                                ),
+
+                                              ),
+                                            ),
+                                          )
+                                      ]
+                                  )
+                              ),
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.only(left: 25, right: 20, bottom: 5),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: <Widget>[
+                                  Text("ScoreCard",
+                                      style: TextStyle(
+                                          fontSize: 20,
+                                          color: Colors.black,
+                                          fontFamily: "Candara")),
+                                  RaisedButton(
+                                    onPressed: () {},
+                                    child: Text('Browse all mock tests',
+                                        style: TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 12.0,
+                                            fontFamily: "Candara")),
+                                    color: Colors.teal,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(5.0),
+                                    ),
+                                  )
+                                ],
+                              ),
+                            ),
+                            Container(
+                              child: SingleChildScrollView(
                                 scrollDirection: Axis.horizontal,
                                 child: Row(
-                                  children: <Widget>[
-                                    for (var i = 0; i <k12_obj!.data1.k12.length; i++)
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Container(
+                                      padding: EdgeInsets.only(left: 20, right: 10),
+                                      width: 400,
+                                      height: 220,
+                                      child: Card(
+                                        color: Colors.white,
+                                        shadowColor: Colors.grey,
+                                        borderOnForeground: true,
+                                        child: Column(
+                                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                                          children: <Widget>[
+                                            Container(
+                                              padding: EdgeInsets.only(left: 10, top: 10),
+                                              child: Text(
+                                                "ASSESSMENTS",
+                                                style: TextStyle(
+                                                    fontSize: 12,
+                                                    color: Colors.indigo,
+                                                    fontWeight: FontWeight.bold,
+                                                    fontFamily: "Candara"),
+                                              ),
+                                            ),
+                                            Container(
+                                              padding: EdgeInsets.only(left: 10, bottom: 5),
+                                              child: Text(
+                                                "Drive your competency",
+                                                style: TextStyle(
+                                                    fontFamily: "Candara",
+                                                    fontSize: 17.5,
+                                                    color: Colors.black),
+                                              ),
+                                            ),
+                                            SizedBox(height: 20,),
+                                            Padding(
+                                              padding: const EdgeInsets.only(left: 15, right: 15, top: 5),
+                                              child: Row(
+                                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                children: <Widget>[
+                                                  Text("Total Tests",
+                                                      style: TextStyle(
+                                                          fontWeight: FontWeight.bold,
+                                                          fontSize: 12,
+                                                          color: Colors.grey,
+                                                          fontFamily: "Candara")),
+                                                  Text("Total Questions",
+                                                      style: TextStyle(
+                                                          fontWeight: FontWeight.bold,
+                                                          fontSize: 12,
+                                                          color: Colors.grey,
+                                                          fontFamily: "Candara")),
+                                                  Text("Correct",
+                                                      style: TextStyle(
+                                                          fontWeight: FontWeight.bold,
+                                                          fontSize: 12,
+                                                          color: Colors.grey,
+                                                          fontFamily: "Candara")),
+                                                  Text("Wrong",
+                                                      style: TextStyle(
+                                                          fontWeight: FontWeight.bold,
+                                                          fontSize: 12,
+                                                          color: Colors.grey,
+                                                          fontFamily: "Candara"))
+                                                ],
+                                              ),
+                                            ),
+                                            Padding(
+                                              padding: const EdgeInsets.only(
+                                                  left: 20, right: 20, top: 5, bottom: 10),
+                                              child: Row(
+                                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                children: <Widget>[
+                                                  Center(
+                                                    child: Text("  ${snapshot.data!.data2.results.assessment.total}",
+                                                        style: TextStyle(
+                                                            fontWeight: FontWeight.bold,
+                                                            fontSize: 25,
+                                                            color: Colors.black,
+                                                            fontFamily: "Candara")),
+                                                  ),
+                                                  Center(
+                                                    child: Text("    ${snapshot.data!.data2.results.assessment.totalQuestions}",
+                                                        style: TextStyle(
+                                                            fontWeight: FontWeight.bold,
+                                                            fontSize: 25,
+                                                            color: Colors.black,
+                                                            fontFamily: "Candara")),
+                                                  ),
+                                                  Center(
+                                                    child: Text("    ${snapshot.data!.data2.results.assessment.correctAnswer}",
+                                                        style: TextStyle(
+                                                            fontWeight: FontWeight.bold,
+                                                            fontSize: 25,
+                                                            color: Colors.green,
+                                                            fontFamily: "Candara")),
+                                                  ),
+                                                  Center(
+                                                    child: Text("${snapshot.data!.data2.results.assessment.wrongAnswer}",
+                                                        style: TextStyle(
+                                                            fontWeight: FontWeight.bold,
+                                                            fontSize: 25,
+                                                            color: Colors.red,
+                                                            fontFamily: "Candara")),
+                                                  )
+                                                ],
+                                              ),
+                                            ),
+                                            //SizedBox(height: 10),
+                                            Padding(
+                                              padding:
+                                              const EdgeInsets.only(left: 10, right: 10, bottom: 10),
+                                              child: RaisedButton(
+                                                onPressed: () {},
+                                                child: Text('PRACTICE AGAIN',
+                                                    style: TextStyle(
+                                                        color: Colors.white,
+                                                        fontSize: 15.0,
+                                                        fontFamily: "Candara")),
+                                                color: Colors.deepOrange,
+                                                shape: RoundedRectangleBorder(
+                                                  borderRadius: BorderRadius.circular(5.0),
+                                                ),
+                                              ),
+                                            )
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                    Container(
+                                      padding: EdgeInsets.only(left: 10, right: 20),
+                                      width: 400,
+                                      height: 220,
+                                      child: Card(
+                                        color: Colors.white,
+                                        shadowColor: Colors.grey,
+                                        borderOnForeground: true,
+                                        child: Column(
+                                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                                          children: <Widget>[
+                                            Container(
+                                              padding: EdgeInsets.only(left: 10, top: 10),
+                                              child: Text(
+                                                "K12-ASSESSMENTS",
+                                                style: TextStyle(
+                                                    fontSize: 12,
+                                                    color: Colors.indigo,
+                                                    fontWeight: FontWeight.bold,
+                                                    fontFamily: "Candara"),
+                                              ),
+                                            ),
+                                            Container(
+                                              padding: EdgeInsets.only(left: 10, bottom: 5),
+                                              child: Text(
+                                                "Drive your competency",
+                                                style: TextStyle(
+                                                    fontFamily: "Candara",
+                                                    fontSize: 17.5,
+                                                    color: Colors.black),
+                                              ),
+                                            ),
+                                            SizedBox(height: 20,),
+                                            Padding(
+                                              padding: const EdgeInsets.only(left: 15, right: 15, top: 5),
+                                              child: Row(
+                                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                children: <Widget>[
+                                                  Text("Total Tests",
+                                                      style: TextStyle(
+                                                          fontWeight: FontWeight.bold,
+                                                          fontSize: 12,
+                                                          color: Colors.grey,
+                                                          fontFamily: "Candara")),
+                                                  Text("Total Questions",
+                                                      style: TextStyle(
+                                                          fontWeight: FontWeight.bold,
+                                                          fontSize: 12,
+                                                          color: Colors.grey,
+                                                          fontFamily: "Candara")),
+                                                  Text("Correct",
+                                                      style: TextStyle(
+                                                          fontWeight: FontWeight.bold,
+                                                          fontSize: 12,
+                                                          color: Colors.grey,
+                                                          fontFamily: "Candara")),
+                                                  Text("Wrong",
+                                                      style: TextStyle(
+                                                          fontWeight: FontWeight.bold,
+                                                          fontSize: 12,
+                                                          color: Colors.grey,
+                                                          fontFamily: "Candara"))
+                                                ],
+                                              ),
+                                            ),
+                                            Padding(
+                                              padding: const EdgeInsets.only(
+                                                  left: 20, right: 20, top: 5, bottom: 10),
+                                              child: Row(
+                                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                children: <Widget>[
+                                                  Center(
+                                                    child: Text("  ${snapshot.data!.data2.results.k12.total}",
+                                                        style: TextStyle(
+                                                            fontWeight: FontWeight.bold,
+                                                            fontSize: 25,
+                                                            color: Colors.black,
+                                                            fontFamily: "Candara")),
+                                                  ),
+                                                  Center(
+                                                    child: Text("    ${snapshot.data!.data2.results.k12.totalQuestions}",
+                                                        style: TextStyle(
+                                                            fontWeight: FontWeight.bold,
+                                                            fontSize: 25,
+                                                            color: Colors.black,
+                                                            fontFamily: "Candara")),
+                                                  ),
+                                                  Center(
+                                                    child: Text("    ${snapshot.data!.data2.results.k12.correctAnswer}",
+                                                        style: TextStyle(
+                                                            fontWeight: FontWeight.bold,
+                                                            fontSize: 25,
+                                                            color: Colors.green,
+                                                            fontFamily: "Candara")),
+                                                  ),
+                                                  Center(
+                                                    child: Text("${snapshot.data!.data2.results.k12.wrongAnswer}",
+                                                        style: TextStyle(
+                                                            fontWeight: FontWeight.bold,
+                                                            fontSize: 25,
+                                                            color: Colors.red,
+                                                            fontFamily: "Candara")),
+                                                  )
+                                                ],
+                                              ),
+                                            ),
+                                            //SizedBox(height: 10),
+                                            Padding(
+                                              padding:
+                                              const EdgeInsets.only(left: 10, right: 10, bottom: 10),
+                                              child: RaisedButton(
+                                                onPressed: () {},
+                                                child: Text('PRACTICE AGAIN',
+                                                    style: TextStyle(
+                                                        color: Colors.white,
+                                                        fontSize: 15.0,
+                                                        fontFamily: "Candara")),
+                                                color: Colors.deepOrange,
+                                                shape: RoundedRectangleBorder(
+                                                  borderRadius: BorderRadius.circular(5.0),
+                                                ),
+                                              ),
+                                            )
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+
+
+                                  ],
+                                ),
+                              ),
+                            ),
+                            SizedBox(height: 10,),
+                            Padding(
+                              padding:
+                              const EdgeInsets.only(left: 20, right: 20, top: 15, bottom: 10),
+                              child: SingleChildScrollView(
+                                  scrollDirection: Axis.horizontal,
+                                  child: Row(children: <Widget>[
+                                    for(var i=0;i<snapshot.data!.data2.mentors.length.toInt();i++)
                                       GestureDetector(
                                         onTap: () {
-                                          Navigator.push(context, MaterialPageRoute(
-                                              builder: (context) => k12_det(k12_obj!.data1.k12[i].id.toString(),landApi!.data.popularCourses[i].img)));
+                                          Navigator.push(
+                                              context, MaterialPageRoute(
+                                              builder: (context) =>
+                                                  mentor(snapshot.data!.data2.mentors[i]
+                                                      .id)));
                                         },
                                         child: Card(
                                           shape: RoundedRectangleBorder(
                                               borderRadius: BorderRadius.all(Radius.circular(10))),
                                           elevation: 5,
                                           child: Column(
-                                            mainAxisAlignment: MainAxisAlignment.start,
                                             crossAxisAlignment: CrossAxisAlignment.center,
                                             children: <Widget>[
                                               Container(
-                                                height: 150,
-                                                width: 150,
+                                                height: 120,
+                                                width: 120,
                                                 decoration: BoxDecoration(
-                                                  image: DecorationImage(image: NetworkImage("${k12_obj!.data1.k12[i].img.toString()}"),fit: BoxFit.fill),
+                                                  image: DecorationImage(image: NetworkImage("${snapshot.data!.data2.mentors[i].img.toString()}"),fit: BoxFit.fill),
                                                 ),
                                               ),
                                               Padding(
-                                                padding: const EdgeInsets.fromLTRB(5, 5, 5, 5),
+                                                padding: const EdgeInsets.fromLTRB(8, 5, 8, 5),
                                                 child: Container(
-                                                  height: 100,
                                                   width: 150,
                                                   child: Column(
                                                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -894,31 +1778,23 @@ class _landingPageState extends State<landingPage> {
                                                         mainAxisAlignment: MainAxisAlignment
                                                             .spaceBetween,
                                                         children: [
-                                                          Flexible(
-                                                            child: Text("${k12_obj!.data1.k12[i].courseName}                       .",
-                                                                style: TextStyle(fontSize: 15,
-                                                                    fontFamily: "Candara",
-                                                                    color: Colors.black),
-                                                              maxLines: 2,
-                                                              overflow: TextOverflow.ellipsis,
-                                                            ),
-                                                          ),
-                                                          //IconButton(onPressed: (){  }, icon: Icon(Icons.favorite_outline,size: 15),color: Colors.grey,)
-
+                                                          Text(snapshot.data!.data2.mentors[i].eduName,
+                                                              style: TextStyle(fontSize: 16,
+                                                                  fontFamily: "Candara",
+                                                                  color: Colors.black)),
+                                                          //IconButton(onPressed: (){  }, icon: Icon(Icons.favorite_outline,size: 25),color: Colors.grey,)
                                                         ],
                                                       ),
-                                                      SizedBox(height: 8),
-                                                      Text("${k12_obj.data1.k12[i].chapter} Chapters", style: TextStyle(
-                                                          fontSize: 14,
-                                                          fontFamily: "Candara",
-                                                          color: Colors
-                                                              .grey)),
-                                                      Text("${k12_obj.data1.k12[i].chapter} Chapters", style: TextStyle(
-                                                          fontSize: 14,
-                                                          fontFamily: "Candara",
-                                                          color: Colors
-                                                              .grey)),
-                                                      SizedBox(height: 5),
+                                                      Row(
+                                                        mainAxisAlignment: MainAxisAlignment.start,
+                                                        children: [
+                                                          Text(snapshot.data!.data2.mentors[i].specilization.toString(), style: TextStyle(
+                                                              fontSize: 15,
+                                                              fontFamily: "Candara",
+                                                              color: Colors.grey))
+                                                        ],
+
+                                                      ),
                                                     ],
                                                   ),
                                                 ),
@@ -928,310 +1804,17 @@ class _landingPageState extends State<landingPage> {
 
                                         ),
                                       )
-
-                                  ],
-
-
-                                )
-                            );
-                              }
-                              else
-                                return Container(child: Center(child: CircularProgressIndicator()));
-                            }
-                            ),
-
-                        SizedBox(height: 15),
-
-
-                      ],
-                    ),
-
-                  ),
-                  Container(
-                    decoration: BoxDecoration(borderRadius: BorderRadius.only(
-                        topLeft: Radius.circular(20),
-                        topRight: Radius.circular(20)), color: Colors.teal),
-                    padding: EdgeInsets.fromLTRB(15, 15, 15, 15),
-                    width: double.infinity,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: <Widget>[
-
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: <Widget>[
-                            Text("Competitive Exam", style: TextStyle(
-                                fontFamily: "Candara",
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white)),
-                            GestureDetector(
-                                child: Text("See all", style: TextStyle(
-                                    fontSize: 18,
-                                    color: Colors.lightBlueAccent,
-                                    fontFamily: "Candara")),
-                                onTap: () {
-                                  Navigator.push(context, MaterialPageRoute(
-                                      builder: (context) =>
-                                          seeallpage("Competitive Exam", 3)));
-                                })
-                          ],
-                        ),
-                        SizedBox(height: 20),
-                        SingleChildScrollView(
-                            scrollDirection: Axis.horizontal,
-                            child: Row(
-                                children: comp_e
-                            )
-                        ),
-                        SizedBox(height: 15),
-                      ],
-                    ),
-
-
-                  ),
-                  Container(
-                    padding: EdgeInsets.fromLTRB(15, 15, 15, 15),
-                    decoration: BoxDecoration(borderRadius: BorderRadius.only(
-                        topLeft: Radius.circular(20),
-                        topRight: Radius.circular(20)), color: Colors.white),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: <Widget>[
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: <Widget>[
-                            Text("Mentor", style: TextStyle(
-                                fontFamily: "Candara",
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.black)),
-                            GestureDetector(
-                                child: Text("See all", style: TextStyle(
-                                    fontSize: 18,
-                                    color: Colors.lightBlueAccent,
-                                    fontFamily: "Candara")),
-                                onTap: () {
-                                  Navigator.push(context, MaterialPageRoute(
-                                      builder: (context) =>
-                                          seeallpage("Mentors", 4)));
-                                })
-                          ],
-                        ),
-                        SizedBox(height: 20),
-                        ElevatedButton(onPressed: (){
-                          Navigator.push(context, MaterialPageRoute(
-                              builder: (context) =>profile()));
-                        },
-                          child: Text("Mentor profile"),),
-                        SingleChildScrollView(
-                            scrollDirection: Axis.horizontal,
-                            child: Row(
-                                children: mento
-                            )
-                        ),
-                        SizedBox(height: 30)
-                      ],
-                    ),
-                  )
-                ],
-              )
-          );
-            }
-            else
-              return Container(child: CircularProgressIndicator());
-          }
-        ),
-        SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Container(
-                padding: EdgeInsets.only(left: 25, top: 10),
-                child: Text(
-                  "Hi Aryan!",
-                  style: TextStyle(
-                      fontSize: 17.5,
-                      color: Colors.black,
-                      fontFamily: "Candara"),
-                ),
-              ),
-              Container(
-                padding: EdgeInsets.only(left: 25, bottom: 10),
-                child: Text(
-                  "Choose your courses",
-                  style: TextStyle(
-                      fontFamily: "Candara",
-                      fontSize: 12.5,
-                      color: Colors.grey),
-                ),
-              ),
-              Container(
-                color: Colors.white,
-                //height: 100,
-                padding: EdgeInsets.only(left: 25, right: 25, top: 10),
-                child: Card(
-                  color: Colors.white,
-                  shadowColor: Colors.grey,
-                  borderOnForeground: true,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: <Widget>[
-                      Container(
-                        padding: EdgeInsets.all(5),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          children: <Widget>[
-                            GestureDetector(
-                              child: Container(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  children: [
-                                    CircleAvatar(
-                                        radius: 30,
-                                        backgroundImage:
-                                        AssetImage('images/maths.png')),
-                                    SizedBox(height: 5),
-                                    Text(
-                                      "MATHS",
-                                      style: TextStyle(
-                                          color: Colors.black,
-                                          fontSize: 12.5,
-                                          fontFamily: "Candara"),
-                                    )
-                                  ],
-                                ),
-                              ),
-                              onTap: () {},
-                            ),
-                            GestureDetector(
-                              child: Container(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  children: [
-                                    CircleAvatar(
-                                        radius: 30,
-                                        backgroundImage:
-                                        AssetImage('images/chemistry.png')),
-                                    SizedBox(height: 5),
-                                    Text(
-                                      "SCIENCE",
-                                      style: TextStyle(
-                                          color: Colors.black,
-                                          fontSize: 12.5,
-                                          fontFamily: "Candara"),
-                                    )
-                                  ],
-                                ),
-                              ),
-                              onTap: () {},
-                            ),
-                            GestureDetector(
-                              child: Container(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  children: [
-                                    CircleAvatar(
-                                        radius: 30,
-                                        backgroundImage:
-                                        AssetImage('images/hindi.png')),
-                                    SizedBox(height: 5),
-                                    Text(
-                                      "HINDI",
-                                      style: TextStyle(
-                                          color: Colors.black,
-                                          fontSize: 12.5,
-                                          fontFamily: "Candara"),
-                                    )
-                                  ],
-                                ),
-                              ),
-                              onTap: () {},
+                                  ])),
                             ),
                           ],
                         ),
-                      ),
-                      SizedBox(height: 5),
-                      Container(
-                        padding: EdgeInsets.all(5),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          children: <Widget>[
-                            GestureDetector(
-                              child: Container(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  children: [
-                                    CircleAvatar(
-                                        radius: 30,
-                                        backgroundImage:
-                                        AssetImage('images/english.png')),
-                                    SizedBox(height: 5),
-                                    Text(
-                                      "ENGLISH",
-                                      style: TextStyle(
-                                          color: Colors.black,
-                                          fontSize: 12.5,
-                                          fontFamily: "Candara"),
-                                    )
-                                  ],
-                                ),
-                              ),
-                              onTap: () {},
-                            ),
-                            GestureDetector(
-                              child: Container(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  children: [
-                                    CircleAvatar(
-                                        radius: 30,
-                                        backgroundImage:
-                                        AssetImage('images/sst.png')),
-                                    SizedBox(height: 5),
-                                    Text(
-                                      "SST",
-                                      style: TextStyle(
-                                          color: Colors.black,
-                                          fontSize: 12.5,
-                                          fontFamily: "Candara"),
-                                    )
-                                  ],
-                                ),
-                              ),
-                              onTap: () {},
-                            ),
-                            GestureDetector(
-                              child: Container(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  children: [
-                                    CircleAvatar(
-                                        radius: 30,
-                                        backgroundImage:
-                                        AssetImage('images/computer.png')),
-                                    SizedBox(height: 5),
-                                    Text(
-                                      "COMPUTER",
-                                      style: TextStyle(
-                                          color: Colors.black,
-                                          fontSize: 12.5,
-                                          fontFamily: "Candara"),
-                                    )
-                                  ],
-                                ),
-                              ),
-                              onTap: () {},
-                            ),
-                          ],
-                        ),
-                      )
-                    ],
-                  ),
-                ),
-              ),
-            ],
-          ),
+                      );
+                    }
+                    else
+                      return Container(child: CircularProgressIndicator());
+                  }
+              );
+          },
         ),
         SingleChildScrollView(
           child: Column(
@@ -1312,22 +1895,31 @@ class _landingPageState extends State<landingPage> {
 
 
       return Scaffold(
-        backgroundColor: Colors.teal,
+        backgroundColor: Colors.white,
         appBar: AppBar(
+          leading: Builder(
+            builder: (BuildContext context) {
+              return IconButton(
+                onPressed:(){ Scaffold.of(context).openDrawer();},
+                icon: Icon(Icons.menu,color: Colors.teal,),
+              );
+            },
+          ),
           toolbarHeight: 70,
           backgroundColor: Colors.white70,
           //leading:
           //Icon(Icons.menu, color: Colors.black, size: 30,),
           //centerTitle: true,
           actions: <IconButton>[
-            IconButton(onPressed: () async {
+            IconButton(
+                /*onPressed: () async {
               if(token=="")
               Navigator.push(
                   context, MaterialPageRoute(builder: (context) => Login()));
               else if(token!="" && classId!=""){
                 print(userName);
                 Navigator.push(
-                    context, MaterialPageRoute(builder: (context) => Dashboard()));
+                    context, MaterialPageRoute(builder: (context) => Dashboard(classId)));
               }
               else{
                 final Future<ConfirmAction?> action =
@@ -1339,12 +1931,15 @@ class _landingPageState extends State<landingPage> {
                     x,
                     'None');
               }
-            }, icon: Icon(Icons.person, color: Colors.white, size: 30))
+            }*/
+                icon: Icon(Icons.notifications, color: Colors.teal, size: 30),
+              onPressed: (){},
+            )
           ],
           title: Text("Let's Start Learning", style: TextStyle(
               fontSize: 20,
               fontFamily: "Candara",
-              color: Colors.white),)
+              color: Colors.teal),)
 
         ),
         drawer: Drawer(
@@ -1370,9 +1965,13 @@ class _landingPageState extends State<landingPage> {
               ListTile(
                 title: const Text('Logout'),
                 onTap: () {
-                  // Update the state of the app
-                  // ...
-                  // Then close the drawer
+                  setState(()  {
+                    userName = "";
+                    userEmail = "";
+                    userId = 0;
+                    token = "";
+                    classId="";
+                  });
                   Navigator.pop(context);
                 },
               ),
@@ -1386,11 +1985,11 @@ class _landingPageState extends State<landingPage> {
             items: const <BottomNavigationBarItem>[
               BottomNavigationBarItem(
                   icon: Icon(Icons.home_outlined, size: 30),
-                  label: 'Dashboard',
+                  label: 'Home',
                   backgroundColor: Colors.white),
               BottomNavigationBarItem(
-                icon: Icon(Icons.favorite_outline, size: 30),
-                label: 'Favourites',
+                icon: Icon(Icons.dashboard_outlined, size: 30),
+                label: 'Dashboard',
               ),
               BottomNavigationBarItem(
                 icon: Icon(
@@ -1411,7 +2010,7 @@ class _landingPageState extends State<landingPage> {
             future: getLanding(),
             builder: (context, AsyncSnapshot<LandingApi> snapshot){
               if(snapshot.hasData){
-
+                //sublen=snapshot.data?.data.subjects.length.toInt();
                 return SafeArea(child:_widgetOptions.elementAt(_selectedIndex));
               }
               else{
@@ -1524,8 +2123,13 @@ Future<Future<ConfirmAction?>> _asyncConfirmDialog(
                       {
                         classId=classController.text.toString();
                         if(classId!="")
-                        Navigator.push(
-                            context, MaterialPageRoute(builder: (context) => Dashboard()));
+                          {
+                            Navigator.of(context).pop(ConfirmAction.Confirm);
+                            Navigator.pushReplacement(
+                                context, MaterialPageRoute(builder: (context) => landing()));
+                          }
+
+
                       }
                     //Navigator.of(context).pop(ConfirmAction.Confirm);
                   },

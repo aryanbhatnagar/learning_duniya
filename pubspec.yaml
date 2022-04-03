@@ -24,6 +24,7 @@ dependencies:
   flutter:
     sdk: flutter
   intro_slider: ^3.0.3
+  image_picker: ^0.8.4+11
   group_button: ^4.5.0
   video_player: ^2.2.3
   http: ^0.13.3
@@ -76,6 +77,8 @@ flutter:
     - images/engass.jfif
     - images/hindiass.jpg
     - images/tick.png
+    - images/mentorProfile.jpeg
+    - images/login.jpg
   #   - images/a_dot_ham.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see

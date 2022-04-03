@@ -150,7 +150,7 @@ class _Login2PageState extends State<Login2> {
     super.initState();
     if(token!=""){
       print(userName);
-      Navigator.push(context, MaterialPageRoute(builder: (context)=>Dashboard()));
+      //Navigator.push(context, MaterialPageRoute(builder: (context)=>Dashboard()));
       //Navigator.push(context,MaterialPageRoute(builder: (context)=>Dashboard()));
     }
     else

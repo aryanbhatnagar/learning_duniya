@@ -7,9 +7,11 @@ import 'globals.dart';
 import 'courses.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
+import 'mentor.dart';
 
+
+var CLASSid;
 StuDashboard stuDashboardFromJson(String str) => StuDashboard.fromJson(json.decode(str));
-
 String stuDashboardToJson(StuDashboard data) => json.encode(data.toJson());
 
 class StuDashboard {
@@ -147,10 +149,10 @@ class K12Class {
     required this.wrongAnswer,
   });
 
-  String total;
-  String totalQuestions;
-  String correctAnswer;
-  String wrongAnswer;
+  var total;
+  var totalQuestions;
+  var correctAnswer;
+  var wrongAnswer;
 
   factory K12Class.fromJson(Map<String, dynamic> json) => K12Class(
     total: json["total"],
@@ -170,19 +172,23 @@ class Subject {
   Subject({
     required this.id,
     required this.subjectName,
+    required this.icon
   });
 
   int id;
   String subjectName;
+  var icon;
 
   factory Subject.fromJson(Map<String, dynamic> json) => Subject(
     id: json["id"],
     subjectName: json["subject_name"],
+    icon: json["icon"]
   );
 
   Map<String, dynamic> toJson() => {
     "id": id,
     "subject_name": subjectName,
+    "icon": icon
   };
 }
 
@@ -190,7 +196,8 @@ Future<StuDashboard> createDash(String id) async {
   final String apiUrl =
       "http://ec2-13-234-116-155.ap-south-1.compute.amazonaws.com/api/mentee/dashboard";
 
-  final response = await http.post(Uri.parse(apiUrl),headers: <String, String> {
+  final response = await http.post(Uri.parse(apiUrl),
+      headers: <String, String> {
     "Authorization": "Bearer $token",
   },
       body: {
@@ -208,10 +215,16 @@ Future<StuDashboard> createDash(String id) async {
 
 SharedPref s = SharedPref();
 class Dashboard extends StatelessWidget {
-  const Dashboard({Key? key}) : super(key: key);
+  //const Dashboard({Key? key}) : super(key: key);
+
+  late String cid;
+
+  Dashboard(this.cid);
 
   @override
   Widget build(BuildContext context) {
+    CLASSid=cid;
+    classId=cid;
     return MaterialApp(
       home: DashboardPage(),
     );
@@ -239,7 +252,7 @@ class _DashboardPageState extends State<DashboardPage> {
 
   static List<Widget> _widgetOptions = <Widget>[
     FutureBuilder(
-        future: createDash(classId),
+        future: createDash(CLASSid),
         builder: (context,AsyncSnapshot<StuDashboard> snapshot) {
           //print(snapshot.data!.data.toString());
           if (snapshot.hasData)
@@ -273,160 +286,47 @@ class _DashboardPageState extends State<DashboardPage> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: <Widget>[
-                        Container(
-                          //padding: EdgeInsets.all(5),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                              children: <Widget>[
-                                GestureDetector(
-                                  child: Container(
-                                    child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.center,
-                                      children: [
-                                        CircleAvatar(
-                                            radius: 35,
-                                            backgroundImage:
-                                            AssetImage('images/maths.png')),
-                                        SizedBox(height: 10),
-                                        Text(
-                                          "MATHS",
-                                          style: TextStyle(
-                                              color: Colors.black,
-                                              fontSize: 15,
-                                              fontFamily: "Candara"),
-                                        )
-                                      ],
-                                    ),
-                                  ),
-                                  onTap: () {},
-                                ),
-                                GestureDetector(
-                                  child: Container(
-                                    child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.center,
-                                      children: [
-                                        CircleAvatar(
-                                            radius: 35,
-                                            backgroundImage:
-                                            AssetImage('images/chemistry.png')),
-                                        SizedBox(height: 10),
-                                        Text(
-                                          "SCIENCE",
-                                          style: TextStyle(
-                                              color: Colors.black,
-                                              fontSize: 15,
-                                              fontFamily: "Candara"),
-                                        )
-                                      ],
-                                    ),
-                                  ),
-                                  onTap: () {},
-                                ),
-                                GestureDetector(
-                                  child: Container(
-                                    child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.center,
-                                      children: [
-                                        CircleAvatar(
-                                            radius: 35,
-                                            backgroundImage:
-                                            AssetImage('images/hindi.png')),
-                                        SizedBox(height: 10),
-                                        Text(
-                                          "HINDI",
-                                          style: TextStyle(
-                                              color: Colors.black,
-                                              fontSize: 15,
-                                              fontFamily: "Candara"),
-                                        )
-                                      ],
-                                    ),
-                                  ),
-                                  onTap: () {},
-                                ),
-                              ],
-                            )),
-                        SizedBox(height: 7.5),
-                        Container(
-                          padding: EdgeInsets.all(5),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                            children: <Widget>[
+                        GridView.count(
+                          shrinkWrap: true,
+                          primary: false,
+                          padding: const EdgeInsets.all(20),
+                          crossAxisSpacing: 10,
+                          mainAxisSpacing: 10,
+                          crossAxisCount: 3,
+                          children: <Widget>[
+                            for(var i=0;i<snapshot.data!.data.subjects.length.toInt();i++)
                               GestureDetector(
-                                child: Container(
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.center,
-                                    children: [
-                                      CircleAvatar(
-                                          radius: 35,
-                                          backgroundImage:
-                                          AssetImage('images/english.png')),
-                                      SizedBox(height: 10),
-                                      Text(
-                                        "ENGLISH",
-                                        style: TextStyle(
-                                            color: Colors.black,
-                                            fontSize: 15,
-                                            fontFamily: "Candara"),
-                                      )
-                                    ],
-                                  ),
+                              child: Container(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    CircleAvatar(
+                                        radius: 35,
+                                        backgroundImage:
+                                        NetworkImage('${snapshot.data!.data.subjects[i].icon.toString()}')),
+                                    SizedBox(height: 10),
+                                    Text(
+                                      "${snapshot.data!.data.subjects[i].subjectName}",
+                                      style: TextStyle(
+                                          color: Colors.black,
+                                          fontSize: 15,
+                                          fontFamily: "Candara"),
+                                    )
+                                  ],
                                 ),
-                                onTap: () {},
                               ),
-                              GestureDetector(
-                                child: Container(
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.center,
-                                    children: [
-                                      CircleAvatar(
-                                          radius: 35,
-                                          backgroundImage:
-                                          AssetImage('images/sst.png')),
-                                      SizedBox(height: 10),
-                                      Text(
-                                        "SST",
-                                        style: TextStyle(
-                                            color: Colors.black,
-                                            fontSize: 15,
-                                            fontFamily: "Candara"),
-                                      )
-                                    ],
-                                  ),
-                                ),
-                                onTap: () {},
-                              ),
-                              GestureDetector(
-                                child: Container(
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.center,
-                                    children: [
-                                      CircleAvatar(
-                                          radius: 35,
-                                          backgroundImage:
-                                          AssetImage('images/computer.png')),
-                                      SizedBox(height: 10),
-                                      Text(
-                                        "COMPUTER",
-                                        style: TextStyle(
-                                            color: Colors.black,
-                                            fontSize: 15,
-                                            fontFamily: "Candara"),
-                                      )
-                                    ],
-                                  ),
-                                ),
-                                onTap: () {},
-                              ),
-                            ],
-                          ),
-                        )
+                              onTap: () {},
+                            ),
+
+                          ],
+                        ),
+
                       ],
                     ),
                   ),
                   Padding(
                     padding:
-                    const EdgeInsets.only(left: 20, right: 20, top: 15, bottom: 10),
+                    const EdgeInsets.only(left: 20, right: 20, bottom: 5),
                     child: SingleChildScrollView(
                         scrollDirection: Axis.horizontal,
                         child: Row(children: <Widget>[
@@ -474,131 +374,338 @@ class _DashboardPageState extends State<DashboardPage> {
                     ),
                   ),
                   Container(
-                    //height: 100,
-                    padding: EdgeInsets.only(left: 20, right: 20),
-                    child: Card(
-                      color: Colors.white,
-                      shadowColor: Colors.grey,
-                      borderOnForeground: true,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: <Widget>[
+                    child: SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
                           Container(
-                            padding: EdgeInsets.only(left: 10, top: 10),
-                            child: Text(
-                              "PRACTICE TESTS",
-                              style: TextStyle(
-                                  fontSize: 12,
-                                  color: Colors.indigo,
-                                  fontWeight: FontWeight.bold,
-                                  fontFamily: "Candara"),
-                            ),
-                          ),
-                          Container(
-                            padding: EdgeInsets.only(left: 10, bottom: 5),
-                            child: Text(
-                              "Drive your competency",
-                              style: TextStyle(
-                                  fontFamily: "Candara",
-                                  fontSize: 17.5,
-                                  color: Colors.black),
-                            ),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.only(left: 15, right: 15, top: 5),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: <Widget>[
-                                Text("Total Tests",
-                                    style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 12,
-                                        color: Colors.grey,
-                                        fontFamily: "Candara")),
-                                Text("Pass In",
-                                    style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 12,
-                                        color: Colors.grey,
-                                        fontFamily: "Candara")),
-                                Text("Re-Test",
-                                    style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 12,
-                                        color: Colors.grey,
-                                        fontFamily: "Candara"))
-                              ],
-                            ),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.only(
-                                left: 20, right: 20, top: 5, bottom: 10),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: <Widget>[
-                                Text("  5",
-                                    style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 25,
-                                        color: Colors.black,
-                                        fontFamily: "Candara")),
-                                Text(" 4",
-                                    style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 25,
-                                        color: Colors.black,
-                                        fontFamily: "Candara")),
-                                Text("1",
-                                    style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 25,
-                                        color: Colors.red,
-                                        fontFamily: "Candara"))
-                              ],
-                            ),
-                          ),
-                          Padding(
-                            padding:
-                            const EdgeInsets.only(left: 10, right: 10, bottom: 10),
-                            child: RaisedButton(
-                              onPressed: () {},
-                              child: Text('PRACTICE AGAIN',
-                                  style: TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 15.0,
-                                      fontFamily: "Candara")),
-                              color: Colors.deepOrange,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(5.0),
+                            padding: EdgeInsets.only(left: 20, right: 10),
+                            width: 400,
+                            height: 220,
+                            child: Card(
+                              color: Colors.white,
+                              shadowColor: Colors.grey,
+                              borderOnForeground: true,
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.stretch,
+                                children: <Widget>[
+                                  Container(
+                                    padding: EdgeInsets.only(left: 10, top: 10),
+                                    child: Text(
+                                      "ASSESSMENTS",
+                                      style: TextStyle(
+                                          fontSize: 12,
+                                          color: Colors.indigo,
+                                          fontWeight: FontWeight.bold,
+                                          fontFamily: "Candara"),
+                                    ),
+                                  ),
+                                  Container(
+                                    padding: EdgeInsets.only(left: 10, bottom: 5),
+                                    child: Text(
+                                      "Drive your competency",
+                                      style: TextStyle(
+                                          fontFamily: "Candara",
+                                          fontSize: 17.5,
+                                          color: Colors.black),
+                                    ),
+                                  ),
+                                  SizedBox(height: 20,),
+                                  Padding(
+                                    padding: const EdgeInsets.only(left: 15, right: 15, top: 5),
+                                    child: Row(
+                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      children: <Widget>[
+                                        Text("Total Tests",
+                                            style: TextStyle(
+                                                fontWeight: FontWeight.bold,
+                                                fontSize: 12,
+                                                color: Colors.grey,
+                                                fontFamily: "Candara")),
+                                        Text("Total Questions",
+                                            style: TextStyle(
+                                                fontWeight: FontWeight.bold,
+                                                fontSize: 12,
+                                                color: Colors.grey,
+                                                fontFamily: "Candara")),
+                                        Text("Correct",
+                                            style: TextStyle(
+                                                fontWeight: FontWeight.bold,
+                                                fontSize: 12,
+                                                color: Colors.grey,
+                                                fontFamily: "Candara")),
+                                        Text("Wrong",
+                                            style: TextStyle(
+                                                fontWeight: FontWeight.bold,
+                                                fontSize: 12,
+                                                color: Colors.grey,
+                                                fontFamily: "Candara"))
+                                      ],
+                                    ),
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.only(
+                                        left: 20, right: 20, top: 5, bottom: 10),
+                                    child: Row(
+                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      children: <Widget>[
+                                        Center(
+                                          child: Text("  ${snapshot.data!.data.results.assessment.total}",
+                                              style: TextStyle(
+                                                  fontWeight: FontWeight.bold,
+                                                  fontSize: 25,
+                                                  color: Colors.black,
+                                                  fontFamily: "Candara")),
+                                        ),
+                                        Center(
+                                          child: Text("    ${snapshot.data!.data.results.assessment.totalQuestions}",
+                                              style: TextStyle(
+                                                  fontWeight: FontWeight.bold,
+                                                  fontSize: 25,
+                                                  color: Colors.black,
+                                                  fontFamily: "Candara")),
+                                        ),
+                                        Center(
+                                          child: Text("    ${snapshot.data!.data.results.assessment.correctAnswer}",
+                                              style: TextStyle(
+                                                  fontWeight: FontWeight.bold,
+                                                  fontSize: 25,
+                                                  color: Colors.green,
+                                                  fontFamily: "Candara")),
+                                        ),
+                                        Center(
+                                          child: Text("${snapshot.data!.data.results.assessment.wrongAnswer}",
+                                              style: TextStyle(
+                                                  fontWeight: FontWeight.bold,
+                                                  fontSize: 25,
+                                                  color: Colors.red,
+                                                  fontFamily: "Candara")),
+                                        )
+                                      ],
+                                    ),
+                                  ),
+                                  //SizedBox(height: 10),
+                                  Padding(
+                                    padding:
+                                    const EdgeInsets.only(left: 10, right: 10, bottom: 10),
+                                    child: RaisedButton(
+                                      onPressed: () {},
+                                      child: Text('PRACTICE AGAIN',
+                                          style: TextStyle(
+                                              color: Colors.white,
+                                              fontSize: 15.0,
+                                              fontFamily: "Candara")),
+                                      color: Colors.deepOrange,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(5.0),
+                                      ),
+                                    ),
+                                  )
+                                ],
                               ),
                             ),
-                          )
+                          ),
+                          Container(
+                            padding: EdgeInsets.only(left: 10, right: 20),
+                            width: 400,
+                            height: 220,
+                            child: Card(
+                              color: Colors.white,
+                              shadowColor: Colors.grey,
+                              borderOnForeground: true,
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.stretch,
+                                children: <Widget>[
+                                  Container(
+                                    padding: EdgeInsets.only(left: 10, top: 10),
+                                    child: Text(
+                                      "K12-ASSESSMENTS",
+                                      style: TextStyle(
+                                          fontSize: 12,
+                                          color: Colors.indigo,
+                                          fontWeight: FontWeight.bold,
+                                          fontFamily: "Candara"),
+                                    ),
+                                  ),
+                                  Container(
+                                    padding: EdgeInsets.only(left: 10, bottom: 5),
+                                    child: Text(
+                                      "Drive your competency",
+                                      style: TextStyle(
+                                          fontFamily: "Candara",
+                                          fontSize: 17.5,
+                                          color: Colors.black),
+                                    ),
+                                  ),
+                                  SizedBox(height: 20,),
+                                  Padding(
+                                    padding: const EdgeInsets.only(left: 15, right: 15, top: 5),
+                                    child: Row(
+                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      children: <Widget>[
+                                        Text("Total Tests",
+                                            style: TextStyle(
+                                                fontWeight: FontWeight.bold,
+                                                fontSize: 12,
+                                                color: Colors.grey,
+                                                fontFamily: "Candara")),
+                                        Text("Total Questions",
+                                            style: TextStyle(
+                                                fontWeight: FontWeight.bold,
+                                                fontSize: 12,
+                                                color: Colors.grey,
+                                                fontFamily: "Candara")),
+                                        Text("Correct",
+                                            style: TextStyle(
+                                                fontWeight: FontWeight.bold,
+                                                fontSize: 12,
+                                                color: Colors.grey,
+                                                fontFamily: "Candara")),
+                                        Text("Wrong",
+                                            style: TextStyle(
+                                                fontWeight: FontWeight.bold,
+                                                fontSize: 12,
+                                                color: Colors.grey,
+                                                fontFamily: "Candara"))
+                                      ],
+                                    ),
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.only(
+                                        left: 20, right: 20, top: 5, bottom: 10),
+                                    child: Row(
+                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      children: <Widget>[
+                                        Center(
+                                          child: Text("  ${snapshot.data!.data.results.k12.total}",
+                                              style: TextStyle(
+                                                  fontWeight: FontWeight.bold,
+                                                  fontSize: 25,
+                                                  color: Colors.black,
+                                                  fontFamily: "Candara")),
+                                        ),
+                                        Center(
+                                          child: Text("    ${snapshot.data!.data.results.k12.totalQuestions}",
+                                              style: TextStyle(
+                                                  fontWeight: FontWeight.bold,
+                                                  fontSize: 25,
+                                                  color: Colors.black,
+                                                  fontFamily: "Candara")),
+                                        ),
+                                        Center(
+                                          child: Text("    ${snapshot.data!.data.results.k12.correctAnswer}",
+                                              style: TextStyle(
+                                                  fontWeight: FontWeight.bold,
+                                                  fontSize: 25,
+                                                  color: Colors.green,
+                                                  fontFamily: "Candara")),
+                                        ),
+                                        Center(
+                                          child: Text("${snapshot.data!.data.results.k12.wrongAnswer}",
+                                              style: TextStyle(
+                                                  fontWeight: FontWeight.bold,
+                                                  fontSize: 25,
+                                                  color: Colors.red,
+                                                  fontFamily: "Candara")),
+                                        )
+                                      ],
+                                    ),
+                                  ),
+                                  //SizedBox(height: 10),
+                                  Padding(
+                                    padding:
+                                    const EdgeInsets.only(left: 10, right: 10, bottom: 10),
+                                    child: RaisedButton(
+                                      onPressed: () {},
+                                      child: Text('PRACTICE AGAIN',
+                                          style: TextStyle(
+                                              color: Colors.white,
+                                              fontSize: 15.0,
+                                              fontFamily: "Candara")),
+                                      color: Colors.deepOrange,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(5.0),
+                                      ),
+                                    ),
+                                  )
+                                ],
+                              ),
+                            ),
+                          ),
+
+
                         ],
                       ),
                     ),
                   ),
+                  SizedBox(height: 10,),
                   Padding(
                     padding:
                     const EdgeInsets.only(left: 20, right: 20, top: 15, bottom: 10),
                     child: SingleChildScrollView(
                         scrollDirection: Axis.horizontal,
                         child: Row(children: <Widget>[
-                          TextButton(
-                              onPressed: () {},
-                              child: Image.asset("images/ad.png",
-                                  height: 100, width: 200)),
-                          TextButton(
-                              onPressed: () {},
-                              child: Image.asset("images/ad.png",
-                                  height: 100, width: 200)),
-                          TextButton(
-                              onPressed: () {},
-                              child: Image.asset("images/ad.png",
-                                  height: 100, width: 200)),
-                          TextButton(
-                              onPressed: () {},
-                              child:
-                              Image.asset("images/ad.png", height: 100, width: 200))
+                          for(var i=0;i<snapshot.data!.data.mentors.length.toInt();i++)
+                            GestureDetector(
+                              onTap: () {
+                                Navigator.push(
+                                    context, MaterialPageRoute(
+                                    builder: (context) =>
+                                        mentor(snapshot.data!.data.mentors[i]
+                                            .id)));
+                              },
+                              child: Card(
+                                shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.all(Radius.circular(10))),
+                                elevation: 5,
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: <Widget>[
+                                    Container(
+                                      height: 120,
+                                      width: 120,
+                                      decoration: BoxDecoration(
+                                        image: DecorationImage(image: NetworkImage("${snapshot.data!.data.mentors[i].img.toString()}"),fit: BoxFit.fill),
+                                      ),
+                                    ),
+                                    Padding(
+                                      padding: const EdgeInsets.fromLTRB(8, 5, 8, 5),
+                                      child: Container(
+                                        width: 150,
+                                        child: Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: [
+                                            Row(
+                                              mainAxisAlignment: MainAxisAlignment
+                                                  .spaceBetween,
+                                              children: [
+                                                Text(snapshot.data!.data.mentors[i].eduName,
+                                                    style: TextStyle(fontSize: 16,
+                                                        fontFamily: "Candara",
+                                                        color: Colors.black)),
+                                                //IconButton(onPressed: (){  }, icon: Icon(Icons.favorite_outline,size: 25),color: Colors.grey,)
+                                              ],
+                                            ),
+                                            Row(
+                                              mainAxisAlignment: MainAxisAlignment.start,
+                                              children: [
+                                                Text(snapshot.data!.data.mentors[i].specilization.toString(), style: TextStyle(
+                                                    fontSize: 15,
+                                                    fontFamily: "Candara",
+                                                    color: Colors.grey))
+                                              ],
+
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    )
+                                  ],
+                                ),
+
+                              ),
+                            )
                         ])),
                   ),
                 ],
