@@ -619,7 +619,7 @@ class _landingPageState extends State<landingPage> {
 
   @override
   Widget build(BuildContext context) {
-
+    var ass_vis=true;
     //isSelected[0]=true;
       final controller = GroupButtonController();
       List<Widget> _widgetOptions = <Widget>[
@@ -1350,7 +1350,8 @@ class _landingPageState extends State<landingPage> {
                                 ],
                               ),
                             ),
-                            Padding(
+                            if(snapshot.data!.data2.assessments1.length>0)
+                              Padding(
                               padding: const EdgeInsets.only(left: 20.0),
                               child: Text("Assessments", style: TextStyle(
                                   fontFamily: "Candara",

@@ -164,10 +164,12 @@ class _Login2PageState extends State<Login2> {
   late String _email,_password;
 
   Widget build(BuildContext context) {
+    Size size = MediaQuery.of(context).size;
     return MaterialApp(
         home: Scaffold(
           body: SafeArea(
             child: Container(
+              height: size.height,
               decoration: new BoxDecoration(
                   image: new DecorationImage(
                     image: new AssetImage("images/bg.png"),
