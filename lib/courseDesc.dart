@@ -38,34 +38,40 @@ class K12Chapter {
     "message": message,
   };
 }
-
 class Data {
   Data({
     required this.chapterDetails,
     required this.videos,
+    required this.questionTypes,
   });
 
   ChapterDetails chapterDetails;
   List<Video> videos;
+  List<QuestionType> questionTypes;
 
   factory Data.fromJson(Map<String, dynamic> json) => Data(
     chapterDetails: ChapterDetails.fromJson(json["chapter_details"]),
     videos: List<Video>.from(json["videos"].map((x) => Video.fromJson(x))),
+    questionTypes: List<QuestionType>.from(json["question_types"].map((x) => QuestionType.fromJson(x))),
   );
 
   Map<String, dynamic> toJson() => {
     "chapter_details": chapterDetails.toJson(),
     "videos": List<dynamic>.from(videos.map((x) => x.toJson())),
+    "question_types": List<dynamic>.from(questionTypes.map((x) => x.toJson())),
   };
 }
-
 class ChapterDetails {
   ChapterDetails({
-     required this.id,
+    required this.id,
     required this.bookId,
     required this.chapterName,
     required this.mediaFile,
     required this.fileName,
+    required this.quizTime,
+    required this.img,
+    required this.likes,
+    required this.visitors,
     required this.about,
     required this.syllabus,
     required this.description,
@@ -76,24 +82,28 @@ class ChapterDetails {
     required this.onSale,
     required this.featured,
     required this.status,
+    required this.pdfFile,
+    required this.pdfFileName,
+    required this.pdfFile1,
+    required this.pdfFileName1,
     required this.school,
     required this.createdBy,
     required this.updatedBy,
     required this.createdAt,
     required this.updatedAt,
-    required this.pdfFile,
-    required this.pdfFileName,
-    required this.pdfFile1,
-    required this.pdfFileName1,
   });
 
-   var id;
-   var bookId;
-   var chapterName;
-   var mediaFile;
-   dynamic fileName;
-   var about;
-   var syllabus;
+  var id;
+  var bookId;
+  var chapterName;
+  var mediaFile;
+  var fileName;
+  var quizTime;
+  dynamic img;
+  var likes;
+  var visitors;
+  var about;
+  var syllabus;
   var description;
   var lifespan;
   var language;
@@ -102,15 +112,17 @@ class ChapterDetails {
   var onSale;
   var featured;
   var status;
-  var school;
-  var createdBy;
-  var updatedBy;
-  var createdAt;
-  var updatedAt;
   dynamic pdfFile;
   dynamic pdfFileName;
   var pdfFile1;
   var pdfFileName1;
+  var school;
+  var createdBy;
+  var updatedBy;
+  dynamic createdAt;
+  dynamic updatedAt;
+
+
 
   factory ChapterDetails.fromJson(Map<String, dynamic> json) => ChapterDetails(
     id: json["id"],
@@ -118,6 +130,10 @@ class ChapterDetails {
     chapterName: json["chapter_name"],
     mediaFile: json["media_file"],
     fileName: json["file_name"],
+    quizTime: json["quiz_time"],
+    img: json["img"],
+    likes: json["likes"],
+    visitors: json["visitors"],
     about: json["about"],
     syllabus: json["syllabus"],
     description: json["description"],
@@ -128,15 +144,15 @@ class ChapterDetails {
     onSale: json["on_sale"],
     featured: json["featured"],
     status: json["status"],
+    pdfFile: json["pdf_file"],
+    pdfFileName: json["pdf_file_name"],
+    pdfFile1: json["pdf_file1"],
+    pdfFileName1: json["pdf_file_name1"],
     school: json["school"],
     createdBy: json["created_by"],
     updatedBy: json["updated_by"],
     createdAt: json["created_at"],
     updatedAt: json["updated_at"],
-    pdfFile: json["pdf_file"],
-    pdfFileName: json["pdf_file_name"],
-    pdfFile1: json["pdf_file1"],
-    pdfFileName1: json["pdf_file_name1"],
   );
 
   Map<String, dynamic> toJson() => {
@@ -145,6 +161,10 @@ class ChapterDetails {
     "chapter_name": chapterName,
     "media_file": mediaFile,
     "file_name": fileName,
+    "quiz_time": quizTime,
+    "img": img,
+    "likes": likes,
+    "visitors": visitors,
     "about": about,
     "syllabus": syllabus,
     "description": description,
@@ -155,18 +175,40 @@ class ChapterDetails {
     "on_sale": onSale,
     "featured": featured,
     "status": status,
-    "school": school,
-    "created_by": createdBy,
-    "updated_by": updatedBy,
-    "created_at": createdAt.toIso8601String(),
-    "updated_at": updatedAt.toIso8601String(),
     "pdf_file": pdfFile,
     "pdf_file_name": pdfFileName,
     "pdf_file1": pdfFile1,
     "pdf_file_name1": pdfFileName1,
+    "school": school,
+    "created_by": createdBy,
+    "updated_by": updatedBy,
+    "created_at": createdAt,
+    "updated_at": updatedAt,
   };
 }
+class QuestionType {
+  QuestionType({
+    required this.id,
+    required this.catName,
+    required this.questionCount,
+  });
 
+  int id;
+  String catName;
+  int questionCount;
+
+  factory QuestionType.fromJson(Map<String, dynamic> json) => QuestionType(
+    id: json["id"],
+    catName: json["cat_name"],
+    questionCount: json["question_count"],
+  );
+
+  Map<String, dynamic> toJson() => {
+    "id": id,
+    "cat_name": catName,
+    "question_count": questionCount,
+  };
+}
 class Video {
   Video({
     required this.id,
@@ -181,8 +223,8 @@ class Video {
   String title;
   String description;
   String fileName;
-  var visitors;
-  var likes;
+  int visitors;
+  int likes;
 
   factory Video.fromJson(Map<String, dynamic> json) => Video(
     id: json["id"],
@@ -190,7 +232,7 @@ class Video {
     description: json["description"],
     fileName: json["file_name"],
     visitors: json["visitors"],
-    likes: json["likes"]
+    likes: json["likes"],
   );
 
   Map<String, dynamic> toJson() => {
@@ -199,9 +241,10 @@ class Video {
     "description": description,
     "file_name": fileName,
     "visitors": visitors,
-    "likes": likes
+    "likes": likes,
   };
 }
+
 
 Future<K12Chapter> createK12(String id) async {
   final String apiUrl =
@@ -455,27 +498,59 @@ class _courseDescPageState extends State<courseDescPage> {
                             ),
                             Visibility(
                               visible: mcq_vis,
-                              child: Center(
-                                child: RaisedButton(
-                                  onPressed: (){
-                                    Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                            builder: (context) => quiz(snapshot1.data!.data.chapterDetails.id)));
-                                  },
-                                  child: Text('MCQ',
-                                      style: TextStyle(
-                                          color: Colors.white,
-                                          fontSize: 30.0,
-                                          fontFamily: "Candara")),
-                                  color: Colors.deepOrange,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(5.0),
-                                  ),
-                                ),
+                              child: Column(
+                                children: [
+                                  for(int i=0; i<k12.data.questionTypes.length; i++)
+                                    GestureDetector(
+                                      onTap: () {
+                                        if(token!="")
+                                        {
+                                          Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                  builder: (context) => quiz(snapshot1.data!.data.chapterDetails.id,snapshot1.data!.data.questionTypes[i].id)));
+                                        }
+                                        else
+                                          Navigator.push(
+                                              context, MaterialPageRoute(builder: (context) => Login2()));
+                                      },
+                                      child: Card(
+                                        elevation: 5,
+                                        child: Container(
+                                          padding: EdgeInsets.all(8),
+                                          child: Row(
+                                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              Flexible(
+                                                child: Column(
+                                                  mainAxisAlignment: MainAxisAlignment.start,
+                                                  children: <Widget>[
+                                                    Align(
+                                                      alignment: Alignment.topLeft,
+                                                      child: Text(k12.data.questionTypes[i].catName.toString(),
+                                                        style: TextStyle(fontFamily: "Candara",
+                                                            fontSize: 15),
+                                                      ),
+                                                    ),
+                                                    Align(
+                                                      alignment: Alignment.topLeft,
+                                                      child: Text("Questions",
+                                                        style: TextStyle(fontFamily: "Candara",color: Colors.grey,
+                                                            fontSize: 12),
+                                                      ),
+                                                    )
+                                                  ],
+                                                ),
+                                              ),
+                                              Icon(Icons.bookmark_outline_sharp, color: Colors.deepOrange, size: 30)
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                ],
                               ),
                             ),
-
 
 
 

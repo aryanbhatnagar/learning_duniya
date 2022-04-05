@@ -250,7 +250,7 @@ class _seeallpageState extends State<seeallpage> {
       asses.add(GestureDetector(
         onTap: () {
           Navigator.push(
-              context, MaterialPageRoute(builder: (context) => quiz(1)));
+              context, MaterialPageRoute(builder: (context) => quiz(1,1)));
         },
         child: Card(
           elevation: 5,
