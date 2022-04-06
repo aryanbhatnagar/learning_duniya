@@ -640,7 +640,7 @@ class _mentorProfileState extends State<mentorProfile> {
                           MentorDataResponse s =await createMentor(mentorDataMap, image!);
                           debugPrint(s.data.token.toString());
                           if(Mcode==200)
-                            Navigator.push(
+                            Navigator.pushReplacement(
                             context,
                             MaterialPageRoute(
                                 builder: (context) => cardPayment((s.data.token.toString()))),

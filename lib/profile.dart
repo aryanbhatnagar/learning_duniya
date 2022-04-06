@@ -36,20 +36,28 @@ class Data {
   Data({
     required this.profile,
     required this.mentees,
+    required this.upcomingEvent,
+    required this.pendingHelpRequest,
   });
 
   Profile profile;
   List<Mentee> mentees;
+  UpcomingEvent upcomingEvent;
+  String pendingHelpRequest;
 
   factory Data.fromJson(Map<String, dynamic> json) => Data(
         profile: Profile.fromJson(json["profile"]),
         mentees:
             List<Mentee>.from(json["mentees"].map((x) => Mentee.fromJson(x))),
+            upcomingEvent: UpcomingEvent.fromJson(json["upcoming_event"]),
+            pendingHelpRequest: json["pending_help_request"],
       );
 
   Map<String, dynamic> toJson() => {
         "profile": profile.toJson(),
         "mentees": List<dynamic>.from(mentees.map((x) => x.toJson())),
+        "upcoming_event": upcomingEvent.toJson(),
+        "pending_help_request": pendingHelpRequest,
       };
 }
 
@@ -192,6 +200,59 @@ class Profile {
         "status": status,
       };
 }
+
+class UpcomingEvent {
+  UpcomingEvent({
+    required this.audioMode,
+    required this.videoMode,
+    required this.chatMode,
+  });
+
+  Mode audioMode;
+  Mode videoMode;
+  Mode chatMode;
+
+  factory UpcomingEvent.fromJson(Map<String, dynamic> json) => UpcomingEvent(
+    audioMode: Mode.fromJson(json["audio_mode"]),
+    videoMode: Mode.fromJson(json["video_mode"]),
+    chatMode: Mode.fromJson(json["chat_mode"]),
+  );
+
+  Map<String, dynamic> toJson() => {
+    "audio_mode": audioMode.toJson(),
+    "video_mode": videoMode.toJson(),
+    "chat_mode": chatMode.toJson(),
+  };
+}
+
+class Mode {
+  Mode({
+    this.id,
+    this.modeCommunication,
+    this.message,
+    required this.dateTime,
+  });
+
+  var id;
+  var modeCommunication;
+  var message;
+  DateTime dateTime;
+
+  factory Mode.fromJson(Map<String, dynamic> json) => Mode(
+    id: json["id"],
+    modeCommunication: json["mode_communication"],
+    message: json["message"],
+    dateTime: DateTime.parse(json["date_time"]),
+  );
+
+  Map<String, dynamic> toJson() => {
+    "id": id,
+    "mode_communication": modeCommunication,
+    "message": message,
+    "date_time": dateTime.toIso8601String(),
+  };
+}
+
 
 Future<MentorApi> getMentorApi() async {
   final String apiUrl =
@@ -635,10 +696,115 @@ class _profileState extends State<profile> {
   //late final AnimationController _controller;
   bool _visible = false;
 
+  Widget getUpcomingEventCard(String type, String mode, DateTime dt) {
+    String month = "-";
+    Icon icon = Icon(Icons.star);
+
+    if(type == "Audio calls") {
+      icon = Icon(Icons.add_call, color: Colors.grey,);
+    } else if (type == "Video Calls") {
+      icon = Icon(Icons.videocam, color: Colors.grey,);
+    } else if (type == "Chat Message") {
+      icon = Icon(Icons.message, color: Colors.grey,);
+    }
+
+    switch(dt.month){
+      case 1:
+        month = "Jan";
+        break;
+      case 2:
+        month = "Feb";
+        break;
+      case 3:
+        month = "Mar";
+        break;
+      case 4:
+        month = "Apr";
+        break;
+    }
+
+    return Center(
+      child: Row(
+      children: [
+        Expanded(
+          flex: 13,
+          child: Container(
+              margin: const EdgeInsets.all(5),
+              padding: const EdgeInsets.all(5),
+              decoration: BoxDecoration(
+                border: Border.all(color: Colors.grey),
+                borderRadius: BorderRadius.circular(5),
+              ),
+              child: Center(
+                child: Text(
+                  dt.day.toString() + ' ' + month + '\n' + dt.hour.toString() + ":" + dt.minute.toString(),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  textAlign: TextAlign.center,
+                  style: TextStyle(fontFamily: "Candara", color: Colors.grey),
+                ),
+              )),
+        ),
+        Expanded(
+          flex: 50,
+          child: Container(
+            margin: const EdgeInsets.only(top: 5, bottom: 5, left: 5, right: 5),
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              border: Border.all(color: Colors.grey),
+              borderRadius: BorderRadius.circular(5),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                Text(
+                  '$type With X',
+                  style: TextStyle(fontFamily: "Candara", color: Colors.grey),
+                ),
+                GestureDetector(
+                  onTap: () {},
+                  child: Text(
+                    'View Details',
+                    style: TextStyle(
+                      fontFamily: "Candara",
+                      color: Colors.grey,
+                      decoration: TextDecoration.underline,
+                      fontSize: 11,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+        Expanded(
+          flex: 13,
+          child: GestureDetector(
+            onTap: () {},
+            child: Container(
+              margin: const EdgeInsets.only(left: 5,right: 5),
+              padding: const EdgeInsets.all(15),
+              decoration: BoxDecoration(
+                border: Border.all(color: Colors.grey),
+                borderRadius: BorderRadius.circular(5),
+              ),
+              child: Center(
+                child: icon,
+              ),
+            ),
+          ),
+        ),
+      ],
+    ));
+  }
+
   @override
   Widget build(BuildContext context) {
-    List<Widget> upComingEvents = <Widget>[];
-    upComingEvents.add(Row(
+    /*List<Widget> upComingEvents = <Widget>[];*/
+    /*upComingEvents.add(*/
+    /*Row(
       children: [
         Expanded(
           flex: 13,
@@ -860,9 +1026,9 @@ class _profileState extends State<profile> {
               )),
             ),
           ),
-        ),
-      ],
-    ));
+        ),*/
+      /*],*/
+    /*));*/
 
     var pageData;
     List<Widget> menteePage = <Widget>[];
@@ -1050,7 +1216,7 @@ class _profileState extends State<profile> {
                       else{
                         return Center(
                           child: Text('No New Mentee Request!', style: TextStyle(
-                            fontSize: 11,
+                            fontSize: 15,
                             fontWeight: FontWeight.bold,
                             fontFamily: 'Candara',
                           ),),
@@ -1170,7 +1336,7 @@ class _profileState extends State<profile> {
                       else{
                         return Center(
                           child: Text('No Old Mentee Request!', style: TextStyle(
-                            fontSize: 11,
+                            fontSize: 15,
                             fontWeight: FontWeight.bold,
                             fontFamily: 'Candara',
                           ),),
@@ -1278,7 +1444,8 @@ class _profileState extends State<profile> {
                       SizedBox(
                         height: 20,
                       ),
-                      GestureDetector(
+                      if(snapshot.data!.data.pendingHelpRequest != '0')
+                        GestureDetector(
                         onTap: () {},
                         child: Container(
                           decoration: BoxDecoration(
@@ -1309,13 +1476,13 @@ class _profileState extends State<profile> {
                                     SizedBox(
                                       width: 10,
                                     ),
-                                    /*Text(
-                                      req.toString() + " Pending Help Request",
+                                    Text(
+                                      snapshot.data!.data.pendingHelpRequest + " Pending Help Request",
                                       style: TextStyle(
                                           fontFamily: 'Candara',
                                           color: Colors.orange,
                                           fontWeight: FontWeight.bold),
-                                    )*/
+                                    )
                                   ],
                                 ),
                               )),
@@ -1324,6 +1491,7 @@ class _profileState extends State<profile> {
                       SizedBox(
                         height: 35,
                       ),
+                      //if (snapshot.data!.data.upcomingEvent > 0)
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: <Widget>[
@@ -1354,7 +1522,11 @@ class _profileState extends State<profile> {
                       SingleChildScrollView(
                           scrollDirection: Axis.vertical,
                           child: Column(
-                            children: upComingEvents,
+                            children: [
+                              getUpcomingEventCard(snapshot.data!.data.upcomingEvent.audioMode.modeCommunication, snapshot.data!.data.upcomingEvent.audioMode.modeCommunication, snapshot.data!.data.upcomingEvent.audioMode.dateTime),
+                              getUpcomingEventCard(snapshot.data!.data.upcomingEvent.videoMode.modeCommunication, snapshot.data!.data.upcomingEvent.videoMode.modeCommunication, snapshot.data!.data.upcomingEvent.videoMode.dateTime),
+                              getUpcomingEventCard(snapshot.data!.data.upcomingEvent.chatMode.modeCommunication, snapshot.data!.data.upcomingEvent.chatMode.modeCommunication, snapshot.data!.data.upcomingEvent.chatMode.dateTime),
+                            ],
                           )),
                       SizedBox(height: 20),
                       if (snapshot.data!.data.mentees.length > 0)
@@ -1513,7 +1685,7 @@ class _profileState extends State<profile> {
               else
                 return Center(
                   child: Text('No Mentee Data Available', style: TextStyle(
-                    fontSize: 11,
+                    fontSize: 15,
                     fontWeight: FontWeight.bold,
                     fontFamily: 'Candara',
                   ),),
