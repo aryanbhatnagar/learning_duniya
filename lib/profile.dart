@@ -523,7 +523,7 @@ class HelpRequests {
       };
 }
 
-Future<MenteeReviewData> getMenteeRequestInvite(String id) async {
+Future<MenteeReviewData> getMenteeRequestInvite(String id, String name) async {
   final String apiUrl =
       "http://ec2-13-234-116-155.ap-south-1.compute.amazonaws.com/api/mentor/help/sent/invition";
   final response = await http.post(Uri.parse(apiUrl),
@@ -536,6 +536,27 @@ Future<MenteeReviewData> getMenteeRequestInvite(String id) async {
     print(response.statusCode.toString());
     final String responseString = response.body;
     debugPrint(response.body);
+
+    AlertDialog(
+      content: Center(
+        child: Text(
+          name +'Invited!!',
+          style: TextStyle(
+              fontFamily: 'Candara',
+              fontWeight: FontWeight.bold
+          ),
+        ),
+      ),
+      actions: <Widget>[
+        TextButton(
+          child: const Text('Ok'),
+          onPressed: () {
+            //Navigator.
+          },
+        ),
+      ],
+    );
+
     return menteeReviewDataFromJson(responseString);
   } else {
     throw Exception('Failed to load album');
@@ -561,7 +582,7 @@ Future<MenteeReviewData> getMenteeRequestReview(String id) async {
   }
 }
 
-Future<MenteeReviewData> getMenteeRequestReject(String id) async {
+Future<MenteeReviewData> getMenteeRequestReject(String id, String name) async {
   final String apiUrl =
       "http://ec2-13-234-116-155.ap-south-1.compute.amazonaws.com/api/mentor/help/sent/invition";
   final response = await http.post(Uri.parse(apiUrl), headers: <String, String>{
@@ -575,6 +596,26 @@ Future<MenteeReviewData> getMenteeRequestReject(String id) async {
     print(response.statusCode.toString());
     final String responseString = response.body;
     debugPrint(response.body);
+
+    AlertDialog(
+      content: Center(
+        child: Text(
+          name +'Rejected!!',
+          style: TextStyle(
+              fontFamily: 'Candara',
+              fontWeight: FontWeight.bold
+          ),
+        ),
+      ),
+      actions: <Widget>[
+        TextButton(
+          child: const Text('Ok'),
+          onPressed: () {
+            //Navigator.
+          },
+        ),
+      ],
+    );
     return menteeReviewDataFromJson(responseString);
   } else {
     throw Exception('Failed to load album');
@@ -886,6 +927,9 @@ class _profileState extends State<profile> {
                             mainAxisAlignment: MainAxisAlignment.start,
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
+                              SizedBox(
+                                height: 10,
+                              ),
                               for(int i=0; i<snapshot.data!.data2.mentees2.length; i++)
                                 SingleChildScrollView(
                                   scrollDirection: Axis.horizontal,
@@ -986,7 +1030,7 @@ class _profileState extends State<profile> {
                                                   ),
                                                 ),
                                                 onPressed: () {
-                                                  getMenteeRequestInvite(snapshot.data!.data2.mentees2[i].id.toString());
+                                                  getMenteeRequestInvite(snapshot.data!.data2.mentees2[i].id.toString(), snapshot.data!.data2.mentees2[i].studentName);
                                                   setState(() {});
                                                   //Navigator.of(context).pop(ConfirmAction.Invite);
                                                 },
@@ -1034,122 +1078,90 @@ class _profileState extends State<profile> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               for(int i=0; i<snapshot.data!.data2.mentees2.length; i++)
-                                SingleChildScrollView(
-                                  scrollDirection: Axis.horizontal,
-                                  child: Row(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      Center(
-                                        child: CircleAvatar(
-                                          backgroundImage: NetworkImage(
-                                              snapshot.data!.data2.mentees2[i].img),
-                                          radius: 30,
+                                GestureDetector(
+                                  child: SingleChildScrollView(
+                                    scrollDirection: Axis.horizontal,
+                                    child: Row(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Center(
+                                          child: CircleAvatar(
+                                            backgroundImage: NetworkImage(
+                                                snapshot.data!.data2.mentees2[i].img),
+                                            radius: 30,
+                                          ),
                                         ),
-                                      ),
-                                      SizedBox(
-                                        width: 10,
-                                      ),
-                                      Card(
-                                        elevation: 0,
-                                        color: Colors.transparent,
-                                        child: Column(
-                                          crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                          children: [
-                                            Text(
-                                              '${snapshot.data!.data2.mentees2[i].studentName}',
-                                              style: TextStyle(
-                                                fontWeight: FontWeight.bold,
-                                                fontFamily: 'Candara',
-                                                fontSize: 18,
-                                              ),
-                                            ),
-                                            Text(
-                                                '${snapshot.data!.data2.mentees2[i].message}',
-                                                style: TextStyle(
-                                                  fontWeight: FontWeight.bold,
-                                                  fontFamily: 'Candara',
-                                                  color: Colors.grey,
-                                                  fontSize: 11,
-                                                ),
-                                                maxLines: 5,
-                                                overflow: TextOverflow.ellipsis),
-                                            RichText(
-                                              text: TextSpan(
-                                                //text: "Through ",
-                                                style: TextStyle(
-                                                  color: Colors.grey,
-                                                  fontWeight: FontWeight.bold,
-                                                  fontFamily: 'Candara',
-                                                  fontSize: 11,
-                                                ),
-                                                children: <TextSpan>[
-                                                  TextSpan(
-                                                      text:
-                                                      '${snapshot.data!.data2.mentees2[i].mode}',
-                                                      style: TextStyle(
-                                                          color: Color.fromARGB(
-                                                              255, 59, 48, 214))),
-                                                ],
-                                              ),
-                                            ),
-                                            Text(
-                                              '${snapshot.data!.data2.mentees2[i].status}',
-                                              style: TextStyle(
-                                                fontWeight: FontWeight.bold,
-                                                fontFamily: 'Candara',
-                                                fontSize: 11,
-                                              ),
-                                            ),
-                                            SizedBox(
-                                              height: 10,
-                                            ),
-                                            /*Row(
+                                        SizedBox(
+                                          width: 10,
+                                        ),
+                                        Card(
+                                          elevation: 0,
+                                          color: Colors.transparent,
+                                          child: Column(
+                                            crossAxisAlignment:
+                                            CrossAxisAlignment.start,
                                             children: [
-                                              OutlinedButton(
-                                                child: const Text(
-                                                  'Review',
+                                              Text(
+                                                '${snapshot.data!.data2.mentees2[i].studentName}',
+                                                style: TextStyle(
+                                                  fontWeight: FontWeight.bold,
+                                                  fontFamily: 'Candara',
+                                                  fontSize: 18,
+                                                ),
+                                              ),
+                                              Text(
+                                                  '${snapshot.data!.data2.mentees2[i].message}',
                                                   style: TextStyle(
+                                                    fontWeight: FontWeight.bold,
                                                     fontFamily: 'Candara',
                                                     color: Colors.grey,
+                                                    fontSize: 11,
                                                   ),
+                                                  maxLines: 5,
+                                                  overflow: TextOverflow.ellipsis),
+                                              RichText(
+                                                text: TextSpan(
+                                                  //text: "Through ",
+                                                  style: TextStyle(
+                                                    color: Colors.grey,
+                                                    fontWeight: FontWeight.bold,
+                                                    fontFamily: 'Candara',
+                                                    fontSize: 11,
+                                                  ),
+                                                  children: <TextSpan>[
+                                                    TextSpan(
+                                                        text:
+                                                        '${snapshot.data!.data2.mentees2[i].mode}',
+                                                        style: TextStyle(
+                                                            color: Color.fromARGB(
+                                                                255, 59, 48, 214))),
+                                                  ],
                                                 ),
-                                                onPressed: () async {
-                                                  final Future<ConfirmAction?> action =
-                                                  await _asyncConfirmDialog(
-                                                      context,
-                                                      'Mentor Name',
-                                                      'Mentor Bio',
-                                                      'Communication',
-                                                      ['a'],
-                                                      'None');
-                                                  //Navigator.of(context).pop(ConfirmAction.Reject);
-                                                },
+                                              ),
+                                              Text(
+                                                '${snapshot.data!.data2.mentees2[i].status}',
+                                                style: TextStyle(
+                                                  fontWeight: FontWeight.bold,
+                                                  fontFamily: 'Candara',
+                                                  fontSize: 11,
+                                                ),
                                               ),
                                               SizedBox(
-                                                width: 30,
-                                              ),
-                                              ElevatedButton(
-                                                style: ButtonStyle(
-                                                    backgroundColor: MaterialStateProperty.all<Color>(
-                                                        Color.fromARGB(255, 59, 48, 214))),
-                                                child: Text(
-                                                  'Invite',
-                                                  style: TextStyle(
-                                                    fontFamily: 'Candara',
-                                                  ),
-                                                ),
-                                                onPressed: () {
-                                                  //Navigator.of(context).pop(ConfirmAction.Invite);
-                                                },
+                                                height: 10,
                                               ),
                                             ],
-                                          ),*/
-                                          ],
+                                          ),
                                         ),
-                                      ),
-                                    ],
+                                      ],
+                                    ),
                                   ),
+                                  onTap: () async {
+                                    final Future<ConfirmAction2?>
+                                    action =
+                                        await _asyncConfirmDialog1(
+                                        context,
+                                        '${snapshot.data!.data2.mentees2[i].id}');
+                                  },
                                 )
                             ],
                           ),
@@ -1181,655 +1193,6 @@ class _profileState extends State<profile> {
           future: getMentorApi(),
           builder: (context, AsyncSnapshot<MentorApi> snapshot) {
             if (snapshot.hasData) {
-              /*menteePage.add(SingleChildScrollView(
-                child: Column(
-                  children: [
-                    SizedBox(
-                      height: 20,
-                    ),
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Center(
-                          child: CircleAvatar(
-                            backgroundImage: AssetImage('images/mentor2.PNG'),
-                            radius: 30,
-                          ),
-                        ),
-                        SizedBox(
-                          width: 10,
-                        ),
-                        Card(
-                          elevation: 0,
-                          color: Colors.transparent,
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                stu_name[0],
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontFamily: 'Candara',
-                                  fontSize: 18,
-                                ),
-                              ),
-                              Text('Requesting help in ' + req_body,
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    fontFamily: 'Candara',
-                                    color: Colors.grey,
-                                    fontSize: 11,
-                                  ),
-                                  maxLines: 5,
-                                  overflow: TextOverflow.ellipsis),
-                              RichText(
-                                text: TextSpan(
-                                  text: "Through ",
-                                  style: TextStyle(
-                                    color: Colors.grey,
-                                    fontWeight: FontWeight.bold,
-                                    fontFamily: 'Candara',
-                                    fontSize: 11,
-                                  ),
-                                  children: <TextSpan>[
-                                    TextSpan(
-                                        text: mode[0],
-                                        style: TextStyle(
-                                            color: Color.fromARGB(255, 59, 48, 214))),
-                                  ],
-                                ),
-                              ),
-                              SizedBox(
-                                height: 10,
-                              ),
-                              Row(
-                                children: [
-                                  OutlinedButton(
-                                    child: const Text(
-                                      'Review',
-                                      style: TextStyle(
-                                        fontFamily: 'Candara',
-                                        color: Colors.grey,
-                                      ),
-                                    ),
-                                    onPressed: () async {
-                                      final Future<ConfirmAction?> action =
-                                      await _asyncConfirmDialog(
-                                          context,
-                                          'Mentor Name',
-                                          'Mentor Bio',
-                                          'Communication',
-                                          x,
-                                          'None');
-                                      //Navigator.of(context).pop(ConfirmAction.Reject);
-                                    },
-                                  ),
-                                  SizedBox(
-                                    width: 30,
-                                  ),
-                                  ElevatedButton(
-                                    style: ButtonStyle(
-                                        backgroundColor: MaterialStateProperty.all<Color>(
-                                            Color.fromARGB(255, 59, 48, 214))),
-                                    child: Text(
-                                      'Invite',
-                                      style: TextStyle(
-                                        fontFamily: 'Candara',
-                                      ),
-                                    ),
-                                    onPressed: () {
-                                      //Navigator.of(context).pop(ConfirmAction.Invite);
-                                    },
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                    SizedBox(
-                      height: 20,
-                    ),
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Center(
-                          child: CircleAvatar(
-                            backgroundImage: AssetImage('images/mentor1.PNG'),
-                            radius: 30,
-                          ),
-                        ),
-                        SizedBox(
-                          width: 10,
-                        ),
-                        Card(
-                          elevation: 0,
-                          color: Colors.transparent,
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                stu_name[1],
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontFamily: 'Candara',
-                                  fontSize: 18,
-                                ),
-                              ),
-                              Text('Requesting help in ' + req_body,
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    fontFamily: 'Candara',
-                                    color: Colors.grey,
-                                    fontSize: 11,
-                                  ),
-                                  maxLines: 5,
-                                  overflow: TextOverflow.ellipsis),
-                              RichText(
-                                text: TextSpan(
-                                  text: "Through ",
-                                  style: TextStyle(
-                                    color: Colors.grey,
-                                    fontWeight: FontWeight.bold,
-                                    fontFamily: 'Candara',
-                                    fontSize: 11,
-                                  ),
-                                  children: <TextSpan>[
-                                    TextSpan(
-                                        text: mode[1],
-                                        style: TextStyle(
-                                            color: Color.fromARGB(255, 59, 48, 214))),
-                                  ],
-                                ),
-                              ),
-                              /*Text('Through ' + mode[1], style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontFamily: 'Candara',
-                          color: Colors.grey,
-                          fontSize: 11,
-                        ),
-                            maxLines: 2,
-                            overflow: TextOverflow.ellipsis
-                        ),*/
-                              SizedBox(
-                                height: 10,
-                              ),
-                              Row(
-                                children: [
-                                  OutlinedButton(
-                                    child: const Text(
-                                      'Review',
-                                      style: TextStyle(
-                                        fontFamily: 'Candara',
-                                        color: Colors.grey,
-                                      ),
-                                    ),
-                                    onPressed: () async {
-                                      final Future<ConfirmAction?> action =
-                                      await _asyncConfirmDialog(
-                                          context,
-                                          'Mentor Name',
-                                          'Mentor Bio',
-                                          'Communication',
-                                          x,
-                                          'None');
-                                      //Navigator.of(context).pop(ConfirmAction.Reject);
-                                    },
-                                  ),
-                                  SizedBox(
-                                    width: 30,
-                                  ),
-                                  ElevatedButton(
-                                    style: ButtonStyle(
-                                        backgroundColor: MaterialStateProperty.all<Color>(
-                                            Color.fromARGB(255, 59, 48, 214))),
-                                    child: Text(
-                                      'Invite',
-                                      style: TextStyle(
-                                        fontFamily: 'Candara',
-                                      ),
-                                    ),
-                                    onPressed: () {
-                                      //Navigator.of(context).pop(ConfirmAction.Invite);
-                                    },
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                    SizedBox(
-                      height: 20,
-                    ),
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Center(
-                          child: CircleAvatar(
-                            backgroundImage: AssetImage('images/mentor2.PNG'),
-                            radius: 30,
-                          ),
-                        ),
-                        SizedBox(
-                          width: 10,
-                        ),
-                        Card(
-                          elevation: 0,
-                          color: Colors.transparent,
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                stu_name[2],
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontFamily: 'Candara',
-                                  fontSize: 18,
-                                ),
-                              ),
-                              Text('Requesting help in ' + req_body,
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    fontFamily: 'Candara',
-                                    color: Colors.grey,
-                                    fontSize: 11,
-                                  ),
-                                  maxLines: 5,
-                                  overflow: TextOverflow.ellipsis),
-                              RichText(
-                                text: TextSpan(
-                                  text: "Through ",
-                                  style: TextStyle(
-                                    color: Colors.grey,
-                                    fontWeight: FontWeight.bold,
-                                    fontFamily: 'Candara',
-                                    fontSize: 11,
-                                  ),
-                                  children: <TextSpan>[
-                                    TextSpan(
-                                        text: mode[2],
-                                        style: TextStyle(
-                                            color: Color.fromARGB(255, 59, 48, 214))),
-                                  ],
-                                ),
-                              ),
-                              SizedBox(
-                                height: 10,
-                              ),
-                              Row(
-                                children: [
-                                  OutlinedButton(
-                                    child: const Text(
-                                      'Review',
-                                      style: TextStyle(
-                                        fontFamily: 'Candara',
-                                        color: Colors.grey,
-                                      ),
-                                    ),
-                                    onPressed: () async {
-                                      final Future<ConfirmAction?> action =
-                                      await _asyncConfirmDialog(
-                                          context,
-                                          'Mentor Name',
-                                          'Mentor Bio',
-                                          'Communication',
-                                          x,
-                                          'None');
-                                      //Navigator.of(context).pop(ConfirmAction.Reject);
-                                    },
-                                  ),
-                                  SizedBox(
-                                    width: 30,
-                                  ),
-                                  ElevatedButton(
-                                    style: ButtonStyle(
-                                        backgroundColor: MaterialStateProperty.all<Color>(
-                                            Color.fromARGB(255, 59, 48, 214))),
-                                    child: Text(
-                                      'Invite',
-                                      style: TextStyle(
-                                        fontFamily: 'Candara',
-                                      ),
-                                    ),
-                                    onPressed: () {
-                                      //Navigator.of(context).pop(ConfirmAction.Invite);
-                                    },
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                    SizedBox(
-                      height: 20,
-                    ),
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Center(
-                          child: CircleAvatar(
-                            backgroundImage: AssetImage('images/mentor2.PNG'),
-                            radius: 30,
-                          ),
-                        ),
-                        SizedBox(
-                          width: 10,
-                        ),
-                        Card(
-                          elevation: 0,
-                          color: Colors.transparent,
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                stu_name[0],
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontFamily: 'Candara',
-                                  fontSize: 18,
-                                ),
-                              ),
-                              Text('Requesting help in ' + req_body,
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    fontFamily: 'Candara',
-                                    color: Colors.grey,
-                                    fontSize: 11,
-                                  ),
-                                  maxLines: 5,
-                                  overflow: TextOverflow.ellipsis),
-                              RichText(
-                                text: TextSpan(
-                                  text: "Through ",
-                                  style: TextStyle(
-                                    color: Colors.grey,
-                                    fontWeight: FontWeight.bold,
-                                    fontFamily: 'Candara',
-                                    fontSize: 11,
-                                  ),
-                                  children: <TextSpan>[
-                                    TextSpan(
-                                        text: mode[0],
-                                        style: TextStyle(
-                                            color: Color.fromARGB(255, 59, 48, 214))),
-                                  ],
-                                ),
-                              ),
-                              SizedBox(
-                                height: 10,
-                              ),
-                              Row(
-                                children: [
-                                  OutlinedButton(
-                                    child: const Text(
-                                      'Review',
-                                      style: TextStyle(
-                                        fontFamily: 'Candara',
-                                        color: Colors.grey,
-                                      ),
-                                    ),
-                                    onPressed: () async {
-                                      final Future<ConfirmAction?> action =
-                                      await _asyncConfirmDialog(
-                                          context,
-                                          'Mentor Name',
-                                          'Mentor Bio',
-                                          'Communication',
-                                          x,
-                                          'None');
-                                      //Navigator.of(context).pop(ConfirmAction.Reject);
-                                    },
-                                  ),
-                                  SizedBox(
-                                    width: 30,
-                                  ),
-                                  ElevatedButton(
-                                    style: ButtonStyle(
-                                        backgroundColor: MaterialStateProperty.all<Color>(
-                                            Color.fromARGB(255, 59, 48, 214))),
-                                    child: Text(
-                                      'Invite',
-                                      style: TextStyle(
-                                        fontFamily: 'Candara',
-                                      ),
-                                    ),
-                                    onPressed: () {
-                                      //Navigator.of(context).pop(ConfirmAction.Invite);
-                                    },
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                    SizedBox(
-                      height: 20,
-                    ),
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Center(
-                          child: CircleAvatar(
-                            backgroundImage: AssetImage('images/mentor1.PNG'),
-                            radius: 30,
-                          ),
-                        ),
-                        SizedBox(
-                          width: 10,
-                        ),
-                        Card(
-                          elevation: 0,
-                          color: Colors.transparent,
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                stu_name[1],
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontFamily: 'Candara',
-                                  fontSize: 18,
-                                ),
-                              ),
-                              Text('Requesting help in ' + req_body,
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    fontFamily: 'Candara',
-                                    color: Colors.grey,
-                                    fontSize: 11,
-                                  ),
-                                  maxLines: 5,
-                                  overflow: TextOverflow.ellipsis),
-                              RichText(
-                                text: TextSpan(
-                                  text: "Through ",
-                                  style: TextStyle(
-                                    color: Colors.grey,
-                                    fontWeight: FontWeight.bold,
-                                    fontFamily: 'Candara',
-                                    fontSize: 11,
-                                  ),
-                                  children: <TextSpan>[
-                                    TextSpan(
-                                        text: mode[1],
-                                        style: TextStyle(
-                                            color: Color.fromARGB(255, 59, 48, 214))),
-                                  ],
-                                ),
-                              ),
-                              /*Text('Through ' + mode[1], style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontFamily: 'Candara',
-                          color: Colors.grey,
-                          fontSize: 11,
-                        ),
-                            maxLines: 2,
-                            overflow: TextOverflow.ellipsis
-                        ),*/
-                              SizedBox(
-                                height: 10,
-                              ),
-                              Row(
-                                children: [
-                                  OutlinedButton(
-                                    child: const Text(
-                                      'Review',
-                                      style: TextStyle(
-                                        fontFamily: 'Candara',
-                                        color: Colors.grey,
-                                      ),
-                                    ),
-                                    onPressed: () async {
-                                      final Future<ConfirmAction?> action =
-                                      await _asyncConfirmDialog(
-                                          context,
-                                          'Mentor Name',
-                                          'Mentor Bio',
-                                          'Communication',
-                                          x,
-                                          'None');
-                                      //Navigator.of(context).pop(ConfirmAction.Reject);
-                                    },
-                                  ),
-                                  SizedBox(
-                                    width: 30,
-                                  ),
-                                  ElevatedButton(
-                                    style: ButtonStyle(
-                                        backgroundColor: MaterialStateProperty.all<Color>(
-                                            Color.fromARGB(255, 59, 48, 214))),
-                                    child: Text(
-                                      'Invite',
-                                      style: TextStyle(
-                                        fontFamily: 'Candara',
-                                      ),
-                                    ),
-                                    onPressed: () {
-                                      //Navigator.of(context).pop(ConfirmAction.Invite);
-                                    },
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                    SizedBox(
-                      height: 20,
-                    ),
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Center(
-                          child: CircleAvatar(
-                            backgroundImage: AssetImage('images/mentor2.PNG'),
-                            radius: 30,
-                          ),
-                        ),
-                        SizedBox(
-                          width: 10,
-                        ),
-                        Card(
-                          elevation: 0,
-                          color: Colors.transparent,
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                stu_name[2],
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontFamily: 'Candara',
-                                  fontSize: 18,
-                                ),
-                              ),
-                              Text('Requesting help in ' + req_body,
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    fontFamily: 'Candara',
-                                    color: Colors.grey,
-                                    fontSize: 11,
-                                  ),
-                                  maxLines: 5,
-                                  overflow: TextOverflow.ellipsis),
-                              RichText(
-                                text: TextSpan(
-                                  text: "Through ",
-                                  style: TextStyle(
-                                    color: Colors.grey,
-                                    fontWeight: FontWeight.bold,
-                                    fontFamily: 'Candara',
-                                    fontSize: 11,
-                                  ),
-                                  children: <TextSpan>[
-                                    TextSpan(
-                                        text: mode[2],
-                                        style: TextStyle(
-                                            color: Color.fromARGB(255, 59, 48, 214))),
-                                  ],
-                                ),
-                              ),
-                              SizedBox(
-                                height: 10,
-                              ),
-                              Row(
-                                children: [
-                                  OutlinedButton(
-                                    child: const Text(
-                                      'Review',
-                                      style: TextStyle(
-                                        fontFamily: 'Candara',
-                                        color: Colors.grey,
-                                      ),
-                                    ),
-                                    onPressed: () async {
-                                      final Future<ConfirmAction?> action =
-                                      await _asyncConfirmDialog(
-                                          context,
-                                          'Mentor Name',
-                                          'Mentor Bio',
-                                          'Communication',
-                                          x,
-                                          'None');
-                                      //Navigator.of(context).pop(ConfirmAction.Reject);
-                                    },
-                                  ),
-                                  SizedBox(
-                                    width: 30,
-                                  ),
-                                  ElevatedButton(
-                                    style: ButtonStyle(
-                                        backgroundColor: MaterialStateProperty.all<Color>(
-                                            Color.fromARGB(255, 59, 48, 214))),
-                                    child: Text(
-                                      'Invite',
-                                      style: TextStyle(
-                                        fontFamily: 'Candara',
-                                      ),
-                                    ),
-                                    onPressed: () {
-                                      //Navigator.of(context).pop(ConfirmAction.Invite);
-                                    },
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ));*/
-              //menteeData = menteePage[0];
               return Container(
                 padding: EdgeInsets.all(15),
                 child: SingleChildScrollView(
@@ -2401,7 +1764,7 @@ Future<Future<ConfirmAction?>> _asyncConfirmDialog(
                           ),
                         ),
                         onPressed: () {
-                          getMenteeRequestReject(id);
+                          getMenteeRequestReject(id, snapshot.data!.data3.helpRequests.studentName);
                           Navigator.of(context).pop(ConfirmAction.Reject);
                         },
                       ),
@@ -2419,11 +1782,173 @@ Future<Future<ConfirmAction?>> _asyncConfirmDialog(
                           ),
                         ),
                         onPressed: () {
-                          getMenteeRequestInvite(id);
+                          getMenteeRequestInvite(id, snapshot.data!.data3.helpRequests.studentName);
                           Navigator.of(context).pop(ConfirmAction.Invite);
                         },
                       ),
                     ],
+                  ),
+                ),
+              ],
+            );
+          } else {
+            return Center(
+              child: CircularProgressIndicator(),
+            );
+          }
+        },
+      );
+    },
+  );
+}
+
+enum ConfirmAction2 {OK}
+Future<Future<ConfirmAction2?>> _asyncConfirmDialog1(
+    BuildContext context, String id) async {
+  return showDialog<ConfirmAction2>(
+    context: context,
+    barrierDismissible: false, // user must tap button for close dialog!
+    builder: (BuildContext context) {
+      return FutureBuilder(
+        future: getMenteeRequestReview(id),
+        builder: (context, AsyncSnapshot<MenteeReviewData> snapshot) {
+          if (snapshot.hasData) {
+            return AlertDialog(
+              //title: Text('Delete This Contact?'),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(15))),
+              title: Image.network(
+                snapshot.data!.data3.helpRequests.img,
+                height: 50,
+                width: 50,
+              ),
+              content: Container(
+                width: double.infinity,
+                //height: Wrap(),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Column(
+                      children: [
+                        Text(
+                          snapshot.data!.data3.helpRequests.studentName,
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontFamily: 'Candara',
+                          ),
+                        ),
+                        Container(
+                          margin: const EdgeInsets.all(4.0),
+                          padding: const EdgeInsets.only(
+                              left: 20, right: 20, top: 5, bottom: 5),
+                          decoration: BoxDecoration(
+                              border: Border.all(color: Colors.grey),
+                              color: Color.fromARGB(255, 236, 255, 238)),
+                          child: Text(
+                            'New Student',
+                            style: TextStyle(
+                              color: Colors.grey,
+                              fontSize: 10,
+                              fontFamily: 'Candara',
+                            ),
+                          ),
+                        ),
+                        //OutlinedButton(onPressed: () {}, child: Text('New Student')),
+                        TextButton(
+                            onPressed: () {},
+                            child: Text(
+                              'VIEW PROFILE',
+                              style: TextStyle(
+                                fontFamily: 'Candara',
+                                color: Color.fromARGB(255, 59, 48, 214),
+                                decoration: TextDecoration.underline,
+                              ),
+                            )),
+                      ],
+                    ),
+                    /*Divider(
+                color: Colors.grey,
+              ),
+              SizedBox(height: 10),*/
+                    Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        SizedBox(height: 10),
+                        Divider(
+                          color: Colors.grey,
+                          thickness: 2,
+                        ),
+                        SizedBox(height: 10),
+                        Text(
+                          'Mode Of Communication',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontFamily: 'Candara',
+                          ),
+                        ),
+                        Text(
+                          snapshot.data!.data3.helpRequests.mode,
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: Colors.grey,
+                            fontFamily: 'Candara',
+                          ),
+                        ),
+                        SizedBox(height: 20),
+                        Text(
+                          'Requesting Help For',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontFamily: 'Candara',
+                          ),
+                        ),
+                        Text(
+                          snapshot.data!.data3.helpRequests.message,
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: Colors.grey,
+                            fontFamily: 'Candara',
+                          ),
+                        ),
+                        SizedBox(height: 20),
+                        Text(
+                          'Comments',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontFamily: 'Candara',
+                          ),
+                        ),
+                        Text(
+                          snapshot.data!.data3.helpRequests.status,
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: Colors.grey,
+                            fontFamily: 'Candara',
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+              actions: <Widget>[
+                Center(
+                  child: ElevatedButton(
+                    style: ButtonStyle(
+                        backgroundColor: MaterialStateProperty.all<Color>(
+                            Color.fromARGB(255, 59, 48, 214))),
+                    child: Text(
+                      'OK',
+                      style: TextStyle(
+                        fontFamily: 'Candara',
+                        fontWeight: FontWeight.bold
+                      ),
+                    ),
+                    onPressed: () {
+                      //getMenteeRequestInvite(id);
+                      Navigator.of(context).pop(ConfirmAction2.OK);
+                    },
                   ),
                 ),
               ],
