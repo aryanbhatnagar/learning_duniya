@@ -17,7 +17,6 @@ import 'globals.dart';
 import 'main.dart';
 
 ConvJson convJsonFromJson(String str) => ConvJson.fromJson(json.decode(str));
-
 String convJsonToJson(ConvJson data) => json.encode(data.toJson());
 
 class ConvJson {
@@ -55,7 +54,6 @@ class ConvJson {
     "status": status,
   };
 }
-
 class AnsSheet {
   AnsSheet({
     required this.que,
@@ -83,7 +81,6 @@ class AnsSheet {
     "result": result,
   };
 }
-
 class Result {
   Result({
     required this.total,
@@ -120,6 +117,7 @@ Questions questionsFromJson(String str) => Questions.fromJson(json.decode(str));
 String questionsToJson(Questions data) => json.encode(data.toJson());
 
 var quizId = "";
+var qtype="";
 late List allQuestionData = [];
 late List quizInputData = [];
 late List assignQuizData = [];
@@ -177,7 +175,6 @@ Future<SendData> createData(String startTime,String endTime,List ansdata,Result 
     throw Exception("failed");
   }
 }
-
 
 class SendData {
   SendData({
@@ -247,11 +244,14 @@ class Data {
 }
 
 
-Future<Questions> createQuestions(String id) async {
+Future<Questions> createQuestions(String id,String qt_id) async {
   final String apiUrl =
       "http://ec2-13-234-116-155.ap-south-1.compute.amazonaws.com/api/chapter/questions";
 
-  final response = await http.post(Uri.parse(apiUrl), body: {"chapter_id": id});
+  final response = await http.post(Uri.parse(apiUrl), body: {
+    "chapter_id":id,
+    "question_type_id":qt_id,
+  });
 
   if (response.statusCode == 200) {
     final String responseString = response.body;
@@ -392,11 +392,13 @@ class Question {
 class quiz extends StatelessWidget {
   //const quiz({Key? key}) : super(key: key);
   late int id;
-  quiz(this.id);
+  late int qid;
+  quiz(this.id,this.qid);
 
   @override
   Widget build(BuildContext context) {
     quizId = id.toString();
+    qtype= qid.toString();
     return MaterialApp(
       home: quizpage(id),
     );
@@ -461,7 +463,7 @@ class _quizpageState extends State<quizpage> with TickerProviderStateMixin {
           centerTitle: true,
         ),*/
         body: FutureBuilder(
-          future: createQuestions(quizId),
+          future: createQuestions(quizId,qtype),
           builder: (context, AsyncSnapshot<Questions> snapshot) {
             int noq=0;
             if (snapshot.hasData) {
