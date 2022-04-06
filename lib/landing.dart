@@ -6,6 +6,7 @@ import 'package:learning_duniya/Dashboard.dart';
 import 'package:learning_duniya/assessment.dart';
 import 'package:learning_duniya/courseDesc.dart';
 import 'package:learning_duniya/k12details.dart';
+import 'package:learning_duniya/k12subjects.dart';
 import 'package:learning_duniya/mentor.dart';
 import 'package:learning_duniya/mentor_profile.dart';
 import 'package:learning_duniya/profile.dart';
@@ -1318,8 +1319,10 @@ class _landingPageState extends State<landingPage> {
                                       for(var i=0;i<snapshot.data!.data2.subjects2.length.toInt();i++)
                                         GestureDetector(
                                           onTap:(){
-                                            Navigator.push(context, MaterialPageRoute(
-                                                builder: (context) => k12_det(snapshot.data!.data2.subjects2[i].id.toString(),"images/english.png")));
+                                            Navigator.push(context, MaterialPageRoute(builder: (context) => k12Subject(snapshot.data!.data2.subjects2[i].id.toString())));
+
+                                            /*Navigator.push(context, MaterialPageRoute(
+                                                builder: (context) => k12_det(snapshot.data!.data2.subjects2[i].id.toString(),"images/english.png")));*/
 
                                           },
                                           child: Container(
