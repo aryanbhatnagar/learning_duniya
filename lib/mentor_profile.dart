@@ -35,10 +35,10 @@ class MentorDataResponse {
       );
 
   Map<String, dynamic> toJson() => {
-        "success": success,
-        "data": data.toJson(),
-        "message": message,
-      };
+    "success": success,
+    "data": data.toJson(),
+    "message": message,
+  };
 }
 class Data {
   Data({
@@ -50,14 +50,14 @@ class Data {
   var name;
 
   factory Data.fromJson(Map<String, dynamic> json) => Data(
-        token: json["token"],
-        name: json["name"],
-      );
+    token: json["token"],
+    name: json["name"],
+  );
 
   Map<String, dynamic> toJson() => {
-        "token": token,
-        "name": name,
-      };
+    "token": token,
+    "name": name,
+  };
 }
 
 class mentorProfile extends StatefulWidget {
@@ -76,7 +76,7 @@ Future createMentor(Map mentorData, File image) async {
   request.fields["name"] = mentorData['name'];
 
   http.MultipartFile multipartFile =
-      await http.MultipartFile.fromPath('img', image.path);
+  await http.MultipartFile.fromPath('img', image.path);
   request.files.add(multipartFile);
 
   request.fields["gender"] = mentorData['gender'];
@@ -98,21 +98,21 @@ Future createMentor(Map mentorData, File image) async {
   //return response.body;
 
   if (response.statusCode == 200) {
-      Mcode=200;
-      final String responseString = response.body;
-      debugPrint(responseString.toString());
-      //debugPrint(response.stream..toString());
-      return mentorDataResponseFromJson(responseString);
+    Mcode=200;
+    final String responseString = response.body;
+    debugPrint(responseString.toString());
+    //debugPrint(response.stream..toString());
+    return mentorDataResponseFromJson(responseString);
 
-    }
-    if (response.statusCode == 404) {
-      Mcode=404;
-      MentorDataResponse a = MentorDataResponse(
-          success: false,
-          data: new Data(token: "", name: ""),
-          message: "The email has already been taken.");
-      return a;
-    }
+  }
+  if (response.statusCode == 404) {
+    Mcode=404;
+    MentorDataResponse a = MentorDataResponse(
+        success: false,
+        data: new Data(token: "", name: ""),
+        message: "The email has already been taken.");
+    return a;
+  }
 
 }
 
@@ -185,7 +185,7 @@ class _mentorProfileState extends State<mentorProfile> {
                         backgroundImage: image != null
                             ? FileImage(image!)
                             : AssetImage('images/mentorProfile.jpeg')
-                                as ImageProvider,
+                        as ImageProvider,
                         /*child: Container(
                           padding: EdgeInsets.all(5),
                           child: ClipRRect(
@@ -205,21 +205,21 @@ class _mentorProfileState extends State<mentorProfile> {
                                 title: Center(
                                     child: Text('Select Image',
                                         style:
-                                            TextStyle(fontFamily: 'Candara'))),
+                                        TextStyle(fontFamily: 'Candara'))),
                                 content: SingleChildScrollView(
                                   child: ListBody(
                                     children: <Widget>[
                                       ElevatedButton(
                                           style: ButtonStyle(
                                               backgroundColor:
-                                                  MaterialStateProperty.all<
-                                                      Color>(Colors.deepPurple),
+                                              MaterialStateProperty.all<
+                                                  Color>(Colors.deepPurple),
                                               shape: MaterialStateProperty.all<
-                                                      RoundedRectangleBorder>(
+                                                  RoundedRectangleBorder>(
                                                   RoundedRectangleBorder(
                                                       borderRadius:
-                                                          BorderRadius.circular(
-                                                              10),
+                                                      BorderRadius.circular(
+                                                          10),
                                                       side: BorderSide(
                                                           color: Colors
                                                               .deepPurple)))),
@@ -244,14 +244,14 @@ class _mentorProfileState extends State<mentorProfile> {
                                       ElevatedButton(
                                           style: ButtonStyle(
                                               backgroundColor:
-                                                  MaterialStateProperty.all<
-                                                      Color>(Colors.deepPurple),
+                                              MaterialStateProperty.all<
+                                                  Color>(Colors.deepPurple),
                                               shape: MaterialStateProperty.all<
-                                                      RoundedRectangleBorder>(
+                                                  RoundedRectangleBorder>(
                                                   RoundedRectangleBorder(
                                                       borderRadius:
-                                                          BorderRadius.circular(
-                                                              10),
+                                                      BorderRadius.circular(
+                                                          10),
                                                       side: BorderSide(
                                                           color: Colors
                                                               .deepPurple)))),
@@ -584,7 +584,7 @@ class _mentorProfileState extends State<mentorProfile> {
                           backgroundColor: MaterialStateProperty.all<Color>(
                               Colors.deepPurple),
                           shape: MaterialStateProperty.all<
-                                  RoundedRectangleBorder>(
+                              RoundedRectangleBorder>(
                               RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(10),
                                   side: BorderSide(color: Colors.deepPurple)))),
@@ -637,32 +637,32 @@ class _mentorProfileState extends State<mentorProfile> {
                           debugPrint(mentorDataMap.toString());
 
                           if(image!=null){
-                          MentorDataResponse s =await createMentor(mentorDataMap, image!);
-                          debugPrint(s.data.token.toString());
-                          if(Mcode==200)
-                            Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => cardPayment((s.data.token.toString()))),
-                          );
-                          else if(Mcode==404)
-                            showDialog(
-                                context: context,
-                                builder: (BuildContext context) {
-                                  return AlertDialog(
-                                    title: Text('Error'),
-                                    content: Text('Email already taken'),
-                                    actions: <Widget>[
-                                      ElevatedButton(
-                                        child: Text('Close'),
-                                        onPressed: () {
-                                          Navigator.of(context).pop();
-                                        },
-                                      )
-                                    ],
-                                  );
-                                });
-                        }
+                            MentorDataResponse s =await createMentor(mentorDataMap, image!);
+                            debugPrint(s.data.token.toString());
+                            if(Mcode==200)
+                              Navigator.pushReplacement(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => cardPayment((s.data.token.toString()))),
+                              );
+                            else if(Mcode==404)
+                              showDialog(
+                                  context: context,
+                                  builder: (BuildContext context) {
+                                    return AlertDialog(
+                                      title: Text('Error'),
+                                      content: Text('Email already taken'),
+                                      actions: <Widget>[
+                                        ElevatedButton(
+                                          child: Text('Close'),
+                                          onPressed: () {
+                                            Navigator.of(context).pop();
+                                          },
+                                        )
+                                      ],
+                                    );
+                                  });
+                          }
                           else
                             showDialog(
                                 context: context,

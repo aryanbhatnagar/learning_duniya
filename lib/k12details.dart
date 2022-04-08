@@ -63,7 +63,12 @@ class K12 {
     required this.language,
     required this.price,
     required this.salePrice,
-
+    required this.classname,
+    required this.subjectname,
+    required this.mcqcount,
+    required this.totalvideos,
+    required this.visitor,
+    required this.likes,
   });
 
    var img;
@@ -75,6 +80,12 @@ class K12 {
    var language;
    var price;
    var salePrice;
+  var classname;
+  var subjectname;
+  var mcqcount;
+  var totalvideos;
+  var visitor;
+  var likes;
 
 
   factory K12.fromJson(Map<String, dynamic> json) => K12(
@@ -88,7 +99,14 @@ class K12 {
     language: json["language"],
     price: json["price"],
     salePrice: json["sale_price"],
-    img : json["img"]
+    img : json["img"],
+    classname: json["class_name"],
+    subjectname: json["subject_name"],
+    mcqcount: json["mcq_count"],
+    totalvideos: json["total_video"],
+    likes: json["likes"],
+    visitor: json["visitor"]
+
 
   );
 
@@ -102,7 +120,13 @@ class K12 {
     "language": language,
     "price": price,
     "sale_price": salePrice,
-    "img": img
+    "img": img,
+    "class_name": classname,
+    "subject_name": subjectname,
+    "mcq_count": mcqcount,
+    "total_video": totalvideos,
+    "visitor": visitor,
+    "likes": likes
   };
 }
 
@@ -232,15 +256,15 @@ class _k12detailState extends State<k12detail> {
                             Row(
                               mainAxisAlignment: MainAxisAlignment.start,
                               children: [
-                                Icon(Icons.book, color: Colors.teal, size: 22),
-                                Text("test",
+                                Icon(Icons.favorite, color: Colors.red, size: 22),
+                                Text(" ${snapshot.data!.data.k12.likes}",
                                     style: TextStyle(
                                         fontSize: 15,
                                         fontFamily: "Candara",
                                         color: Colors.teal)),
                                 SizedBox(width: 30),
                                 Icon(Icons.people, color: Colors.yellow, size: 25),
-                                Text("test",
+                                Text(" ${snapshot.data!.data.k12.visitor}",
                                     style: TextStyle(
                                         fontSize: 15,
                                         fontFamily: "Candara",
@@ -249,13 +273,8 @@ class _k12detailState extends State<k12detail> {
                               ],
                             ),
                             SizedBox(height: 20),
-                            Text("Description",
-                                style: TextStyle(
-                                    fontSize: 18,
-                                    fontFamily: "Candara",
-                                    color: Colors.black)),
-                            SizedBox(height: 10),
-                            Text(k12.data.k12.description.toString(),
+                            if(k12.data.k12.description.toString()!="null")
+                              Text(k12.data.k12.description.toString(),
                                 style: TextStyle(
                                     fontSize: 15,
                                     fontFamily: "Candara",
@@ -277,7 +296,7 @@ class _k12detailState extends State<k12detail> {
                                                 color: Colors.black)),
                                       ],
                                     ),
-                                    Text("      ${k12.data.k12.lifespan.toString()}",
+                                    Text("      ${k12.data.k12.subjectname.toString()}",
                                         style: TextStyle(
                                             fontSize: 16,
                                             fontFamily: "Candara",
@@ -285,19 +304,19 @@ class _k12detailState extends State<k12detail> {
                                     SizedBox(height: 15),
                                     Row(
                                       children: [
-                                        Icon(Icons.monetization_on,color: Colors.green,size: 20),
-                                        Text(" Subject ID",
-                                            style: TextStyle(
-                                                fontSize: 16,
-                                                fontFamily: "Candara",
-                                                color: Colors.black)),
-                                      ],
-                                    ),
-                                    Text("      ${k12.data.k12.language.toString()}",
+                                    Icon(Icons.hourglass_bottom_outlined,color: Colors.teal,size: 20),
+                                    Text(" No. of MCQ",
                                         style: TextStyle(
                                             fontSize: 16,
                                             fontFamily: "Candara",
-                                            color: Colors.grey)),
+                                            color: Colors.black)),
+                                  ],
+                                ),
+                                Text("      ${k12.data.k12.mcqcount.toString()}",
+                                    style: TextStyle(
+                                        fontSize: 16,
+                                        fontFamily: "Candara",
+                                        color: Colors.grey)),
                                   ],
                                 ),
                                 SizedBox(width: 20),
@@ -306,15 +325,16 @@ class _k12detailState extends State<k12detail> {
                                   children: <Widget>[
                                     Row(
                                       children: [
-                                        Icon(Icons.class_,color: Colors.teal,size: 20),
-                                        Text(" Class ID",
+
+                                        Icon(Icons.account_box_outlined,color: Colors.green,size: 20),
+                                        Text(" Class",
                                             style: TextStyle(
                                                 fontSize: 16,
                                                 fontFamily: "Candara",
                                                 color: Colors.black)),
                                       ],
                                     ),
-                                    Text("      ${k12.data.k12.price.toString()}",
+                                    Text("      ${k12.data.k12.classname.toString()}",
                                         style: TextStyle(
                                             fontSize: 16,
                                             fontFamily: "Candara",
@@ -322,15 +342,15 @@ class _k12detailState extends State<k12detail> {
                                     SizedBox(height: 15),
                                     Row(
                                       children: [
-                                        Icon(Icons.monetization_on,color: Colors.teal,size: 20),
-                                        Text(" Board ID",
+                                        Icon(Icons.video_collection,color: Colors.teal,size: 20),
+                                        Text(" Vidoes",
                                             style: TextStyle(
                                                 fontSize: 16,
                                                 fontFamily: "Candara",
                                                 color: Colors.black)),
                                       ],
                                     ),
-                                    Text("      ${k12.data.k12.salePrice.toString()}",
+                                    Text("      ${k12.data.k12.totalvideos.toString()}",
                                         style: TextStyle(
                                             fontSize: 16,
                                             fontFamily: "Candara",
@@ -342,7 +362,6 @@ class _k12detailState extends State<k12detail> {
 
                             SizedBox(height: 25),
                             for(int i=0; i<k12.data.k12Details.length; i++)
-
                               GestureDetector(
                                 onTap: () {
                                   Navigator.push(context, MaterialPageRoute(

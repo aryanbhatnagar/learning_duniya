@@ -34,10 +34,10 @@ class MentorAccountDataResponse {
       );
 
   Map<String, dynamic> toJson() => {
-        "data": data.toJson(),
-        "message": message,
-        "status": status,
-      };
+    "data": data.toJson(),
+    "message": message,
+    "status": status,
+  };
 }
 class Data {
   Data({
@@ -87,52 +87,52 @@ class Data {
   var status;
 
   factory Data.fromJson(Map<String, dynamic> json) => Data(
-        id: json["id"],
-        userId: json["user_id"],
-        eduName: json["edu_name"],
-        specilization: json["specilization"],
-        secondarySubject: json["secondary_subject"],
-        exp: json["exp"],
-        aboutUs: json["about_us"],
-        phone: json["phone"],
-        country: json["country"],
-        state: json["state"],
-        city: json["city"],
-        nameAsAccount: json["name_as_account"],
-        accountNo: json["account_no"],
-        ifscCode: json["ifsc_code"],
-        branch: json["branch"],
-        reviews: json["reviews"],
-        likes: json["likes"],
-        img: json["img"],
-        createdAt:json["created_at"],
-        updatedAt: json["updated_at"],
-        status: json["status"],
-      );
+    id: json["id"],
+    userId: json["user_id"],
+    eduName: json["edu_name"],
+    specilization: json["specilization"],
+    secondarySubject: json["secondary_subject"],
+    exp: json["exp"],
+    aboutUs: json["about_us"],
+    phone: json["phone"],
+    country: json["country"],
+    state: json["state"],
+    city: json["city"],
+    nameAsAccount: json["name_as_account"],
+    accountNo: json["account_no"],
+    ifscCode: json["ifsc_code"],
+    branch: json["branch"],
+    reviews: json["reviews"],
+    likes: json["likes"],
+    img: json["img"],
+    createdAt:json["created_at"],
+    updatedAt: json["updated_at"],
+    status: json["status"],
+  );
 
   Map<String, dynamic> toJson() => {
-        "id": id,
-        "user_id": userId,
-        "edu_name": eduName,
-        "specilization": specilization,
-        "secondary_subject": secondarySubject,
-        "exp": exp,
-        "about_us": aboutUs,
-        "phone": phone,
-        "country": country,
-        "state": state,
-        "city": city,
-        "name_as_account": nameAsAccount,
-        "account_no": accountNo,
-        "ifsc_code": ifscCode,
-        "branch": branch,
-        "reviews": reviews,
-        "likes": likes,
-        "img": img,
-        "created_at": createdAt,
-        "updated_at": updatedAt,
-        "status": status,
-      };
+    "id": id,
+    "user_id": userId,
+    "edu_name": eduName,
+    "specilization": specilization,
+    "secondary_subject": secondarySubject,
+    "exp": exp,
+    "about_us": aboutUs,
+    "phone": phone,
+    "country": country,
+    "state": state,
+    "city": city,
+    "name_as_account": nameAsAccount,
+    "account_no": accountNo,
+    "ifsc_code": ifscCode,
+    "branch": branch,
+    "reviews": reviews,
+    "likes": likes,
+    "img": img,
+    "created_at": createdAt,
+    "updated_at": updatedAt,
+    "status": status,
+  };
 }
 
 Future<MentorAccountDataResponse> addBankDetails(
@@ -145,11 +145,11 @@ Future<MentorAccountDataResponse> addBankDetails(
         "Authorization": "Bearer $token",
       },
       body: {
-    "name_as_account": name.toString(),
-    "account_no": accountNumber.toString(),
-    "ifsc_code": ifscCode.toString(),
-    "branch": branch.toString()
-  });
+        "name_as_account": name.toString(),
+        "account_no": accountNumber.toString(),
+        "ifsc_code": ifscCode.toString(),
+        "branch": branch.toString()
+      });
 
   if (response.statusCode == 200) {
     Acode=200;
@@ -334,13 +334,13 @@ class _cardPayment extends State<cardPayment> {
                 child: ElevatedButton(
                     style: ButtonStyle(
                         backgroundColor:
-                            MaterialStateProperty.all<Color>(Colors.deepPurple),
+                        MaterialStateProperty.all<Color>(Colors.deepPurple),
                         shape:
-                            MaterialStateProperty.all<RoundedRectangleBorder>(
-                                RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(10),
-                                    side:
-                                        BorderSide(color: Colors.deepPurple)))),
+                        MaterialStateProperty.all<RoundedRectangleBorder>(
+                            RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10),
+                                side:
+                                BorderSide(color: Colors.deepPurple)))),
                     onPressed: () async {
                       if (nameController.text.isEmpty ||
                           accountContoller.text.isEmpty ||
@@ -386,11 +386,11 @@ class _cardPayment extends State<cardPayment> {
                                     ElevatedButton(
                                       child: Text('OK'),
                                       onPressed: () {
+                                        Navigator.of(context).pop();
                                         Navigator.pushReplacement(context,
                                             MaterialPageRoute(
                                                 builder: (context) =>
-                                            landing()));
-                                        //Navigator.of(context).pop();
+                                                    landing()));
                                       },
                                     )
                                   ],

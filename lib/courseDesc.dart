@@ -7,6 +7,7 @@ import 'package:learning_duniya/Login2.dart';
 import 'package:learning_duniya/videoplayer.dart';
 import 'package:video_player/video_player.dart';
 import 'package:learning_duniya/quiz.dart';
+import 'package:wakelock/wakelock.dart';
 
 import 'Login.dart';
 import 'globals.dart';
@@ -280,8 +281,6 @@ class courseDesc extends StatelessWidget {
     );
   }
 }
-
-
 class courseDescPage extends StatefulWidget {
   const courseDescPage({Key? key}) : super(key: key);
 
@@ -336,17 +335,16 @@ class _courseDescPageState extends State<courseDescPage> {
                             Row(
                               mainAxisAlignment: MainAxisAlignment.start,
                               children: [
-                                Icon(Icons.person,color: Colors.teal,size: 22),
-                                Text("Academy",style: TextStyle(fontSize:15,fontFamily: "Candara",color: Colors.teal)),
+                                Icon(Icons.favorite,color: Colors.red,size: 22),
+                                Text(" ${k12.data.chapterDetails.likes}",style: TextStyle(fontSize:15,fontFamily: "Candara",color: Colors.teal)),
                                 SizedBox(width: 30),
-                                Icon(Icons.star,color: Colors.yellow,size: 25),
-                                Text("4.8",style: TextStyle(fontSize:15,fontFamily: "Candara",color: Colors.grey))
+                                Icon(Icons.people,color: Colors.yellow,size: 25),
+                                Text(" ${k12.data.chapterDetails.visitors}",style: TextStyle(fontSize:15,fontFamily: "Candara",color: Colors.grey))
                            ],
                             ),
                             SizedBox(height: 20),
-                            Text("Description",style: TextStyle(fontSize: 18,fontFamily: "Candara",color: Colors.black)),
-                            SizedBox(height: 10),
-                            Text(k12!.data.chapterDetails.description.toString(),style: TextStyle(fontSize:15,fontFamily: "Candara",color: Colors.grey)),
+                            if(k12!.data.chapterDetails.description.toString()!="null")
+                              Text(k12!.data.chapterDetails.description.toString(),style: TextStyle(fontSize:15,fontFamily: "Candara",color: Colors.grey)),
                             SizedBox(height: 25),
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -446,13 +444,14 @@ class _courseDescPageState extends State<courseDescPage> {
                                       onTap: () {
                                         if(token!="")
                                           {
+                                            Wakelock.enable();
                                         Navigator.push(context, MaterialPageRoute(
                                             builder: (context) =>
                                                 video(k12.data.videos[i].fileName,
                                                     k12.data.videos[i].title,
                                                     k12.data.videos[i].description,
                                                     k12.data.videos[i].id.toString(),
-                                                  k12.data.videos[i].likes.toString(),
+                                                  k12.data.videos[i].likes,
                                                   k12.data.videos[i].visitors.toString()
                                                 )));}
                                         else
@@ -542,7 +541,7 @@ class _courseDescPageState extends State<courseDescPage> {
                                                   ],
                                                 ),
                                               ),
-                                              Icon(Icons.bookmark_outline_sharp, color: Colors.deepOrange, size: 30)
+                                              Icon(Icons.hourglass_bottom, color: Colors.deepOrange, size: 30)
                                             ],
                                           ),
                                         ),

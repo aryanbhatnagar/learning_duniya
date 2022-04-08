@@ -6,12 +6,14 @@ import 'package:learning_duniya/Dashboard.dart';
 import 'package:learning_duniya/assessment.dart';
 import 'package:learning_duniya/courseDesc.dart';
 import 'package:learning_duniya/k12details.dart';
+import 'package:learning_duniya/k12subjects.dart';
 import 'package:learning_duniya/mentor.dart';
 import 'package:learning_duniya/mentor_profile.dart';
 import 'package:learning_duniya/profile.dart';
 import 'package:learning_duniya/quiz.dart';
 import 'package:group_button/group_button.dart';
 import 'package:learning_duniya/seeall.dart';
+import 'package:learning_duniya/test.dart';
 import 'package:toggle_switch/toggle_switch.dart';
 import 'Login.dart';
 import 'package:http/http.dart' as http;
@@ -50,26 +52,57 @@ class Data3 {
     required this.subjects2,
     required this.assessments1,
     required this.results,
+    required this.experience,
     required this.mentors,
   });
 
   List<Subject2> subjects2;
   List<AssessmentElement> assessments1;
   Results results;
-  List<Mentor> mentors;
+  var experience;
+  List<Mentor1> mentors;
 
   factory Data3.fromJson(Map<String, dynamic> json) => Data3(
     subjects2: List<Subject2>.from(json["subjects"].map((x) => Subject2.fromJson(x))),
     assessments1: List<AssessmentElement>.from(json["assessments"].map((x) => AssessmentElement.fromJson(x))),
     results: Results.fromJson(json["results"]),
-    mentors: List<Mentor>.from(json["mentors"].map((x) => Mentor.fromJson(x))),
+    experience: json["exp"],
+    mentors: List<Mentor1>.from(json["mentors"].map((x) => Mentor1.fromJson(x))),
   );
 
   Map<String, dynamic> toJson() => {
     "subjects": List<dynamic>.from(subjects2.map((x) => x.toJson())),
     "assessments": List<dynamic>.from(assessments1.map((x) => x.toJson())),
     "results": results.toJson(),
+    "exp" : experience,
     "mentors": List<dynamic>.from(mentors.map((x) => x.toJson())),
+  };
+}
+class Mentor1 {
+  Mentor1({
+    required this.id,
+    required this.eduName,
+    required this.img,
+    required this.specilization
+  });
+
+  int id;
+  String eduName;
+  String img;
+  var specilization;
+
+  factory Mentor1.fromJson(Map<String, dynamic> json) => Mentor1(
+      id: json["id"],
+      eduName: json["edu_name"],
+      img: json["img"],
+      specilization: json["specilization"]
+  );
+
+  Map<String, dynamic> toJson() => {
+    "id": id,
+    "edu_name": eduName,
+    "img": img,
+    "specilization": specilization
   };
 }
 class AssessmentElement {
@@ -168,7 +201,6 @@ class Subject2 {
     "icon": icon
   };
 }
-
 Future<StuDashboard> createDash(String id) async {
   final String apiUrl =
       "http://ec2-13-234-116-155.ap-south-1.compute.amazonaws.com/api/mentee/dashboard";
@@ -178,7 +210,7 @@ Future<StuDashboard> createDash(String id) async {
         "Authorization": "Bearer $token",
       },
       body: {
-        "class_id": id
+        "class_name": id
       }
   );
 
@@ -241,18 +273,32 @@ class K12_c {
     required this.courseName,
     required this.img,
     required this.chapter,
+    required this.classname,
+    required this.subjectname,
+    required this.mcqcount,
+    required this.totalvideos
   });
 
   int id;
-  int chapter;
+  var chapter;
   String courseName;
   String img;
+  var classname;
+  var subjectname;
+  var mcqcount;
+  var totalvideos;
+
 
   factory K12_c.fromJson(Map<String, dynamic> json) => K12_c(
     id: json["id"],
     courseName: json["course_name"],
     img: json["img"],
     chapter : json["chapter"],
+    classname: json["class_name"],
+    subjectname: json["subject_name"],
+    mcqcount: json["mcq_count"],
+    totalvideos: json["total_video"]
+
   );
 
   Map<String, dynamic> toJson() => {
@@ -260,13 +306,18 @@ class K12_c {
     "course_name": courseName,
     "img": img,
     "chapter": chapter,
-    };
+    "class_name": classname,
+    "subject_name": subjectname,
+    "mcq_count": mcqcount,
+    "total_video": totalvideos
+  };
 }
 Future<K12Card> createK12card(String id) async {
   final String apiUrl =
       "http://ec2-13-234-116-155.ap-south-1.compute.amazonaws.com/api/getk12";
 
-  final response = await http.post(Uri.parse(apiUrl), body: {
+  final response = await http.post(Uri.parse(apiUrl),
+      body: {
     "subject_id": id
   }
   );
@@ -280,17 +331,17 @@ Future<K12Card> createK12card(String id) async {
 }
 Future<LandingApi> getLanding() async {
 
-    final String apiUrl = "http://ec2-13-234-116-155.ap-south-1.compute.amazonaws.com/api/dashboard";
-    final response = await http.get(Uri.parse(apiUrl));
+  final String apiUrl = "http://ec2-13-234-116-155.ap-south-1.compute.amazonaws.com/api/dashboard";
+  final response = await http.get(Uri.parse(apiUrl));
 
-    if (response.statusCode == 200) {
-      final String responseString = response.body;
-      return landingApiFromJson(responseString);
-    }
-    else {
-      throw Exception('Failed to load album');
-    }
+  if (response.statusCode == 200) {
+    final String responseString = response.body;
+    return landingApiFromJson(responseString);
   }
+  else {
+    throw Exception('Failed to load album');
+  }
+}
 
 
 class LandingApi {
@@ -446,10 +497,10 @@ class Mentor {
   var specilization;
 
   factory Mentor.fromJson(Map<String, dynamic> json) => Mentor(
-    id: json["id"],
-    eduName: json["edu_name"],
-    img: json["img"],
-    specilization: json["specilization"]
+      id: json["id"],
+      eduName: json["edu_name"],
+      img: json["img"],
+      specilization: json["specilization"]
   );
 
   Map<String, dynamic> toJson() => {
@@ -492,10 +543,10 @@ class Compete{
   String subjectName;
 
   factory Compete.fromJson(Map<String, dynamic> json) => Compete(
-    id: json["id"],
-    img: json["img"],
-    price: json["price"],
-    subjectName: json["subject_name"]
+      id: json["id"],
+      img: json["img"],
+      price: json["price"],
+      subjectName: json["subject_name"]
 
   );
 
@@ -522,11 +573,11 @@ class popular{
   String subject;
 
   factory popular.fromJson(Map<String, dynamic> json) => popular(
-    id: json["id"],
-    img: json["img"],
-    price: json["price"],
-    subjectName: json["subject_name"] ,
-    subject: json["subject"]
+      id: json["id"],
+      img: json["img"],
+      price: json["price"],
+      subjectName: json["subject_name"] ,
+      subject: json["subject"]
   );
 
   Map<String, dynamic> toJson() => {
@@ -592,22 +643,22 @@ class _landingPageState extends State<landingPage> {
 
   Future<void> _onItemTapped(int index) async {
     if(index==1)
-      {
-        if (token!="")
-          if(classId=="")
-            {
-              Future<ConfirmAction?> action =
-                  await _asyncConfirmDialog(
-                  context,
-                  'Mentor Name',
-                  'Mentor Bio',
-                  'Communication',
-                  [],
-                  'None');
-            }
-      }
+    {
+      if (token!="")
+        if(classId=="")
+        {
+          Future<ConfirmAction?> action =
+          await _asyncConfirmDialog(
+              context,
+              'Mentor Name',
+              'Mentor Bio',
+              'Communication',
+              [],
+              'None');
+        }
+    }
     if(index==1 && classId!="")
-    indexSelect(index);
+      indexSelect(index);
     else
       indexSelect(index);
   }
@@ -621,10 +672,10 @@ class _landingPageState extends State<landingPage> {
   Widget build(BuildContext context) {
     var ass_vis=true;
     //isSelected[0]=true;
-      final controller = GroupButtonController();
-      List<Widget> _widgetOptions = <Widget>[
+    final controller = GroupButtonController();
+    List<Widget> _widgetOptions = <Widget>[
 
-        FutureBuilder(
+      FutureBuilder(
           future: getLanding(),
           builder: (context,AsyncSnapshot<LandingApi> snapshot) {
             print(snapshot.data);
@@ -755,8 +806,8 @@ class _landingPageState extends State<landingPage> {
                                         Text(
                                             "${landApi!.data.assessments[i].price}",
                                             style: TextStyle(fontSize: 18,
-                                            fontFamily: "Candara",
-                                            color: Colors.red)),
+                                                fontFamily: "Candara",
+                                                color: Colors.red)),
                                         FavoriteButton(
                                           iconSize: 24,
                                           isFavorite: false,
@@ -900,359 +951,384 @@ class _landingPageState extends State<landingPage> {
 
                 for(int j=0;j<snapshot.data!.data.subjects.length;j++)
                   butind.add(snapshot.data!.data.subjects[j].id.toInt());
-               // isSelected = List.generate(snapshot.data!.data.subjects.length, (index) => false);
+                // isSelected = List.generate(snapshot.data!.data.subjects.length, (index) => false);
 
               }
               return Container(
                 color: Colors.teal,
                 child: SingleChildScrollView(
-                child: Column(
-                  children: [
-                    Container(
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.only(
-                            bottomLeft: Radius.circular(20),
-                            bottomRight: Radius.circular(20)),
-                        color: Colors.white,
-                      ),
-                      padding: EdgeInsets.fromLTRB(15, 15, 15, 15),
-                      width: double.infinity,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: <Widget>[
-                          SizedBox(height: 10),
-
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    child: Column(
+                      children: [
+                        Container(
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.only(
+                                bottomLeft: Radius.circular(20),
+                                bottomRight: Radius.circular(20)),
+                            color: Colors.white,
+                          ),
+                          padding: EdgeInsets.fromLTRB(15, 15, 15, 15),
+                          width: double.infinity,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.center,
                             children: <Widget>[
-                              Text("Popular Courses", style: TextStyle(
-                                  fontFamily: "Candara",
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.black)),
-                            ],
-                          ),
-                          SizedBox(height: 20),
-                          SingleChildScrollView(
-                              scrollDirection: Axis.horizontal,
-                              child: Row(
-                                children: pop_c,
+                              SizedBox(height: 10),
 
-                              )
-                          ),
-                          SizedBox(height: 15),
-
-
-                        ],
-                      ),
-
-
-                    ),
-                    Container(
-                      padding: EdgeInsets.fromLTRB(15, 15, 15, 15),
-                      color: Colors.teal,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: <Widget>[
-
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: <Widget>[
-                              Text("Assessment", style: TextStyle(
-                                  fontFamily: "Candara",
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.white)),
-                              GestureDetector(
-                                child: Text("See all", style: TextStyle(
-                                    fontSize: 18,
-                                    color: Colors.lightBlueAccent,
-                                    fontFamily: "Candara")),
-                                onTap: () {
-                                  Navigator.push(context, MaterialPageRoute(
-                                      builder: (context) =>
-                                          seeallpage("Assessment", 2)));
-                                },)
-                            ],
-                          ),
-                          SizedBox(height: 20),
-                          SingleChildScrollView(
-                              scrollDirection: Axis.horizontal,
-                              child: Row(
-                                  children: asses
-                              )
-                          ),
-                          SizedBox(height: 15),
-
-                        ],
-                      ),
-                    ),
-                    Container(
-                      decoration: BoxDecoration(
-                          borderRadius: BorderRadius.all(Radius.circular(20)),
-                          color: Colors.white),
-                      padding: EdgeInsets.fromLTRB(15, 15, 15, 15),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: <Widget>[
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: <Widget>[
-                              Text("K12", style: TextStyle(fontFamily: "Candara",
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.black)),
-                              //GestureDetector(child: Text("See all",style: TextStyle(fontSize: 20,color: Colors.blue,fontFamily: "Candara")))
-                            ],
-                          ),
-                          SizedBox(height: 10),
-                          SingleChildScrollView(
-                            scrollDirection: Axis.horizontal,
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                              children: <Widget>[
-                                ToggleButtons(
-                                    children: <Widget>[
-                                      for(int j=0;j<snapshot.data!.data.subjects.length;j++)
-                                        Text(" ${snapshot.data!.data.subjects[j].subjectName}  ",style: TextStyle(fontFamily: "Candara",fontSize: 17),)
-                                  ],
-
-                                  selectedBorderColor: Colors.teal,
-                                  selectedColor: Colors.white,
-                                  borderColor: Colors.transparent,
-                                  borderRadius: BorderRadius.circular(10),
-                                  disabledColor: Colors.transparent,
-                                  disabledBorderColor: Colors.transparent,
-                                  focusColor: Colors.teal,
-                                  fillColor: Colors.teal,
-                                  onPressed: (int index) {
-                                    setState(() {
-                                      for (int buttonIndex = 0; buttonIndex < isSelected.length; buttonIndex++) {
-                                        if (buttonIndex == index) {
-                                          isSelected[buttonIndex] = true;
-                                        } else {
-                                          isSelected[buttonIndex] = false;
-                                        }
-                                      }
-                                      k12_pos=butind[index];
-                                    });
-                                  },
-                                  isSelected: isSelected,
-                                )
-                              ],
-                            ),
-                          ),
-                          SizedBox(height: 10),
-                          FutureBuilder(
-                              future: createK12card(k12_pos.toString()),
-                              builder: (context,AsyncSnapshot<K12Card> snapshot2){
-                                if(snapshot2.hasData){
-                                  K12Card? k12_obj = snapshot2.data;
-                                  return SingleChildScrollView(
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: <Widget>[
+                                  Text("Popular Courses", style: TextStyle(
+                                      fontFamily: "Candara",
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.black)),
+                                ],
+                              ),
+                              SizedBox(height: 20),
+                              SingleChildScrollView(
                                   scrollDirection: Axis.horizontal,
                                   child: Row(
-                                    children: <Widget>[
-                                      for (var i = 0; i <k12_obj!.data1.k12.length; i++)
-                                        GestureDetector(
-                                          onTap: () {
-                                            Navigator.push(context, MaterialPageRoute(
-                                                builder: (context) => k12_det(k12_obj!.data1.k12[i].id.toString(),landApi!.data.popularCourses[i].img)));
-                                          },
-                                          child: Card(
-                                            shape: RoundedRectangleBorder(
-                                                borderRadius: BorderRadius.all(Radius.circular(10))),
-                                            elevation: 5,
-                                            child: Column(
-                                              mainAxisAlignment: MainAxisAlignment.start,
-                                              crossAxisAlignment: CrossAxisAlignment.center,
-                                              children: <Widget>[
-                                                Container(
-                                                  height: 150,
-                                                  width: 150,
-                                                  decoration: BoxDecoration(
-                                                    image: DecorationImage(image: NetworkImage("${k12_obj!.data1.k12[i].img.toString()}"),fit: BoxFit.fill),
-                                                  ),
-                                                ),
-                                                Padding(
-                                                  padding: const EdgeInsets.fromLTRB(5, 5, 5, 5),
-                                                  child: Container(
-                                                    height: 100,
-                                                    width: 150,
-                                                    child: Column(
-                                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                                      children: [
-                                                        Row(
-                                                          mainAxisAlignment: MainAxisAlignment
-                                                              .spaceBetween,
-                                                          children: [
-                                                            Flexible(
-                                                              child: Text("${k12_obj!.data1.k12[i].courseName}\n",
-                                                                  style: TextStyle(fontSize: 15,
-                                                                      fontFamily: "Candara",
-                                                                      color: Colors.black),
-                                                                maxLines: 2,
-                                                                overflow: TextOverflow.ellipsis,
-                                                              ),
-                                                            ),
-                                                            //IconButton(onPressed: (){  }, icon: Icon(Icons.favorite_outline,size: 15),color: Colors.grey,)
-
-                                                          ],
-                                                        ),
-                                                        SizedBox(height: 8),
-                                                        Text("${k12_obj.data1.k12[i].chapter} Chapters", style: TextStyle(
-                                                            fontSize: 14,
-                                                            fontFamily: "Candara",
-                                                            color: Colors
-                                                                .grey)),
-                                                        Text("${k12_obj.data1.k12[i].chapter} Chapters", style: TextStyle(
-                                                            fontSize: 14,
-                                                            fontFamily: "Candara",
-                                                            color: Colors
-                                                                .grey)),
-                                                        SizedBox(height: 5),
-                                                      ],
-                                                    ),
-                                                  ),
-                                                )
-                                              ],
-                                            ),
-
-                                          ),
-                                        )
-
-                                    ],
-
+                                    children: pop_c,
 
                                   )
-                              );
-                                }
-                                else
-                                  return Container(child: Center(child: CircularProgressIndicator()));
-                              }
+                              ),
+                              SizedBox(height: 15),
+
+
+                            ],
+                          ),
+
+
+                        ),
+                        Container(
+                          padding: EdgeInsets.fromLTRB(15, 15, 15, 15),
+                          color: Colors.teal,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: <Widget>[
+
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: <Widget>[
+                                  Text("Assessment", style: TextStyle(
+                                      fontFamily: "Candara",
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.white)),
+                                  GestureDetector(
+                                    child: Text("See all", style: TextStyle(
+                                        fontSize: 18,
+                                        color: Colors.lightBlueAccent,
+                                        fontFamily: "Candara")),
+                                    onTap: () {
+                                      Navigator.push(context, MaterialPageRoute(
+                                          builder: (context) =>
+                                              seeallpage("Assessment", 2)));
+                                    },)
+                                ],
+                              ),
+                              SizedBox(height: 20),
+                              SingleChildScrollView(
+                                  scrollDirection: Axis.horizontal,
+                                  child: Row(
+                                      children: asses
+                                  )
+                              ),
+                              SizedBox(height: 15),
+
+                            ],
+                          ),
+                        ),
+                        Container(
+                          decoration: BoxDecoration(
+                              borderRadius: BorderRadius.all(Radius.circular(20)),
+                              color: Colors.white),
+                          padding: EdgeInsets.fromLTRB(15, 15, 15, 15),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: <Widget>[
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: <Widget>[
+                                  Text("K12", style: TextStyle(fontFamily: "Candara",
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.black)),
+                                  //GestureDetector(child: Text("See all",style: TextStyle(fontSize: 20,color: Colors.blue,fontFamily: "Candara")))
+                                ],
+                              ),
+                              SizedBox(height: 10),
+                              SingleChildScrollView(
+                                scrollDirection: Axis.horizontal,
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                  children: <Widget>[
+                                    ToggleButtons(
+                                      children: <Widget>[
+                                        for(int j=0;j<snapshot.data!.data.subjects.length;j++)
+                                          Text(" ${snapshot.data!.data.subjects[j].subjectName}  ",style: TextStyle(fontFamily: "Candara",fontSize: 17),)
+                                      ],
+
+                                      selectedBorderColor: Colors.teal,
+                                      selectedColor: Colors.white,
+                                      borderColor: Colors.transparent,
+                                      borderRadius: BorderRadius.circular(10),
+                                      disabledColor: Colors.transparent,
+                                      disabledBorderColor: Colors.transparent,
+                                      focusColor: Colors.teal,
+                                      fillColor: Colors.teal,
+                                      onPressed: (int index) {
+                                        setState(() {
+                                          for (int buttonIndex = 0; buttonIndex < isSelected.length; buttonIndex++) {
+                                            if (buttonIndex == index) {
+                                              isSelected[buttonIndex] = true;
+                                            } else {
+                                              isSelected[buttonIndex] = false;
+                                            }
+                                          }
+                                          k12_pos=butind[index];
+                                        });
+                                      },
+                                      isSelected: isSelected,
+                                    )
+                                  ],
+                                ),
+                              ),
+                              SizedBox(height: 10),
+                              FutureBuilder(
+                                  future: createK12card(k12_pos.toString()),
+                                  builder: (context,AsyncSnapshot<K12Card> snapshot2){
+                                    if(snapshot2.hasData){
+                                      K12Card? k12_obj = snapshot2.data;
+                                      return SingleChildScrollView(
+                                          scrollDirection: Axis.horizontal,
+                                          child: Row(
+                                            children: <Widget>[
+                                              for (var i = 0; i <k12_obj!.data1.k12.length; i++)
+                                                GestureDetector(
+                                                  onTap: () {
+                                                    Navigator.push(context, MaterialPageRoute(
+                                                        builder: (context) => k12_det(k12_obj!.data1.k12[i].id.toString(),"")));
+                                                  },
+                                                  child: Card(
+                                                    shape: RoundedRectangleBorder(
+                                                        borderRadius: BorderRadius.all(Radius.circular(10))),
+                                                    elevation: 5,
+                                                    child: Column(
+                                                      mainAxisAlignment: MainAxisAlignment.start,
+                                                      crossAxisAlignment: CrossAxisAlignment.center,
+                                                      children: <Widget>[
+                                                        Container(
+                                                          height: 150,
+                                                          width: 150,
+                                                          decoration: BoxDecoration(
+                                                            image: DecorationImage(image: NetworkImage("${k12_obj!.data1.k12[i].img.toString()}"),fit: BoxFit.fill),
+                                                          ),
+                                                        ),
+                                                        Padding(
+                                                          padding: const EdgeInsets.fromLTRB(5, 5, 5, 5),
+                                                          child: Container(
+                                                            height: 95,
+                                                            width: 150,
+                                                            child: Column(
+                                                              crossAxisAlignment: CrossAxisAlignment.start,
+                                                              children: [
+                                                                Row(
+                                                                  mainAxisAlignment: MainAxisAlignment
+                                                                      .spaceBetween,
+                                                                  children: [
+                                                                    Flexible(
+                                                                      child: Text(" ${k12_obj!.data1.k12[i].courseName}\n",
+                                                                        style: TextStyle(fontSize: 15,
+                                                                            fontFamily: "Candara",
+                                                                            color: Colors.black),
+                                                                        maxLines: 2,
+                                                                        overflow: TextOverflow.ellipsis,
+                                                                      ),
+                                                                    ),
+                                                                    //IconButton(onPressed: (){  }, icon: Icon(Icons.favorite_outline,size: 15),color: Colors.grey,)
+
+                                                                  ],
+                                                                ),
+                                                                SizedBox(height: 12),
+                                                                Row(
+                                                                  children: [
+                                                                    Icon(Icons.menu_book,size: 12,color: Colors.grey),
+                                                                    Text(" ${k12_obj.data1.k12[i].chapter.toString()} Chapters", style: TextStyle(
+                                                                        fontSize: 12,
+                                                                        fontFamily: "Candara",
+                                                                        color: Colors
+                                                                            .grey)),
+
+
+
+                                                                  ],
+                                                                ),
+                                                                SizedBox(height: 4),
+                                                                Row(children: <Widget>[
+                                                                  Icon(Icons.play_arrow,size: 14,color: Colors.grey),
+                                                                  Text(" ${k12_obj.data1.k12[i].totalvideos.toString()} Videos", style: TextStyle(
+                                                                      fontSize: 12,
+                                                                      fontFamily: "Candara",
+                                                                      color: Colors
+                                                                          .grey)),
+                                                                  SizedBox(width: 4,),
+                                                                  Row(children: <Widget>[
+                                                                    Icon(Icons.pending_actions,size: 12,color: Colors.grey),
+                                                                    Text(" ${k12_obj.data1.k12[i].mcqcount.toString()} MCQ's", style: TextStyle(
+                                                                        fontSize: 12,
+                                                                        fontFamily: "Candara",
+                                                                        color: Colors
+                                                                            .grey)),
+                                                                  ],),
+
+                                                                ],),
+
+                                                                SizedBox(height: 5),
+                                                              ],
+                                                            ),
+                                                          ),
+                                                        )
+                                                      ],
+                                                    ),
+
+                                                  ),
+                                                )
+
+                                            ],
+
+
+                                          )
+                                      );
+                                    }
+                                    else
+                                      return Container(child: Center(child: CircularProgressIndicator()));
+                                  }
                               ),
 
-                          SizedBox(height: 15),
+                              SizedBox(height: 15),
 
 
-                        ],
-                      ),
-
-                    ),
-                    Container(
-                      decoration: BoxDecoration(borderRadius: BorderRadius.only(
-                          topLeft: Radius.circular(20),
-                          topRight: Radius.circular(20)), color: Colors.teal),
-                      padding: EdgeInsets.fromLTRB(15, 15, 15, 15),
-                      width: double.infinity,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: <Widget>[
-
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: <Widget>[
-                              Text("Competitive Exam", style: TextStyle(
-                                  fontFamily: "Candara",
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.white)),
-                              GestureDetector(
-                                  child: Text("See all", style: TextStyle(
-                                      fontSize: 18,
-                                      color: Colors.lightBlueAccent,
-                                      fontFamily: "Candara")),
-                                  onTap: () {
-                                    Navigator.push(context, MaterialPageRoute(
-                                        builder: (context) =>
-                                            seeallpage("Competitive Exam", 3)));
-                                  })
                             ],
                           ),
-                          SizedBox(height: 20),
-                          SingleChildScrollView(
-                              scrollDirection: Axis.horizontal,
-                              child: Row(
-                                  children: comp_e
-                              )
-                          ),
-                          SizedBox(height: 15),
-                        ],
-                      ),
 
-
-                    ),
-                    Container(
-                      padding: EdgeInsets.fromLTRB(15, 15, 15, 15),
-                      decoration: BoxDecoration(borderRadius: BorderRadius.only(
-                          topLeft: Radius.circular(20),
-                          topRight: Radius.circular(20)), color: Colors.white),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: <Widget>[
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        ),
+                        Container(
+                          decoration: BoxDecoration(borderRadius: BorderRadius.only(
+                              topLeft: Radius.circular(20),
+                              topRight: Radius.circular(20)), color: Colors.teal),
+                          padding: EdgeInsets.fromLTRB(15, 15, 15, 15),
+                          width: double.infinity,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.center,
                             children: <Widget>[
-                              Text("Mentor", style: TextStyle(
-                                  fontFamily: "Candara",
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.black)),
-                              GestureDetector(
-                                  child: Text("See all", style: TextStyle(
+
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: <Widget>[
+                                  Text("Competitive Exam", style: TextStyle(
+                                      fontFamily: "Candara",
                                       fontSize: 18,
-                                      color: Colors.lightBlueAccent,
-                                      fontFamily: "Candara")),
-                                  onTap: () {
-                                    Navigator.push(context, MaterialPageRoute(
-                                        builder: (context) =>
-                                            seeallpage("Mentors", 4)));
-                                  })
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.white)),
+                                  GestureDetector(
+                                      child: Text("See all", style: TextStyle(
+                                          fontSize: 18,
+                                          color: Colors.lightBlueAccent,
+                                          fontFamily: "Candara")),
+                                      onTap: () {
+                                        Navigator.push(context, MaterialPageRoute(
+                                            builder: (context) =>
+                                                seeallpage("Competitive Exam", 3)));
+                                      })
+                                ],
+                              ),
+                              SizedBox(height: 20),
+                              SingleChildScrollView(
+                                  scrollDirection: Axis.horizontal,
+                                  child: Row(
+                                      children: comp_e
+                                  )
+                              ),
+                              SizedBox(height: 15),
                             ],
                           ),
-                          SizedBox(height: 20),
-                          ElevatedButton(onPressed: (){
-                            Navigator.push(context, MaterialPageRoute(
-                                builder: (context) =>mentorProfile()));
-                          },
-                            child: Text("Become a mentor"),),
-                          SingleChildScrollView(
-                              scrollDirection: Axis.horizontal,
-                              child: Row(
-                                  children: mento
-                              )
+
+
+                        ),
+                        Container(
+                          padding: EdgeInsets.fromLTRB(15, 15, 15, 15),
+                          decoration: BoxDecoration(borderRadius: BorderRadius.only(
+                              topLeft: Radius.circular(20),
+                              topRight: Radius.circular(20)), color: Colors.white),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: <Widget>[
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: <Widget>[
+                                  Text("Mentor", style: TextStyle(
+                                      fontFamily: "Candara",
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.black)),
+                                  GestureDetector(
+                                      child: Text("See all", style: TextStyle(
+                                          fontSize: 18,
+                                          color: Colors.lightBlueAccent,
+                                          fontFamily: "Candara")),
+                                      onTap: () {
+                                        Navigator.push(context, MaterialPageRoute(
+                                            builder: (context) =>
+                                                seeallpage("Mentors", 4)));
+                                      })
+                                ],
+                              ),
+                              SizedBox(height: 20),
+                              SingleChildScrollView(
+                                  scrollDirection: Axis.horizontal,
+                                  child: Row(
+                                      children: mento
+                                  )
+                              ),
+                              SizedBox(height: 10,),
+                              if(token=="")
+                                ElevatedButton(onPressed: (){
+                                  Navigator.push(context, MaterialPageRoute(
+                                      builder: (context) =>mentorProfile()));
+                                },
+                                  child: Text("Become a mentor"),),
+                              SizedBox(height: 15)
+                            ],
                           ),
-                          SizedBox(height: 30)
-                        ],
-                      ),
+                        )
+                      ],
                     )
-                  ],
-                )
-          ),
+                ),
               );
             }
             else
-              return Container(child: CircularProgressIndicator());
+              return Center(child: Container(child: CircularProgressIndicator()));
           }
-        ),
-        FutureBuilder(
-          future: getLanding(),
-          builder: (context,AsyncSnapshot<LandingApi> snapshot1) {
-            if (token=="")
-              return Column(
-                children: [
-                  Container(
-                    height: 250,
-                    width: 250,
-                    decoration: BoxDecoration(
-                      image: DecorationImage(image: AssetImage("images/login.jpg"),fit: BoxFit.fill),
-                    ),
+      ),
+      FutureBuilder(
+        future: getLanding(),
+        builder: (context,AsyncSnapshot<LandingApi> snapshot1) {
+          if (token=="")
+            return Column(
+              children: [
+                Container(
+                  height: 250,
+                  width: 250,
+                  decoration: BoxDecoration(
+                    image: DecorationImage(image: AssetImage("images/login.jpg"),fit: BoxFit.fill),
                   ),
-                  Center(child: Text("Please Login to view Dashboard", style: TextStyle(
-                      fontSize: 20,
-                      fontFamily: "Candara",
-                      color: Colors.teal),),),
-                  SizedBox(height: 15,),
-                  Center(
+                ),
+                Center(child: Text("Please Login to view Dashboard", style: TextStyle(
+                    fontSize: 20,
+                    fontFamily: "Candara",
+                    color: Colors.teal),),),
+                SizedBox(height: 15,),
+                Center(
                     child:  RaisedButton(
                       onPressed: (){
                         Navigator.pushReplacement(
@@ -1268,90 +1344,92 @@ class _landingPageState extends State<landingPage> {
                         borderRadius: BorderRadius.circular(5.0),
                       ),
                     )
-            ),
-                ],
-              );
-            else
-              return FutureBuilder(
-                  future: createDash(classId),
-                  builder: (context,AsyncSnapshot<StuDashboard> snapshot) {
-                    //print(snapshot.data!.data.toString());
-                    if (snapshot.hasData)
-                    {
-                      print(snapshot.data!.message.toString());
-                      //LandingApi? landApi=snapshot.data;
-                      List<bool> isSelected = List.generate(snapshot.data!.data2.subjects2.length, (index) => false);
-                      return SingleChildScrollView(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.stretch,
-                          children: [
-                            Container(
-                              padding: EdgeInsets.only(left: 25, top: 10),
-                              child: Text(
-                                'Hi $userName',
-                                style: TextStyle(
-                                    fontSize: 17.5, color: Colors.black, fontFamily: "Candara"),
-                              ),
+                ),
+              ],
+            );
+          else
+            return FutureBuilder(
+                future: createDash(classId),
+                builder: (context,AsyncSnapshot<StuDashboard> snapshot) {
+                  //print(snapshot.data!.data.toString());
+                  if (snapshot.hasData)
+                  {
+                    print(snapshot.data!.message.toString());
+                    //LandingApi? landApi=snapshot.data;
+                    List<bool> isSelected = List.generate(snapshot.data!.data2.subjects2.length, (index) => false);
+                    return SingleChildScrollView(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          Container(
+                            padding: EdgeInsets.only(left: 25, top: 10),
+                            child: Text(
+                              'Hi $userName',
+                              style: TextStyle(
+                                  fontSize: 17.5, color: Colors.black, fontFamily: "Candara"),
                             ),
-                            Container(
-                              padding: EdgeInsets.only(left: 25, bottom: 10),
-                              child: Text(
-                                "Choose your courses",
-                                style: TextStyle(
-                                    fontFamily: "Candara", fontSize: 12.5, color: Colors.grey),
-                              ),
+                          ),
+                          Container(
+                            padding: EdgeInsets.only(left: 25, bottom: 10),
+                            child: Text(
+                              "Choose your courses",
+                              style: TextStyle(
+                                  fontFamily: "Candara", fontSize: 12.5, color: Colors.grey),
                             ),
-                            Container(
-                              //height: 100,
-                              padding: EdgeInsets.only(left: 1, right: 1, top: 10),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.stretch,
-                                children: <Widget>[
-                                  GridView.count(
-                                    shrinkWrap: true,
-                                    primary: false,
-                                    padding: const EdgeInsets.all(20),
-                                    crossAxisSpacing: 10,
-                                    mainAxisSpacing: 10,
-                                    crossAxisCount: 3,
-                                    children: <Widget>[
-                                      for(var i=0;i<snapshot.data!.data2.subjects2.length.toInt();i++)
-                                        GestureDetector(
-                                          onTap:(){
-                                            Navigator.push(context, MaterialPageRoute(
-                                                builder: (context) => k12_det(snapshot.data!.data2.subjects2[i].id.toString(),"images/english.png")));
+                          ),
+                          Container(
+                            //height: 100,
+                            padding: EdgeInsets.only(left: 1, right: 1, top: 10),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.stretch,
+                              children: <Widget>[
+                                GridView.count(
+                                  shrinkWrap: true,
+                                  primary: false,
+                                  padding: const EdgeInsets.all(20),
+                                  crossAxisSpacing: 10,
+                                  mainAxisSpacing: 10,
+                                  crossAxisCount: 3,
+                                  children: <Widget>[
+                                    for(var i=0;i<snapshot.data!.data2.subjects2.length.toInt();i++)
+                                      GestureDetector(
+                                        onTap:(){
+                                          Navigator.push(context, MaterialPageRoute(builder: (context) => k12Subject1(snapshot.data!.data2.subjects2[i].id.toString(),snapshot.data!.data2.subjects2[i].subjectName.toString())));
 
-                                          },
-                                          child: Container(
-                                            child: Column(
-                                              crossAxisAlignment: CrossAxisAlignment.center,
-                                              children: [
-                                                CircleAvatar(
-                                                    radius: 35,
-                                                    backgroundImage:
-                                                    NetworkImage('${snapshot.data!.data2.subjects2[i].icon.toString()}')),
-                                                SizedBox(height: 10),
-                                                Text(
-                                                  "${snapshot.data!.data2.subjects2[i].subjectName}",
-                                                  style: TextStyle(
-                                                      color: Colors.black,
-                                                      fontSize: 15,
-                                                      fontFamily: "Candara"),
-                                                )
-                                              ],
-                                            ),
+                                          /*Navigator.push(context, MaterialPageRoute(
+                                                builder: (context) => k12_det(snapshot.data!.data2.subjects2[i].id.toString(),"images/english.png")));*/
+
+                                        },
+                                        child: Container(
+                                          child: Column(
+                                            crossAxisAlignment: CrossAxisAlignment.center,
+                                            children: [
+                                              CircleAvatar(
+                                                  radius: 35,
+                                                  backgroundImage:
+                                                  NetworkImage('${snapshot.data!.data2.subjects2[i].icon.toString()}')),
+                                              SizedBox(height: 10),
+                                              Text(
+                                                "${snapshot.data!.data2.subjects2[i].subjectName}",
+                                                style: TextStyle(
+                                                    color: Colors.black,
+                                                    fontSize: 15,
+                                                    fontFamily: "Candara"),
+                                              )
+                                            ],
                                           ),
-
                                         ),
 
-                                    ],
-                                  ),
+                                      ),
 
-                                ],
-                              ),
+                                  ],
+                                ),
+
+                              ],
                             ),
-                            if(snapshot.data!.data2.assessments1.length>0)
-                              Padding(
+                          ),
+                          if(snapshot.data!.data2.assessments1.length>0)
+                            Padding(
                               padding: const EdgeInsets.only(left: 20.0),
                               child: Text("Assessments", style: TextStyle(
                                   fontFamily: "Candara",
@@ -1359,560 +1437,560 @@ class _landingPageState extends State<landingPage> {
                                   fontWeight: FontWeight.bold,
                                   color: Colors.black)),
                             ),
-                            Container(
-                              child: SingleChildScrollView(
+                          Container(
+                            child: SingleChildScrollView(
                                 padding: EdgeInsets.all(20),
-                                  scrollDirection: Axis.horizontal,
-                                  child: Row(
-                                      children: <Widget>[
-                                        for (var i = 0; i < snapshot.data!.data2.assessments1.length; i++)
-                                          GestureDetector(
-                                            onTap: () {
-                                              Navigator.push(
-                                                  context, MaterialPageRoute(builder: (context) =>
-                                                  assess(snapshot.data!.data2.assessments1[i].id,snapshot.data!.data2.assessments1[i].img.toString())));
-                                            },
-                                            child: Container(
+                                scrollDirection: Axis.horizontal,
+                                child: Row(
+                                    children: <Widget>[
+                                      for (var i = 0; i < snapshot.data!.data2.assessments1.length; i++)
+                                        GestureDetector(
+                                          onTap: () {
+                                            Navigator.push(
+                                                context, MaterialPageRoute(builder: (context) =>
+                                                assess(snapshot.data!.data2.assessments1[i].id,snapshot.data!.data2.assessments1[i].img.toString())));
+                                          },
+                                          child: Container(
 //width: 220,
-                                              child: Card(
-                                                elevation: 5,
-                                                shape: RoundedRectangleBorder(
-                                                    borderRadius: BorderRadius.all(Radius.circular(
-                                                        10))),
-                                                child: Column(
-                                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                                  children: <Widget>[
-                                                    SizedBox(height: 2.5),
-                                                    Container(
-                                                      height: 120,
-                                                      width: 120,
-                                                      decoration: BoxDecoration(
-                                                        image: DecorationImage(image: NetworkImage("${snapshot.data!.data2.assessments1[i].img}"),fit: BoxFit.fill),
+                                            child: Card(
+                                              elevation: 5,
+                                              shape: RoundedRectangleBorder(
+                                                  borderRadius: BorderRadius.all(Radius.circular(
+                                                      10))),
+                                              child: Column(
+                                                crossAxisAlignment: CrossAxisAlignment.center,
+                                                children: <Widget>[
+                                                  SizedBox(height: 2.5),
+                                                  Container(
+                                                    height: 120,
+                                                    width: 120,
+                                                    decoration: BoxDecoration(
+                                                      image: DecorationImage(image: NetworkImage("${snapshot.data!.data2.assessments1[i].img}"),fit: BoxFit.fill),
+                                                    ),
+                                                  ),
+                                                  Padding(
+                                                    padding: const EdgeInsets.fromLTRB(5, 5, 5, 5),
+                                                    child: Container(
+                                                      width: 130,
+                                                      child: Column(
+                                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                                        children: [
+                                                          Row(
+                                                            mainAxisSize: MainAxisSize.max,
+                                                            mainAxisAlignment: MainAxisAlignment
+                                                                .spaceBetween,
+                                                            children: [
+                                                              Flexible(
+                                                                child: Text(
+                                                                    "${snapshot.data!.data2.assessments1[i]
+                                                                        .assessmentName}\n",
+                                                                    overflow: TextOverflow.clip,
+                                                                    maxLines: 2,
+                                                                    style: TextStyle(fontSize: 16,
+                                                                        fontFamily: "Candara",
+                                                                        color: Colors.black)),
+                                                              ),
+//SizedBox(width: 5),
+                                                            ],
+                                                          ),
+                                                          SizedBox(height: 10),
+                                                          Row(
+                                                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                            children: [
+                                                              Text(
+                                                                  "${snapshot.data!.data2.assessments1[i].price.toString()}", style: TextStyle(fontSize:18,
+                                                                  fontFamily: "Candara",
+                                                                  color: Colors.red)),
+                                                              FavoriteButton(
+                                                                iconSize: 24,
+                                                                isFavorite: false,
+// iconDisabledColor: Colors.white,
+                                                                valueChanged: (_isFavorite) {
+                                                                  print('Is Favorite : $_isFavorite');
+                                                                },
+                                                              )
+                                                            ],
+                                                          )
+                                                        ],
                                                       ),
                                                     ),
-                                                    Padding(
-                                                      padding: const EdgeInsets.fromLTRB(5, 5, 5, 5),
-                                                      child: Container(
-                                                        width: 130,
-                                                        child: Column(
-                                                          crossAxisAlignment: CrossAxisAlignment.start,
-                                                          children: [
-                                                            Row(
-                                                              mainAxisSize: MainAxisSize.max,
-                                                              mainAxisAlignment: MainAxisAlignment
-                                                                  .spaceBetween,
-                                                              children: [
-                                                                Flexible(
-                                                                  child: Text(
-                                                                      "${snapshot.data!.data2.assessments1[i]
-                                                                          .assessmentName}\n",
-                                                                      overflow: TextOverflow.clip,
-                                                                      maxLines: 2,
-                                                                      style: TextStyle(fontSize: 16,
-                                                                          fontFamily: "Candara",
-                                                                          color: Colors.black)),
-                                                                ),
-//SizedBox(width: 5),
-                                                              ],
-                                                            ),
-                                                            SizedBox(height: 10),
-                                                            Row(
-                                                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                                              children: [
-                                                                Text(
-                                                                    "${snapshot.data!.data2.assessments1[i].price.toString()}", style: TextStyle(fontSize:18,
-                                                                    fontFamily: "Candara",
-                                                                    color: Colors.red)),
-                                                                FavoriteButton(
-                                                                  iconSize: 24,
-                                                                  isFavorite: false,
-// iconDisabledColor: Colors.white,
-                                                                  valueChanged: (_isFavorite) {
-                                                                    print('Is Favorite : $_isFavorite');
-                                                                  },
-                                                                )
-                                                              ],
-                                                            )
-                                                          ],
-                                                        ),
-                                                      ),
-                                                    )
-                                                  ],
-                                                ),
+                                                  )
+                                                ],
+                                              ),
 
+                                            ),
+                                          ),
+                                        )
+                                    ]
+                                )
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.only(left: 25, right: 20, bottom: 5),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: <Widget>[
+                                Text("ScoreCard",
+                                    style: TextStyle(
+                                        fontSize: 20,
+                                        color: Colors.black,
+                                        fontFamily: "Candara")),
+                                RaisedButton(
+                                  onPressed: () {},
+                                  child: Text('Browse all mock tests',
+                                      style: TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 12.0,
+                                          fontFamily: "Candara")),
+                                  color: Colors.teal,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(5.0),
+                                  ),
+                                )
+                              ],
+                            ),
+                          ),
+                          Container(
+                            child: SingleChildScrollView(
+                              scrollDirection: Axis.horizontal,
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Container(
+                                    padding: EdgeInsets.only(left: 20, right: 10),
+                                    width: 400,
+                                    height: 220,
+                                    child: Card(
+                                      color: Colors.white,
+                                      shadowColor: Colors.grey,
+                                      borderOnForeground: true,
+                                      child: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                                        children: <Widget>[
+                                          Container(
+                                            padding: EdgeInsets.only(left: 10, top: 10),
+                                            child: Text(
+                                              "ASSESSMENTS",
+                                              style: TextStyle(
+                                                  fontSize: 12,
+                                                  color: Colors.indigo,
+                                                  fontWeight: FontWeight.bold,
+                                                  fontFamily: "Candara"),
+                                            ),
+                                          ),
+                                          Container(
+                                            padding: EdgeInsets.only(left: 10, bottom: 5),
+                                            child: Text(
+                                              "Drive your competency",
+                                              style: TextStyle(
+                                                  fontFamily: "Candara",
+                                                  fontSize: 17.5,
+                                                  color: Colors.black),
+                                            ),
+                                          ),
+                                          SizedBox(height: 20,),
+                                          Padding(
+                                            padding: const EdgeInsets.only(left: 15, right: 15, top: 5),
+                                            child: Row(
+                                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                              children: <Widget>[
+                                                Text("Total Tests",
+                                                    style: TextStyle(
+                                                        fontWeight: FontWeight.bold,
+                                                        fontSize: 12,
+                                                        color: Colors.grey,
+                                                        fontFamily: "Candara")),
+                                                Text("Total Questions",
+                                                    style: TextStyle(
+                                                        fontWeight: FontWeight.bold,
+                                                        fontSize: 12,
+                                                        color: Colors.grey,
+                                                        fontFamily: "Candara")),
+                                                Text("Correct",
+                                                    style: TextStyle(
+                                                        fontWeight: FontWeight.bold,
+                                                        fontSize: 12,
+                                                        color: Colors.grey,
+                                                        fontFamily: "Candara")),
+                                                Text("Wrong",
+                                                    style: TextStyle(
+                                                        fontWeight: FontWeight.bold,
+                                                        fontSize: 12,
+                                                        color: Colors.grey,
+                                                        fontFamily: "Candara"))
+                                              ],
+                                            ),
+                                          ),
+                                          Padding(
+                                            padding: const EdgeInsets.only(
+                                                left: 20, right: 20, top: 5, bottom: 10),
+                                            child: Row(
+                                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                              children: <Widget>[
+                                                Center(
+                                                  child: Text("  ${snapshot.data!.data2.results.assessment.total}",
+                                                      style: TextStyle(
+                                                          fontWeight: FontWeight.bold,
+                                                          fontSize: 25,
+                                                          color: Colors.black,
+                                                          fontFamily: "Candara")),
+                                                ),
+                                                Center(
+                                                  child: Text("    ${snapshot.data!.data2.results.assessment.totalQuestions}",
+                                                      style: TextStyle(
+                                                          fontWeight: FontWeight.bold,
+                                                          fontSize: 25,
+                                                          color: Colors.black,
+                                                          fontFamily: "Candara")),
+                                                ),
+                                                Center(
+                                                  child: Text("    ${snapshot.data!.data2.results.assessment.correctAnswer}",
+                                                      style: TextStyle(
+                                                          fontWeight: FontWeight.bold,
+                                                          fontSize: 25,
+                                                          color: Colors.green,
+                                                          fontFamily: "Candara")),
+                                                ),
+                                                Center(
+                                                  child: Text("${snapshot.data!.data2.results.assessment.wrongAnswer}",
+                                                      style: TextStyle(
+                                                          fontWeight: FontWeight.bold,
+                                                          fontSize: 25,
+                                                          color: Colors.red,
+                                                          fontFamily: "Candara")),
+                                                )
+                                              ],
+                                            ),
+                                          ),
+                                          //SizedBox(height: 10),
+                                          Padding(
+                                            padding:
+                                            const EdgeInsets.only(left: 10, right: 10, bottom: 10),
+                                            child: RaisedButton(
+                                              onPressed: () {},
+                                              child: Text('PRACTICE AGAIN',
+                                                  style: TextStyle(
+                                                      color: Colors.white,
+                                                      fontSize: 15.0,
+                                                      fontFamily: "Candara")),
+                                              color: Colors.deepOrange,
+                                              shape: RoundedRectangleBorder(
+                                                borderRadius: BorderRadius.circular(5.0),
                                               ),
                                             ),
                                           )
-                                      ]
-                                  )
-                              ),
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.only(left: 25, right: 20, bottom: 5),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: <Widget>[
-                                  Text("ScoreCard",
-                                      style: TextStyle(
-                                          fontSize: 20,
-                                          color: Colors.black,
-                                          fontFamily: "Candara")),
-                                  RaisedButton(
-                                    onPressed: () {},
-                                    child: Text('Browse all mock tests',
-                                        style: TextStyle(
-                                            color: Colors.white,
-                                            fontSize: 12.0,
-                                            fontFamily: "Candara")),
-                                    color: Colors.teal,
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(5.0),
+                                        ],
+                                      ),
                                     ),
-                                  )
+                                  ),
+                                  Container(
+                                    padding: EdgeInsets.only(left: 10, right: 20),
+                                    width: 400,
+                                    height: 220,
+                                    child: Card(
+                                      color: Colors.white,
+                                      shadowColor: Colors.grey,
+                                      borderOnForeground: true,
+                                      child: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                                        children: <Widget>[
+                                          Container(
+                                            padding: EdgeInsets.only(left: 10, top: 10),
+                                            child: Text(
+                                              "K12-ASSESSMENTS",
+                                              style: TextStyle(
+                                                  fontSize: 12,
+                                                  color: Colors.indigo,
+                                                  fontWeight: FontWeight.bold,
+                                                  fontFamily: "Candara"),
+                                            ),
+                                          ),
+                                          Container(
+                                            padding: EdgeInsets.only(left: 10, bottom: 5),
+                                            child: Text(
+                                              "Drive your competency",
+                                              style: TextStyle(
+                                                  fontFamily: "Candara",
+                                                  fontSize: 17.5,
+                                                  color: Colors.black),
+                                            ),
+                                          ),
+                                          SizedBox(height: 20,),
+                                          Padding(
+                                            padding: const EdgeInsets.only(left: 15, right: 15, top: 5),
+                                            child: Row(
+                                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                              children: <Widget>[
+                                                Text("Total Tests",
+                                                    style: TextStyle(
+                                                        fontWeight: FontWeight.bold,
+                                                        fontSize: 12,
+                                                        color: Colors.grey,
+                                                        fontFamily: "Candara")),
+                                                Text("Total Questions",
+                                                    style: TextStyle(
+                                                        fontWeight: FontWeight.bold,
+                                                        fontSize: 12,
+                                                        color: Colors.grey,
+                                                        fontFamily: "Candara")),
+                                                Text("Correct",
+                                                    style: TextStyle(
+                                                        fontWeight: FontWeight.bold,
+                                                        fontSize: 12,
+                                                        color: Colors.grey,
+                                                        fontFamily: "Candara")),
+                                                Text("Wrong",
+                                                    style: TextStyle(
+                                                        fontWeight: FontWeight.bold,
+                                                        fontSize: 12,
+                                                        color: Colors.grey,
+                                                        fontFamily: "Candara"))
+                                              ],
+                                            ),
+                                          ),
+                                          Padding(
+                                            padding: const EdgeInsets.only(
+                                                left: 20, right: 20, top: 5, bottom: 10),
+                                            child: Row(
+                                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                              children: <Widget>[
+                                                Center(
+                                                  child: Text("  ${snapshot.data!.data2.results.k12.total}",
+                                                      style: TextStyle(
+                                                          fontWeight: FontWeight.bold,
+                                                          fontSize: 25,
+                                                          color: Colors.black,
+                                                          fontFamily: "Candara")),
+                                                ),
+                                                Center(
+                                                  child: Text("    ${snapshot.data!.data2.results.k12.totalQuestions}",
+                                                      style: TextStyle(
+                                                          fontWeight: FontWeight.bold,
+                                                          fontSize: 25,
+                                                          color: Colors.black,
+                                                          fontFamily: "Candara")),
+                                                ),
+                                                Center(
+                                                  child: Text("    ${snapshot.data!.data2.results.k12.correctAnswer}",
+                                                      style: TextStyle(
+                                                          fontWeight: FontWeight.bold,
+                                                          fontSize: 25,
+                                                          color: Colors.green,
+                                                          fontFamily: "Candara")),
+                                                ),
+                                                Center(
+                                                  child: Text("${snapshot.data!.data2.results.k12.wrongAnswer}",
+                                                      style: TextStyle(
+                                                          fontWeight: FontWeight.bold,
+                                                          fontSize: 25,
+                                                          color: Colors.red,
+                                                          fontFamily: "Candara")),
+                                                )
+                                              ],
+                                            ),
+                                          ),
+                                          //SizedBox(height: 10),
+                                          Padding(
+                                            padding:
+                                            const EdgeInsets.only(left: 10, right: 10, bottom: 10),
+                                            child: RaisedButton(
+                                              onPressed: () {},
+                                              child: Text('PRACTICE AGAIN',
+                                                  style: TextStyle(
+                                                      color: Colors.white,
+                                                      fontSize: 15.0,
+                                                      fontFamily: "Candara")),
+                                              color: Colors.deepOrange,
+                                              shape: RoundedRectangleBorder(
+                                                borderRadius: BorderRadius.circular(5.0),
+                                              ),
+                                            ),
+                                          )
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+
+
                                 ],
                               ),
                             ),
-                            Container(
-                              child: SingleChildScrollView(
+                          ),
+                          SizedBox(height: 10,),
+                          Padding(
+                            padding:
+                            const EdgeInsets.only(left: 20, right: 20, top: 15, bottom: 10),
+                            child: SingleChildScrollView(
                                 scrollDirection: Axis.horizontal,
-                                child: Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    Container(
-                                      padding: EdgeInsets.only(left: 20, right: 10),
-                                      width: 400,
-                                      height: 220,
+                                child: Row(children: <Widget>[
+                                  for(var i=0;i<snapshot.data!.data2.mentors.length.toInt();i++)
+                                    GestureDetector(
+                                      onTap: () {
+                                        Navigator.push(
+                                            context, MaterialPageRoute(
+                                            builder: (context) =>
+                                                mentor(snapshot.data!.data2.mentors[i]
+                                                    .id)));
+                                      },
                                       child: Card(
-                                        color: Colors.white,
-                                        shadowColor: Colors.grey,
-                                        borderOnForeground: true,
+                                        shape: RoundedRectangleBorder(
+                                            borderRadius: BorderRadius.all(Radius.circular(10))),
+                                        elevation: 5,
                                         child: Column(
-                                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                                          crossAxisAlignment: CrossAxisAlignment.center,
                                           children: <Widget>[
                                             Container(
-                                              padding: EdgeInsets.only(left: 10, top: 10),
-                                              child: Text(
-                                                "ASSESSMENTS",
-                                                style: TextStyle(
-                                                    fontSize: 12,
-                                                    color: Colors.indigo,
-                                                    fontWeight: FontWeight.bold,
-                                                    fontFamily: "Candara"),
-                                              ),
-                                            ),
-                                            Container(
-                                              padding: EdgeInsets.only(left: 10, bottom: 5),
-                                              child: Text(
-                                                "Drive your competency",
-                                                style: TextStyle(
-                                                    fontFamily: "Candara",
-                                                    fontSize: 17.5,
-                                                    color: Colors.black),
-                                              ),
-                                            ),
-                                            SizedBox(height: 20,),
-                                            Padding(
-                                              padding: const EdgeInsets.only(left: 15, right: 15, top: 5),
-                                              child: Row(
-                                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                                children: <Widget>[
-                                                  Text("Total Tests",
-                                                      style: TextStyle(
-                                                          fontWeight: FontWeight.bold,
-                                                          fontSize: 12,
-                                                          color: Colors.grey,
-                                                          fontFamily: "Candara")),
-                                                  Text("Total Questions",
-                                                      style: TextStyle(
-                                                          fontWeight: FontWeight.bold,
-                                                          fontSize: 12,
-                                                          color: Colors.grey,
-                                                          fontFamily: "Candara")),
-                                                  Text("Correct",
-                                                      style: TextStyle(
-                                                          fontWeight: FontWeight.bold,
-                                                          fontSize: 12,
-                                                          color: Colors.grey,
-                                                          fontFamily: "Candara")),
-                                                  Text("Wrong",
-                                                      style: TextStyle(
-                                                          fontWeight: FontWeight.bold,
-                                                          fontSize: 12,
-                                                          color: Colors.grey,
-                                                          fontFamily: "Candara"))
-                                                ],
+                                              height: 120,
+                                              width: 120,
+                                              decoration: BoxDecoration(
+                                                image: DecorationImage(image: NetworkImage("${snapshot.data!.data2.mentors[i].img.toString()}"),fit: BoxFit.fill),
                                               ),
                                             ),
                                             Padding(
-                                              padding: const EdgeInsets.only(
-                                                  left: 20, right: 20, top: 5, bottom: 10),
-                                              child: Row(
-                                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                                children: <Widget>[
-                                                  Center(
-                                                    child: Text("  ${snapshot.data!.data2.results.assessment.total}",
-                                                        style: TextStyle(
-                                                            fontWeight: FontWeight.bold,
-                                                            fontSize: 25,
-                                                            color: Colors.black,
-                                                            fontFamily: "Candara")),
-                                                  ),
-                                                  Center(
-                                                    child: Text("    ${snapshot.data!.data2.results.assessment.totalQuestions}",
-                                                        style: TextStyle(
-                                                            fontWeight: FontWeight.bold,
-                                                            fontSize: 25,
-                                                            color: Colors.black,
-                                                            fontFamily: "Candara")),
-                                                  ),
-                                                  Center(
-                                                    child: Text("    ${snapshot.data!.data2.results.assessment.correctAnswer}",
-                                                        style: TextStyle(
-                                                            fontWeight: FontWeight.bold,
-                                                            fontSize: 25,
-                                                            color: Colors.green,
-                                                            fontFamily: "Candara")),
-                                                  ),
-                                                  Center(
-                                                    child: Text("${snapshot.data!.data2.results.assessment.wrongAnswer}",
-                                                        style: TextStyle(
-                                                            fontWeight: FontWeight.bold,
-                                                            fontSize: 25,
-                                                            color: Colors.red,
-                                                            fontFamily: "Candara")),
-                                                  )
-                                                ],
-                                              ),
-                                            ),
-                                            //SizedBox(height: 10),
-                                            Padding(
-                                              padding:
-                                              const EdgeInsets.only(left: 10, right: 10, bottom: 10),
-                                              child: RaisedButton(
-                                                onPressed: () {},
-                                                child: Text('PRACTICE AGAIN',
-                                                    style: TextStyle(
-                                                        color: Colors.white,
-                                                        fontSize: 15.0,
-                                                        fontFamily: "Candara")),
-                                                color: Colors.deepOrange,
-                                                shape: RoundedRectangleBorder(
-                                                  borderRadius: BorderRadius.circular(5.0),
+                                              padding: const EdgeInsets.fromLTRB(8, 5, 8, 5),
+                                              child: Container(
+                                                width: 150,
+                                                child: Column(
+                                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                                  children: [
+                                                    Row(
+                                                      mainAxisAlignment: MainAxisAlignment
+                                                          .spaceBetween,
+                                                      children: [
+                                                        Text(snapshot.data!.data2.mentors[i].eduName,
+                                                            style: TextStyle(fontSize: 16,
+                                                                fontFamily: "Candara",
+                                                                color: Colors.black)),
+                                                        //IconButton(onPressed: (){  }, icon: Icon(Icons.favorite_outline,size: 25),color: Colors.grey,)
+                                                      ],
+                                                    ),
+                                                    Row(
+                                                      mainAxisAlignment: MainAxisAlignment.start,
+                                                      children: [
+                                                        Text(snapshot.data!.data2.mentors[i].specilization.toString(), style: TextStyle(
+                                                            fontSize: 15,
+                                                            fontFamily: "Candara",
+                                                            color: Colors.grey))
+                                                      ],
+
+                                                    ),
+                                                  ],
                                                 ),
                                               ),
                                             )
                                           ],
                                         ),
+
                                       ),
-                                    ),
-                                    Container(
-                                      padding: EdgeInsets.only(left: 10, right: 20),
-                                      width: 400,
-                                      height: 220,
-                                      child: Card(
-                                        color: Colors.white,
-                                        shadowColor: Colors.grey,
-                                        borderOnForeground: true,
-                                        child: Column(
-                                          crossAxisAlignment: CrossAxisAlignment.stretch,
-                                          children: <Widget>[
-                                            Container(
-                                              padding: EdgeInsets.only(left: 10, top: 10),
-                                              child: Text(
-                                                "K12-ASSESSMENTS",
-                                                style: TextStyle(
-                                                    fontSize: 12,
-                                                    color: Colors.indigo,
-                                                    fontWeight: FontWeight.bold,
-                                                    fontFamily: "Candara"),
-                                              ),
-                                            ),
-                                            Container(
-                                              padding: EdgeInsets.only(left: 10, bottom: 5),
-                                              child: Text(
-                                                "Drive your competency",
-                                                style: TextStyle(
-                                                    fontFamily: "Candara",
-                                                    fontSize: 17.5,
-                                                    color: Colors.black),
-                                              ),
-                                            ),
-                                            SizedBox(height: 20,),
-                                            Padding(
-                                              padding: const EdgeInsets.only(left: 15, right: 15, top: 5),
-                                              child: Row(
-                                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                                children: <Widget>[
-                                                  Text("Total Tests",
-                                                      style: TextStyle(
-                                                          fontWeight: FontWeight.bold,
-                                                          fontSize: 12,
-                                                          color: Colors.grey,
-                                                          fontFamily: "Candara")),
-                                                  Text("Total Questions",
-                                                      style: TextStyle(
-                                                          fontWeight: FontWeight.bold,
-                                                          fontSize: 12,
-                                                          color: Colors.grey,
-                                                          fontFamily: "Candara")),
-                                                  Text("Correct",
-                                                      style: TextStyle(
-                                                          fontWeight: FontWeight.bold,
-                                                          fontSize: 12,
-                                                          color: Colors.grey,
-                                                          fontFamily: "Candara")),
-                                                  Text("Wrong",
-                                                      style: TextStyle(
-                                                          fontWeight: FontWeight.bold,
-                                                          fontSize: 12,
-                                                          color: Colors.grey,
-                                                          fontFamily: "Candara"))
-                                                ],
-                                              ),
-                                            ),
-                                            Padding(
-                                              padding: const EdgeInsets.only(
-                                                  left: 20, right: 20, top: 5, bottom: 10),
-                                              child: Row(
-                                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                                children: <Widget>[
-                                                  Center(
-                                                    child: Text("  ${snapshot.data!.data2.results.k12.total}",
-                                                        style: TextStyle(
-                                                            fontWeight: FontWeight.bold,
-                                                            fontSize: 25,
-                                                            color: Colors.black,
-                                                            fontFamily: "Candara")),
-                                                  ),
-                                                  Center(
-                                                    child: Text("    ${snapshot.data!.data2.results.k12.totalQuestions}",
-                                                        style: TextStyle(
-                                                            fontWeight: FontWeight.bold,
-                                                            fontSize: 25,
-                                                            color: Colors.black,
-                                                            fontFamily: "Candara")),
-                                                  ),
-                                                  Center(
-                                                    child: Text("    ${snapshot.data!.data2.results.k12.correctAnswer}",
-                                                        style: TextStyle(
-                                                            fontWeight: FontWeight.bold,
-                                                            fontSize: 25,
-                                                            color: Colors.green,
-                                                            fontFamily: "Candara")),
-                                                  ),
-                                                  Center(
-                                                    child: Text("${snapshot.data!.data2.results.k12.wrongAnswer}",
-                                                        style: TextStyle(
-                                                            fontWeight: FontWeight.bold,
-                                                            fontSize: 25,
-                                                            color: Colors.red,
-                                                            fontFamily: "Candara")),
-                                                  )
-                                                ],
-                                              ),
-                                            ),
-                                            //SizedBox(height: 10),
-                                            Padding(
-                                              padding:
-                                              const EdgeInsets.only(left: 10, right: 10, bottom: 10),
-                                              child: RaisedButton(
-                                                onPressed: () {},
-                                                child: Text('PRACTICE AGAIN',
-                                                    style: TextStyle(
-                                                        color: Colors.white,
-                                                        fontSize: 15.0,
-                                                        fontFamily: "Candara")),
-                                                color: Colors.deepOrange,
-                                                shape: RoundedRectangleBorder(
-                                                  borderRadius: BorderRadius.circular(5.0),
-                                                ),
-                                              ),
-                                            )
-                                          ],
-                                        ),
-                                      ),
-                                    ),
-
-
-                                  ],
-                                ),
-                              ),
-                            ),
-                            SizedBox(height: 10,),
-                            Padding(
-                              padding:
-                              const EdgeInsets.only(left: 20, right: 20, top: 15, bottom: 10),
-                              child: SingleChildScrollView(
-                                  scrollDirection: Axis.horizontal,
-                                  child: Row(children: <Widget>[
-                                    for(var i=0;i<snapshot.data!.data2.mentors.length.toInt();i++)
-                                      GestureDetector(
-                                        onTap: () {
-                                          Navigator.push(
-                                              context, MaterialPageRoute(
-                                              builder: (context) =>
-                                                  mentor(snapshot.data!.data2.mentors[i]
-                                                      .id)));
-                                        },
-                                        child: Card(
-                                          shape: RoundedRectangleBorder(
-                                              borderRadius: BorderRadius.all(Radius.circular(10))),
-                                          elevation: 5,
-                                          child: Column(
-                                            crossAxisAlignment: CrossAxisAlignment.center,
-                                            children: <Widget>[
-                                              Container(
-                                                height: 120,
-                                                width: 120,
-                                                decoration: BoxDecoration(
-                                                  image: DecorationImage(image: NetworkImage("${snapshot.data!.data2.mentors[i].img.toString()}"),fit: BoxFit.fill),
-                                                ),
-                                              ),
-                                              Padding(
-                                                padding: const EdgeInsets.fromLTRB(8, 5, 8, 5),
-                                                child: Container(
-                                                  width: 150,
-                                                  child: Column(
-                                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                                    children: [
-                                                      Row(
-                                                        mainAxisAlignment: MainAxisAlignment
-                                                            .spaceBetween,
-                                                        children: [
-                                                          Text(snapshot.data!.data2.mentors[i].eduName,
-                                                              style: TextStyle(fontSize: 16,
-                                                                  fontFamily: "Candara",
-                                                                  color: Colors.black)),
-                                                          //IconButton(onPressed: (){  }, icon: Icon(Icons.favorite_outline,size: 25),color: Colors.grey,)
-                                                        ],
-                                                      ),
-                                                      Row(
-                                                        mainAxisAlignment: MainAxisAlignment.start,
-                                                        children: [
-                                                          Text(snapshot.data!.data2.mentors[i].specilization.toString(), style: TextStyle(
-                                                              fontSize: 15,
-                                                              fontFamily: "Candara",
-                                                              color: Colors.grey))
-                                                        ],
-
-                                                      ),
-                                                    ],
-                                                  ),
-                                                ),
-                                              )
-                                            ],
-                                          ),
-
-                                        ),
-                                      )
-                                  ])),
-                            ),
-                          ],
-                        ),
-                      );
-                    }
-                    else
-                      return Container(child: CircularProgressIndicator());
+                                    )
+                                ])),
+                          ),
+                        ],
+                      ),
+                    );
                   }
-              );
-          },
+                  else
+                    return Center(child: Container(child: CircularProgressIndicator()));
+                }
+            );
+        },
+      ),
+      SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Container(
+              color: Colors.white,
+              height: 100,
+              padding: EdgeInsets.only(left: 30, right: 30, top: 10),
+              child: Card(
+                color: Colors.blue,
+                shadowColor: Colors.grey,
+              ),
+            ),
+            SizedBox(height: 10),
+            Container(
+              color: Colors.white,
+              height: 100,
+              padding: EdgeInsets.only(left: 30, right: 30, top: 10),
+              child: Card(
+                color: Colors.blue,
+                shadowColor: Colors.grey,
+              ),
+            ),
+            SizedBox(height: 10),
+            Container(
+              color: Colors.white,
+              height: 100,
+              padding: EdgeInsets.only(left: 30, right: 30, top: 10),
+              child: Card(
+                color: Colors.blue,
+                shadowColor: Colors.grey,
+              ),
+            ),
+            SizedBox(height: 10),
+          ],
         ),
-        SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Container(
-                color: Colors.white,
-                height: 100,
-                padding: EdgeInsets.only(left: 30, right: 30, top: 10),
-                child: Card(
-                  color: Colors.blue,
-                  shadowColor: Colors.grey,
-                ),
+      ),
+      SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Container(
+              color: Colors.white,
+              height: 100,
+              padding: EdgeInsets.only(left: 30, right: 30, top: 10),
+              child: Card(
+                color: Colors.orange,
+                shadowColor: Colors.grey,
               ),
-              SizedBox(height: 10),
-              Container(
-                color: Colors.white,
-                height: 100,
-                padding: EdgeInsets.only(left: 30, right: 30, top: 10),
-                child: Card(
-                  color: Colors.blue,
-                  shadowColor: Colors.grey,
-                ),
+            ),
+            SizedBox(height: 10),
+            Container(
+              color: Colors.white,
+              height: 100,
+              padding: EdgeInsets.only(left: 30, right: 30, top: 10),
+              child: Card(
+                color: Colors.orange,
+                shadowColor: Colors.grey,
               ),
-              SizedBox(height: 10),
-              Container(
-                color: Colors.white,
-                height: 100,
-                padding: EdgeInsets.only(left: 30, right: 30, top: 10),
-                child: Card(
-                  color: Colors.blue,
-                  shadowColor: Colors.grey,
-                ),
+            ),
+            SizedBox(height: 10),
+            Container(
+              color: Colors.white,
+              height: 100,
+              padding: EdgeInsets.only(left: 30, right: 30, top: 10),
+              child: Card(
+                color: Colors.orange,
+                shadowColor: Colors.grey,
               ),
-              SizedBox(height: 10),
-            ],
-          ),
+            ),
+            SizedBox(height: 10),
+          ],
         ),
-        SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Container(
-                color: Colors.white,
-                height: 100,
-                padding: EdgeInsets.only(left: 30, right: 30, top: 10),
-                child: Card(
-                  color: Colors.orange,
-                  shadowColor: Colors.grey,
-                ),
-              ),
-              SizedBox(height: 10),
-              Container(
-                color: Colors.white,
-                height: 100,
-                padding: EdgeInsets.only(left: 30, right: 30, top: 10),
-                child: Card(
-                  color: Colors.orange,
-                  shadowColor: Colors.grey,
-                ),
-              ),
-              SizedBox(height: 10),
-              Container(
-                color: Colors.white,
-                height: 100,
-                padding: EdgeInsets.only(left: 30, right: 30, top: 10),
-                child: Card(
-                  color: Colors.orange,
-                  shadowColor: Colors.grey,
-                ),
-              ),
-              SizedBox(height: 10),
-            ],
-          ),
-        )
+      )
 
-      ];
+    ];
 
 
-      return Scaffold(
+    return Scaffold(
         backgroundColor: Colors.white,
         appBar: AppBar(
-          leading: Builder(
-            builder: (BuildContext context) {
-              return IconButton(
-                onPressed:(){ Scaffold.of(context).openDrawer();},
-                icon: Icon(Icons.menu,color: Colors.teal,),
-              );
-            },
-          ),
-          toolbarHeight: 70,
-          backgroundColor: Colors.white70,
-          //leading:
-          //Icon(Icons.menu, color: Colors.black, size: 30,),
-          //centerTitle: true,
-          actions: <IconButton>[
-            IconButton(
+            leading: Builder(
+              builder: (BuildContext context) {
+                return IconButton(
+                  onPressed:(){ Scaffold.of(context).openDrawer();},
+                  icon: Icon(Icons.menu,color: Colors.teal,),
+                );
+              },
+            ),
+            toolbarHeight: 70,
+            backgroundColor: Colors.white70,
+            //leading:
+            //Icon(Icons.menu, color: Colors.black, size: 30,),
+            //centerTitle: true,
+            actions: <IconButton>[
+              IconButton(
                 /*onPressed: () async {
               if(token=="")
               Navigator.push(
@@ -1934,13 +2012,13 @@ class _landingPageState extends State<landingPage> {
               }
             }*/
                 icon: Icon(Icons.notifications, color: Colors.teal, size: 30),
-              onPressed: (){},
-            )
-          ],
-          title: Text("Let's Start Learning", style: TextStyle(
-              fontSize: 20,
-              fontFamily: "Candara",
-              color: Colors.teal),)
+                onPressed: (){},
+              )
+            ],
+            title: Text("Let's Start Learning", style: TextStyle(
+                fontSize: 20,
+                fontFamily: "Candara",
+                color: Colors.teal),)
 
         ),
         drawer: Drawer(
@@ -1954,7 +2032,8 @@ class _landingPageState extends State<landingPage> {
                 ),
                 child: Text('MENU'),
               ),
-              ListTile(
+              if(token!="")
+                ListTile(
                 title: const Text('Profile'),
                 onTap: () {
                   // Update the state of the app
@@ -1963,7 +2042,8 @@ class _landingPageState extends State<landingPage> {
                   Navigator.pop(context);
                 },
               ),
-              ListTile(
+              if(token!="")
+                ListTile(
                 title: const Text('Logout'),
                 onTap: () {
                   setState(()  {
@@ -1994,39 +2074,39 @@ class _landingPageState extends State<landingPage> {
               ),
               BottomNavigationBarItem(
                 icon: Icon(
-                  Icons.school_outlined,
+                  Icons.book,
                   size: 30,
                 ),
-                label: 'Scholarship',
+                label: 'Challenge',
               ),
               BottomNavigationBarItem(
                   icon: Icon(Icons.notifications_active_outlined, size: 30),
-                  label: 'Exam Alert'),
+                  label: 'Alerts'),
             ],
             type: BottomNavigationBarType.shifting,
             currentIndex: _selectedIndex,
             onTap: _onItemTapped,
             elevation: 5),
         body: FutureBuilder(
-            future: getLanding(),
-            builder: (context, AsyncSnapshot<LandingApi> snapshot){
-              if(snapshot.hasData){
-                //sublen=snapshot.data?.data.subjects.length.toInt();
-                return SafeArea(child:_widgetOptions.elementAt(_selectedIndex));
-              }
-              else{
-                return Container(child: Center(child: CircularProgressIndicator()));
-              }
-            },
-          )
+          future: getLanding(),
+          builder: (context, AsyncSnapshot<LandingApi> snapshot){
+            if(snapshot.hasData){
+              //sublen=snapshot.data?.data.subjects.length.toInt();
+              return SafeArea(child:_widgetOptions.elementAt(_selectedIndex));
+            }
+            else{
+              return Container(child: Center(child: CircularProgressIndicator()));
+            }
+          },
+        )
 
-      );
-    }
+    );
+  }
 
 }
 final TextEditingController classController = TextEditingController();
 final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-
+String _dropDownValue="";
 enum ConfirmAction { Confirm }
 Future<Future<ConfirmAction?>> _asyncConfirmDialog(
     BuildContext context,
@@ -2039,6 +2119,9 @@ Future<Future<ConfirmAction?>> _asyncConfirmDialog(
     context: context,
     barrierDismissible: false, // user must tap button for close dialog!
     builder: (BuildContext context) {
+      String _currentSelectedVakue='';
+
+
       return AlertDialog(
         //title: Text('Delete This Contact?'),
         shape: RoundedRectangleBorder(
@@ -2064,7 +2147,7 @@ Future<Future<ConfirmAction?>> _asyncConfirmDialog(
                     ),
                   ),
                   SizedBox(height: 20),
-                  Form(
+                  /*Form(
                     key: _formKey,
                     child: Container(
                       padding: EdgeInsets.only(left: 10,right: 10),
@@ -2093,7 +2176,60 @@ Future<Future<ConfirmAction?>> _asyncConfirmDialog(
 // onSaved: (input) => _email = input!
                       ),
                     ),
+                  ),*/
+                  FormField<String>(
+                    builder: (FormFieldState<String> state) {
+                      String _currentSelectedValue='';
+                      return Container(
+                        height: 60,
+                        padding: EdgeInsets.only(left: 10,right: 10),
+                        child: InputDecorator(
+                          decoration: InputDecoration(
+                            //labelText: 'CLASS',
+                              prefixIcon: Icon(Icons.school,color: Colors.teal),
+                              labelStyle: TextStyle(fontFamily: "Candara"),
+                              errorStyle: TextStyle(fontFamily:"Candara",color: Colors.redAccent, fontSize: 16.0),
+                              //hintText: 'Please select expense',
+                              enabledBorder:OutlineInputBorder(
+                                  borderSide: const BorderSide(color: Colors.grey, width: 2.0),
+                                  borderRadius: BorderRadius.circular(5)),
+                              focusedBorder: OutlineInputBorder(
+                                  borderSide: const BorderSide(color: Colors.teal,width: 2.0),
+                                  borderRadius: BorderRadius.circular(5)
+                              )),
+                              //border: OutlineInputBorder(borderRadius: BorderRadius.circular(5.0))),
+                          isEmpty: _currentSelectedValue == '',
+                          child: DropdownButtonHideUnderline(
+                            child: DropdownButton(
+                              hint: _dropDownValue == null
+                                  ? Text('Dropdown')
+                                  : Text(
+                                _dropDownValue,
+                                style: TextStyle(fontFamily: "Candara",color: Colors.black,fontSize: 16),
+                              ),
+                              isExpanded: true,
+                              iconSize: 30.0,
+                              style: TextStyle(color: Colors.black),
+                              items: ["LKG","UKG","1", "2","3", "4","5", "6","7", "8","9", "10","11", "12"].map(
+                                    (val) {
+                                  return DropdownMenuItem<String>(
+                                    value: val,
+                                    child: Text(val),
+                                  );
+                                },
+                              ).toList(),
+                              onChanged: (String? val) {
+                                _dropDownValue = val!;
+                                (context as Element).markNeedsBuild();
+
+                              },
+                            )
+                          ),
+                        ),
+                      );
+                    },
                   ),
+
                 ],
               ),
               /*Divider(
@@ -2120,18 +2256,19 @@ Future<Future<ConfirmAction?>> _asyncConfirmDialog(
                     ),
                   ),
                   onPressed: () {
-                    if(_formKey.currentState!.validate())
+                    print(_dropDownValue);
+                    if(_dropDownValue!="")
+                    {
+                      classId=_dropDownValue;
+                      if(classId!="")
                       {
-                        classId=classController.text.toString();
-                        if(classId!="")
-                          {
-                            Navigator.of(context).pop(ConfirmAction.Confirm);
-                            Navigator.pushReplacement(
-                                context, MaterialPageRoute(builder: (context) => landing()));
-                          }
-
-
+                        Navigator.of(context).pop(ConfirmAction.Confirm);
+                        Navigator.pushReplacement(
+                            context, MaterialPageRoute(builder: (context) => landing()));
                       }
+
+
+                    }
                     //Navigator.of(context).pop(ConfirmAction.Confirm);
                   },
                 ),
@@ -2143,4 +2280,3 @@ Future<Future<ConfirmAction?>> _asyncConfirmDialog(
     },
   );
 }
-

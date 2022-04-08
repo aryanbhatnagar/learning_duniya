@@ -117,6 +117,7 @@ String questionsToJson(Questions data) => json.encode(data.toJson());
 
 var quizId = "";
 var ASSid="";
+var qtid="";
 late List allQuestionData = [];
 late List quizInputData = [];
 late List assignQuizData = [];
@@ -239,12 +240,15 @@ class Data {
 }
 
 
-Future<Questions> createQuestions(String id,String assID) async {
+Future<Questions> createQuestions(String id,String assID,String qtypeId) async {
   final String apiUrl =
       "http://ec2-13-234-116-155.ap-south-1.compute.amazonaws.com/api/question";
 
-  final response = await http.post(Uri.parse(apiUrl), body: {"assessment_id":assID,
-    "chapter_id":id});
+  final response = await http.post(Uri.parse(apiUrl), body: {
+    "assessment_id":assID,
+    "chapter_id":id,
+    "question_type_id":qtypeId,
+  });
 
   if (response.statusCode == 200) {
     final String responseString = response.body;
@@ -440,13 +444,15 @@ class quiz_assessment extends StatelessWidget {
   //const quiz({Key? key}) : super(key: key);
   late int id;
   late int asid;
-  quiz_assessment(this.id,this.asid);
+  late int qt_id;
+  quiz_assessment(this.id,this.asid,this.qt_id);
 
 
   @override
   Widget build(BuildContext context) {
     quizId = id.toString();
     ASSid=asid.toString();
+    qtid=qt_id.toString();
     print(quizId);
     return MaterialApp(
       home: quizpage(id),
@@ -505,7 +511,7 @@ class _quizpageState extends State<quizpage> with TickerProviderStateMixin {
           centerTitle: true,
         ),*/
         body: FutureBuilder(
-          future: createQuestions(quizId,ASSid),
+          future: createQuestions(quizId,ASSid,qtid),
           builder: (context, AsyncSnapshot<Questions> snapshot) {
             int noq=0;
             late VideoPlayerController _controller;
@@ -962,6 +968,7 @@ class _quizpageState extends State<quizpage> with TickerProviderStateMixin {
 
     allData = {
       "assessment_id" : ass_id,
+      "chapter_id":quizId,
       "start_time" : start_time,
       "end_time" : end_time,
       "ans_sheet":allQuestionData,

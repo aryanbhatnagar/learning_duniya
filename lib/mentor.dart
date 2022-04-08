@@ -13,6 +13,7 @@ String mentorToJson(Mentor data) => json.encode(data.toJson());
 
 var memId = "3";
 var like=0;
+int count=0;
 List<String> serviceList = <String>[];
 
 Future<Mentor> createMentor(String id) async {
@@ -127,6 +128,7 @@ class Educator {
     required this.reviews,
     required this.likes,
     required this.img,
+    required this.experience
 
   });
 
@@ -141,6 +143,7 @@ class Educator {
   var reviews;
   var likes;
   var img;
+  var experience;
 
 
   factory Educator.fromJson(Map<String, dynamic> json) => Educator(
@@ -155,6 +158,7 @@ class Educator {
     reviews: json["reviews"],
     likes: json["likes"],
     img: json["img"],
+    experience: json["exp"]
 
   );
 
@@ -170,6 +174,7 @@ class Educator {
     "reviews": reviews,
     "likes": likes,
     "img": img,
+    "exp": experience
 
   };
 }
@@ -182,11 +187,11 @@ class Service {
     required this.communicationVideo,
   });
 
-  int id;
-  String services;
-  String communicationText;
-  String communicationAudio;
-  String communicationVideo;
+  var id;
+  var services;
+  var communicationText;
+  var communicationAudio;
+  var communicationVideo;
 
   factory Service.fromJson(Map<String, dynamic> json) => Service(
     id: json["id"],
@@ -275,12 +280,13 @@ class _mentorpageState extends State<mentorpage> {
                                   Flexible(
                                     child: Text(men1!.data.educator.eduName.toString(),
                                         style: TextStyle(
-                                            fontSize: 28,
+                                            fontSize: 25,
                                             fontFamily: "Candara",
                                             color: Colors.black)),
                                   ),
-                                  FavoriteButton(
-                                    iconSize: 50,
+                                  if (token!="")
+                                    FavoriteButton(
+                                    iconSize: 30,
                                     isFavorite: false,
                                     valueChanged: (_isFavorite) async {
                                       Mentorlike Abc=await createMentorlike(memId);
@@ -294,41 +300,48 @@ class _mentorpageState extends State<mentorpage> {
                                   )
                                 ],
                               ),
-                              Text(men1.data.educator.specilization.toString(),
-                                  style: TextStyle(
-                                      fontSize: 20,
-                                      fontFamily: "Candara",
-                                      color: Colors.teal)),
+                              Row(
+                                children: [
+                                  Text("${men1.data.educator.specilization.toString()} | ${men1.data.educator.experience.toString()} yrs",
+                                      style: TextStyle(
+                                          fontSize: 15,
+                                          fontFamily: "Candara",
+                                          color: Colors.teal)),
+                                  VerticalDivider(width: 10,color: Colors.grey),
+                                ],
+                              ),
                               SizedBox(height: 10),
                               Row(
                                 mainAxisAlignment: MainAxisAlignment.start,
                                 children: [
                                   Icon(Icons.favorite, color: Colors.red, size: 22),
-                                  Text(men1.data.educator.likes.toString(),
+                                  Text(" ${men1.data.educator.likes.toString()}",
                                       style: TextStyle(
-                                          fontSize: 18,
+                                          fontSize: 16,
                                           fontFamily: "Candara",
                                           color: Colors.grey)),
                                   SizedBox(width: 30),
                                   Icon(Icons.play_arrow,
                                       color: Colors.lightBlueAccent, size: 25),
-                                  Text(men1.data.educator.reviews.toString(),
+                                  Text("${men1.data.educator.reviews.toString()}",
                                       style: TextStyle(
-                                          fontSize: 18,
+                                          fontSize: 16,
+                                          fontFamily: "Candara",
+                                          color: Colors.grey)),
+                                  SizedBox(width: 30),
+                                  Icon(Icons.location_on,
+                                      color: Colors.deepOrange, size: 25),
+                                  Text("${men1.data.educator.city.toString()}",
+                                      style: TextStyle(
+                                          fontSize: 16,
                                           fontFamily: "Candara",
                                           color: Colors.grey))
                                 ],
                               ),
-                              SizedBox(height: 20),
-                              Text("About Mentor",
-                                  style: TextStyle(
-                                      fontSize: 20,
-                                      fontFamily: "Candara",
-                                      color: Colors.black)),
                               SizedBox(height: 10),
                               Text(men1.data.educator.aboutUs.toString(),
                                   style: TextStyle(
-                                      fontSize: 18,
+                                      fontSize: 16,
                                       fontFamily: "Candara",
                                       color: Colors.grey)),
                               SizedBox(height: 10),
@@ -343,9 +356,7 @@ class _mentorpageState extends State<mentorpage> {
                                 ],
                               ),
                               SizedBox(height: 10),
-                              for (int i = 0;
-                              i < snapshot.data!.data.services.length;
-                              i++)
+                              for (int i = 0; i < snapshot.data!.data.services.length; i++)
                                 GestureDetector(
                                   onTap: () {},
                                   child: Center(
@@ -380,11 +391,7 @@ class _mentorpageState extends State<mentorpage> {
                                                       children: [
                                                         Center(
                                                             child: Text(
-                                                                snapshot
-                                                                    .data!
-                                                                    .data
-                                                                    .services[i]
-                                                                    .services,
+                                                                snapshot.data!.data.services[i].services,
                                                                 style: TextStyle(
                                                                     fontSize: 20,
                                                                     fontFamily:
@@ -402,45 +409,12 @@ class _mentorpageState extends State<mentorpage> {
                                                                 MaterialPageRoute(
                                                                   builder: (context) {
                                                                     serviceList.clear();
-                                                                    if (snapshot
-                                                                        .data!
-                                                                        .data
-                                                                        .services[i]
-                                                                        .communicationAudio !=
-                                                                        "")
-                                                                      serviceList.add(
-                                                                          snapshot
-                                                                              .data!
-                                                                              .data
-                                                                              .services[
-                                                                          i]
-                                                                              .communicationAudio);
-                                                                    if (snapshot
-                                                                        .data!
-                                                                        .data
-                                                                        .services[i]
-                                                                        .communicationText !=
-                                                                        "")
-                                                                      serviceList.add(
-                                                                          snapshot
-                                                                              .data!
-                                                                              .data
-                                                                              .services[
-                                                                          i]
-                                                                              .communicationText);
-                                                                    if (snapshot
-                                                                        .data!
-                                                                        .data
-                                                                        .services[i]
-                                                                        .communicationVideo !=
-                                                                        "")
-                                                                      serviceList.add(
-                                                                          snapshot
-                                                                              .data!
-                                                                              .data
-                                                                              .services[
-                                                                          i]
-                                                                              .communicationVideo);
+                                                                    if (snapshot.data!.data.services[i].communicationAudio != "")
+                                                                      serviceList.add(snapshot.data!.data.services[i].communicationAudio.toString());
+                                                                    if (snapshot.data!.data.services[i].communicationText != "")
+                                                                      serviceList.add(snapshot.data!.data.services[i].communicationText.toString());
+                                                                    if (snapshot.data!.data.services[i].communicationVideo != "")
+                                                                      serviceList.add(snapshot.data!.data.services[i].communicationVideo.toString());
                                                                     print(serviceList);
                                                                     /*return trial(
                                                                 serviceList);*/

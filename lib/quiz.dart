@@ -146,7 +146,7 @@ late SendData? _sendData;
 
 Future<SendData> createData(String startTime,String endTime,List ansdata,Result result) async {
   //ConvJson con=new ConvJson(assessmentId: assId, startTime: startTime, endTime: endTime, ansSheet: ansdata, result: result, status: "successful");
-  final String apiUrl = "http://ec2-13-234-116-155.ap-south-1.compute.amazonaws.com/api/assessmet/ansheet";
+  final String apiUrl = "http://ec2-13-234-116-155.ap-south-1.compute.amazonaws.com/api/k12/ansheet";
   //debugPrint(allData.toString());
 
   final response = await http.post(Uri.parse(apiUrl),
@@ -201,7 +201,7 @@ class SendData {
 }
 class Data {
   Data({
-    required this.assessmentId,
+    required this.chapterId,
     required this.userId,
     required this.testToken,
     required this.startTime,
@@ -211,7 +211,7 @@ class Data {
     required this.sheetStatus,
   });
 
-  String assessmentId;
+  String chapterId;
   int userId;
   String testToken;
   String startTime;
@@ -221,7 +221,7 @@ class Data {
   String sheetStatus;
 
   factory Data.fromJson(Map<String, dynamic> json) => Data(
-    assessmentId: json["assessment_id"],
+    chapterId: json["chapter_id"],
     userId: json["user_id"],
     testToken: json["test_token"],
     startTime: json["start_time"],
@@ -232,7 +232,7 @@ class Data {
   );
 
   Map<String, dynamic> toJson() => {
-    "assessment_id": assessmentId,
+    "chapter_id": chapterId,
     "user_id": userId,
     "test_token": testToken,
     "start_time": startTime,
@@ -917,7 +917,7 @@ class _quizpageState extends State<quizpage> with TickerProviderStateMixin {
     };
 
     allData = {
-      "assessment_id" : ass_id,
+      "chapter_id" : quizId,
       "start_time" : start_time,
       "end_time" : end_time,
       "ans_sheet":allQuestionData,

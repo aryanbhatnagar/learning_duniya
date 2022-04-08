@@ -401,7 +401,7 @@ class _LoginPageState extends State<Login> {
 
 final TextEditingController classController = TextEditingController();
 final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-
+String _dropDownValue="";
 enum ConfirmAction { Confirm }
 Future<Future<ConfirmAction?>> _asyncConfirmDialog(
     BuildContext context,
@@ -414,6 +414,9 @@ Future<Future<ConfirmAction?>> _asyncConfirmDialog(
     context: context,
     barrierDismissible: false, // user must tap button for close dialog!
     builder: (BuildContext context) {
+      String _currentSelectedVakue='';
+
+
       return AlertDialog(
         //title: Text('Delete This Contact?'),
         shape: RoundedRectangleBorder(
@@ -439,11 +442,12 @@ Future<Future<ConfirmAction?>> _asyncConfirmDialog(
                     ),
                   ),
                   SizedBox(height: 20),
-                  Form(
+                  /*Form(
                     key: _formKey,
                     child: Container(
                       padding: EdgeInsets.only(left: 10,right: 10),
                       child: TextFormField(
+
                         controller: classController,
                         validator: (input) {
                           if (input!.isEmpty) return 'Enter Class';
@@ -467,7 +471,60 @@ Future<Future<ConfirmAction?>> _asyncConfirmDialog(
 // onSaved: (input) => _email = input!
                       ),
                     ),
+                  ),*/
+                  FormField<String>(
+                    builder: (FormFieldState<String> state) {
+                      String _currentSelectedValue='';
+                      return Container(
+                        height: 60,
+                        padding: EdgeInsets.only(left: 10,right: 10),
+                        child: InputDecorator(
+                          decoration: InputDecoration(
+                            //labelText: 'CLASS',
+                              prefixIcon: Icon(Icons.school,color: Colors.teal),
+                              labelStyle: TextStyle(fontFamily: "Candara"),
+                              errorStyle: TextStyle(fontFamily:"Candara",color: Colors.redAccent, fontSize: 16.0),
+                              //hintText: 'Please select expense',
+                              enabledBorder:OutlineInputBorder(
+                                  borderSide: const BorderSide(color: Colors.grey, width: 2.0),
+                                  borderRadius: BorderRadius.circular(5)),
+                              focusedBorder: OutlineInputBorder(
+                                  borderSide: const BorderSide(color: Colors.teal,width: 2.0),
+                                  borderRadius: BorderRadius.circular(5)
+                              )),
+                          //border: OutlineInputBorder(borderRadius: BorderRadius.circular(5.0))),
+                          isEmpty: _currentSelectedValue == '',
+                          child: DropdownButtonHideUnderline(
+                              child: DropdownButton(
+                                hint: _dropDownValue == null
+                                    ? Text('Dropdown')
+                                    : Text(
+                                  _dropDownValue,
+                                  style: TextStyle(fontFamily: "Candara",color: Colors.black,fontSize: 16),
+                                ),
+                                isExpanded: true,
+                                iconSize: 30.0,
+                                style: TextStyle(color: Colors.black),
+                                items: ["LKG","UKG","1", "2","3", "4","5", "6","7", "8","9", "10","11", "12"].map(
+                                      (val) {
+                                    return DropdownMenuItem<String>(
+                                      value: val,
+                                      child: Text(val),
+                                    );
+                                  },
+                                ).toList(),
+                                onChanged: (String? val) {
+                                  _dropDownValue = val!;
+                                  (context as Element).markNeedsBuild();
+
+                                },
+                              )
+                          ),
+                        ),
+                      );
+                    },
                   ),
+
                 ],
               ),
               /*Divider(
@@ -494,19 +551,20 @@ Future<Future<ConfirmAction?>> _asyncConfirmDialog(
                     ),
                   ),
                   onPressed: () {
-                    if(_formKey.currentState!.validate())
+                    print(_dropDownValue);
+                    if(_dropDownValue!="")
                     {
-                      classId=classController.text.toString();
+                      classId=_dropDownValue;
                       if(classId!="")
-                        {
-                          Navigator.of(context).pop(ConfirmAction.Confirm);
-                          Navigator.pushReplacement(
-                              context, MaterialPageRoute(builder: (context) => landing()));
+                      {
+                        Navigator.of(context).pop(ConfirmAction.Confirm);
+                        Navigator.pushReplacement(
+                            context, MaterialPageRoute(builder: (context) => landing()));
+                      }
 
-                        }
 
                     }
-
+                    //Navigator.of(context).pop(ConfirmAction.Confirm);
                   },
                 ),
               ],

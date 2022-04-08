@@ -5,10 +5,11 @@ import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
 import 'package:flutter/cupertino.dart';
 import 'globals.dart';
+import 'package:wakelock/wakelock.dart';
 
 Videolike videolikeFromJson(String str) => Videolike.fromJson(json.decode(str));
 String videolikeToJson(Videolike data) => json.encode(data.toJson());
-
+var dispLike=0;
 var like=0;
 var video_id="";
 var count =0;
@@ -75,7 +76,7 @@ class video extends StatefulWidget {
   late String name;
   late String vid;
   late String description;
-  late String like;
+  late int like;
   late String visit;
   video(this.url,this.name,this.description,this.vid,this.like,this.visit); //const video({Key? key}) : super(key: key);
 
@@ -88,7 +89,7 @@ class _videoState extends State<video> {
   late String _name;
   late String _vid;
   late String _description;
-  late String _like;
+  late int _like;
   late String _visit;
   _videoState(this._url,this._name,this._description,this._vid,this._like,this._visit);
 
@@ -100,17 +101,21 @@ class _videoState extends State<video> {
     super.initState();
     _controller = VideoPlayerController.network(_url);
         _controller.addListener(() {
-      setState(() {});
+      setState(() {
+      });
     });
 
     _controller.setLooping(true);
     _controller.initialize().then((_) => setState(() {}));
     _controller.play();
 
+
+
   }
 
   @override
   Widget build(BuildContext context) {
+    dispLike=_like;
     video_id=_vid;
     if (count==0) {
       createVideolike(video_id);
@@ -167,12 +172,19 @@ class _videoState extends State<video> {
                       iconSize: 40,
                       isFavorite: false,
                       valueChanged: (_isFavorite) async {
-                        Videolike Abc=await createVideovisit(video_id);
-                        if(like==1)
-                          print("video like successfull");
-                        setState(() {
+                        if(_isFavorite==true){
+                          Videolike Abc=await createVideovisit(video_id);
+                          if(like==1)
+                            print("video like successfull");
+                          setState(() {
+                            dispLike++;
+                          });
+                        }
+                        else
+                          setState(() {
+                            dispLike--;
+                          });
 
-                        });
                         print('Is Favorite : $_isFavorite');
                       },
                     )
@@ -185,7 +197,7 @@ class _videoState extends State<video> {
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: [
                     Icon(Icons.favorite,color: Colors.red,size: 22),
-                    Text(_like.toString(),style: TextStyle(fontSize:15,fontFamily: "Candara",color: Colors.teal)),
+                    Text(dispLike.toString(),style: TextStyle(fontSize:15,fontFamily: "Candara",color: Colors.teal)),
                     SizedBox(width: 30),
                     Icon(Icons.play_arrow_rounded,color: Colors.blue,size: 27),
                     Text(_visit.toString(),style: TextStyle(fontSize:15,fontFamily: "Candara",color: Colors.grey))
@@ -193,9 +205,7 @@ class _videoState extends State<video> {
                 ),
               ),
               Padding(padding: EdgeInsets.fromLTRB(10,10,10,0),
-                child: Text("Description",style: TextStyle(fontFamily: "Candara",fontSize: 22,color: Colors.grey),maxLines: 2,overflow: TextOverflow.ellipsis),),
-              Padding(padding: EdgeInsets.fromLTRB(10,10,10,0),
-              child: Text(_description,style: TextStyle(fontFamily: "Candara",fontSize: 16,color: Colors.grey),maxLines: 2,overflow: TextOverflow.ellipsis),),
+              child: Text(_description,style: TextStyle(fontFamily: "Candara",fontSize: 16,color: Colors.grey)),),
             ],
           ),
         ),
@@ -266,7 +276,7 @@ class _ControlsOverlay extends StatelessWidget {
           },
         ),
         Align(
-          alignment: Alignment.topLeft,
+          alignment: Alignment.bottomRight,
           child: Padding(
             padding: const EdgeInsets.all(8.0),
             child: Container(
