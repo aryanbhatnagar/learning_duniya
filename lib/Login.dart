@@ -9,15 +9,16 @@ import 'package:learning_duniya/forgot_password.dart';
 import 'package:learning_duniya/main.dart';
 import 'package:learning_duniya/profile.dart';
 import 'globals.dart';
+import 'main.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'landing.dart';
 
 late Login1? _log =null;
 late Map x;
+
 Login1 login1FromJson(String str) => Login1.fromJson(json.decode(str));
 String login1ToJson(Login1 data) => json.encode(data.toJson());
-
 class Login1 {
   Login1({
     required this.token,
@@ -46,7 +47,6 @@ class Login1 {
 
   };
 }
-
 class User {
   User({
     required this.id,
@@ -119,7 +119,14 @@ class User {
   };
 }
 
+Future<void> _incrementCounter(int role) async {
+  final SharedPreferences prefs = await SharedPreferences.getInstance();
+  prefs.clear();
+  prefs.setString('role', role.toString());
+  prefs.setString('token', token);
+  prefs.setString('username', userName);
 
+}
 
 class Login extends StatefulWidget {
   const Login({Key? key}) : super(key: key);
@@ -304,11 +311,13 @@ class _LoginPageState extends State<Login> {
                                           userEmail = _log!.user.email;
                                         });
                                         if (_log!.role == "1") {
-                                          if (classId != "")
+                                          if (classId != "") {
+                                            await _incrementCounter(1);
                                             Navigator.push(context,
                                                 MaterialPageRoute(
                                                     builder: (context) =>
                                                         Dashboard(classId)));
+                                          }
                                           else {
                                             final Future<
                                                 ConfirmAction?> action =
@@ -320,11 +329,13 @@ class _LoginPageState extends State<Login> {
                                                 [],
                                                 'None');
                                           }
+
                                         }
                                         else if(x["role"]=="2"){
                                           setState(() {
                                             token=x["token"];
                                           });
+                                          await _incrementCounter(2);
                                           Navigator.pushReplacement(context,
                                               MaterialPageRoute(
                                                   builder: (context) =>
@@ -496,13 +507,14 @@ Future<Future<ConfirmAction?>> _asyncConfirmDialog(
                           isEmpty: _currentSelectedValue == '',
                           child: DropdownButtonHideUnderline(
                               child: DropdownButton(
+                                menuMaxHeight: 200,
                                 hint: _dropDownValue == null
                                     ? Text('Dropdown')
                                     : Text(
                                   _dropDownValue,
                                   style: TextStyle(fontFamily: "Candara",color: Colors.black,fontSize: 16),
                                 ),
-                                isExpanded: true,
+                                isExpanded: false,
                                 iconSize: 30.0,
                                 style: TextStyle(color: Colors.black),
                                 items: ["LKG","UKG","1", "2","3", "4","5", "6","7", "8","9", "10","11", "12"].map(

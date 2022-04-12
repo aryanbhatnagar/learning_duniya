@@ -749,7 +749,7 @@ class _seeallpageState extends State<seeallpage> {
                                                //fontWeight: FontWeight.bold,
                                                fontFamily: 'Candara',
                                                color: Colors.grey,
-                                               fontSize: 13,
+                                               fontSize: 13 ,
                                              ),
                                              maxLines: 5,
                                              overflow: TextOverflow.ellipsis),

@@ -9,6 +9,7 @@ import 'package:learning_duniya/k12details.dart';
 import 'package:learning_duniya/k12subjects.dart';
 import 'package:learning_duniya/mentor.dart';
 import 'package:learning_duniya/mentor_profile.dart';
+import 'package:learning_duniya/navigationScreen.dart';
 import 'package:learning_duniya/profile.dart';
 import 'package:learning_duniya/quiz.dart';
 import 'package:group_button/group_button.dart';
@@ -18,6 +19,24 @@ import 'package:toggle_switch/toggle_switch.dart';
 import 'Login.dart';
 import 'package:http/http.dart' as http;
 import 'globals.dart';
+
+Future<K12Card> getMentorApi(String cls, String sub) async {
+  final String apiUrl =
+      "http://ec2-13-234-116-155.ap-south-1.compute.amazonaws.com/api/getk12";
+  final response = await http.post(Uri.parse(apiUrl), headers: <String, String>{
+    "Authorization": "Bearer $token",
+  }, body: {"class_id": cls, "subject_id": sub});
+
+  if (response.statusCode == 200) {
+    print(response.statusCode.toString());
+    final String responseString = response.body;
+    debugPrint(response.body);
+    return k12CardFromJson(responseString);
+  } else {
+    throw Exception('Failed to load album');
+  }
+}
+
 
 
 var CLASSid;
@@ -1393,9 +1412,16 @@ class _landingPageState extends State<landingPage> {
                                   children: <Widget>[
                                     for(var i=0;i<snapshot.data!.data2.subjects2.length.toInt();i++)
                                       GestureDetector(
-                                        onTap:(){
-                                          Navigator.push(context, MaterialPageRoute(builder: (context) => k12Subject1(snapshot.data!.data2.subjects2[i].id.toString(),snapshot.data!.data2.subjects2[i].subjectName.toString())));
-
+                                        onTap:() async {
+                                          //Navigator.push(context, MaterialPageRoute(builder: (context) => k12Subject1(snapshot.data!.data2.subjects2[i].id.toString(),snapshot.data!.data2.subjects2[i].subjectName.toString())));
+                                          Future<SubjectAction?> action =
+                                              await _asyncSubjectDialog(
+                                              context,
+                                              'Mentor Name',
+                                                  snapshot.data!.data2.subjects2[i].id.toString(),
+                                              'Communication',
+                                              [],
+                                              'None');
                                           /*Navigator.push(context, MaterialPageRoute(
                                                 builder: (context) => k12_det(snapshot.data!.data2.subjects2[i].id.toString(),"images/english.png")));*/
 
@@ -1536,7 +1562,11 @@ class _landingPageState extends State<landingPage> {
                                         color: Colors.black,
                                         fontFamily: "Candara")),
                                 RaisedButton(
-                                  onPressed: () {},
+                                  onPressed: () {
+                                    Navigator.push(
+                                        context, MaterialPageRoute(builder: (context) =>navigationScreenPage()));
+
+                                  },
                                   child: Text('Browse all mock tests',
                                       style: TextStyle(
                                           color: Colors.white,
@@ -2056,6 +2086,15 @@ class _landingPageState extends State<landingPage> {
                   Navigator.pop(context);
                 },
               ),
+              if(token=="")
+                ListTile(
+                  title: const Text('Login'),
+                  onTap: () {
+                    Navigator.pop(context);
+                    Navigator.push(context, MaterialPageRoute(
+                        builder: (context) => Login()));
+                  },
+                )
             ],
           ),
         ),
@@ -2107,7 +2146,7 @@ class _landingPageState extends State<landingPage> {
 final TextEditingController classController = TextEditingController();
 final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 String _dropDownValue="";
-enum ConfirmAction { Confirm }
+enum ConfirmAction { Confirm, Cancel }
 Future<Future<ConfirmAction?>> _asyncConfirmDialog(
     BuildContext context,
     String userName,
@@ -2207,7 +2246,7 @@ Future<Future<ConfirmAction?>> _asyncConfirmDialog(
                                 _dropDownValue,
                                 style: TextStyle(fontFamily: "Candara",color: Colors.black,fontSize: 16),
                               ),
-                              isExpanded: true,
+                              isExpanded: false,
                               iconSize: 30.0,
                               style: TextStyle(color: Colors.black),
                               items: ["LKG","UKG","1", "2","3", "4","5", "6","7", "8","9", "10","11", "12"].map(
@@ -2248,6 +2287,29 @@ Future<Future<ConfirmAction?>> _asyncConfirmDialog(
                 ElevatedButton(
                   style: ButtonStyle(
                       backgroundColor: MaterialStateProperty.all<Color>(
+                          Colors.deepOrange)),
+                  child: Text(
+                    'Cancel',
+                    style: TextStyle(
+                      fontFamily: 'Candara',
+                    ),
+                  ),
+                  onPressed: () {
+
+                        //Navigator.of(context).pop(ConfirmAction.Confirm);
+                        Navigator.pushReplacement(
+                            context, MaterialPageRoute(builder: (context) => landing()));
+
+
+
+
+                    //Navigator.of(context).pop(ConfirmAction.Confirm);
+                  },
+                ),
+                SizedBox(width: 10),
+                ElevatedButton(
+                  style: ButtonStyle(
+                      backgroundColor: MaterialStateProperty.all<Color>(
                           Colors.teal)),
                   child: Text(
                     'CONFIRM',
@@ -2262,7 +2324,7 @@ Future<Future<ConfirmAction?>> _asyncConfirmDialog(
                       classId=_dropDownValue;
                       if(classId!="")
                       {
-                        Navigator.of(context).pop(ConfirmAction.Confirm);
+                        //Navigator.of(context).pop(ConfirmAction.Confirm);
                         Navigator.pushReplacement(
                             context, MaterialPageRoute(builder: (context) => landing()));
                       }
@@ -2270,6 +2332,125 @@ Future<Future<ConfirmAction?>> _asyncConfirmDialog(
 
                     }
                     //Navigator.of(context).pop(ConfirmAction.Confirm);
+                  },
+                ),
+              ],
+            ),
+          ),
+        ],
+      );
+    },
+  );
+}
+
+enum SubjectAction { Confirm }
+Future<Future<SubjectAction?>> _asyncSubjectDialog(
+    BuildContext context,
+    String userName,
+    String SubjectID,
+    String modeOfC,
+    List<String> selected,
+    String comments) async {
+  return showDialog<SubjectAction>(
+    context: context,
+    barrierDismissible: false, // user must tap button for close dialog!
+    builder: (BuildContext context) {
+      String _currentSelectedVakue='';
+
+
+      return AlertDialog(
+        //title: Text('Delete This Contact?'),
+        shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.all(Radius.circular(15))),
+        title: Text("Book List"),
+        content: Container(
+          width: double.infinity,
+          //height: Wrap(),
+          child: FutureBuilder(
+            future: getMentorApi(classId.toString(), SubjectID),
+            builder: (context, AsyncSnapshot<K12Card> snapshot) {
+              if(snapshot.hasData){
+                if(snapshot.data!.data1.k12.length>0)
+                  return SingleChildScrollView(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Container(
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              for(var i=0;i<snapshot.data!.data1.k12.length;i++)
+                                Padding(
+                                  padding: const EdgeInsets.fromLTRB(0,10,0,0),
+                                  child: GestureDetector(
+                                    onTap:(){
+                                      Navigator.push(context, MaterialPageRoute(
+                                          builder: (context) => k12_det(snapshot.data!.data1.k12[i].id.toString(),"images/english.png")));
+
+                                      /*Navigator.push(context, MaterialPageRoute(
+                                                      builder: (context) => k12_det(snapshot.data!.data2.subjects2[i].id.toString(),"images/english.png")));*/
+
+                                    },
+                                    child: Container(
+                                      child: Column(
+                                        mainAxisAlignment: MainAxisAlignment.center,
+                                        crossAxisAlignment: CrossAxisAlignment.center,
+                                        children: [
+                                          CircleAvatar(
+                                              radius: 45,
+                                              backgroundImage:
+                                              NetworkImage('${snapshot.data!.data1.k12[i].img.toString()}')),
+                                          SizedBox(height: 10),
+                                          Text(
+                                            "${snapshot.data!.data1.k12[i].courseName}",
+                                            style: TextStyle(
+                                                color: Colors.black,
+                                                fontSize: 15,
+                                                fontFamily: "Candara"),
+                                          )
+                                        ],
+                                      ),
+                                    ),
+
+                                  ),
+                                ),
+                            ],
+                          ),
+                        ),
+                        SizedBox(height: 10,)
+                      ],
+                    ),
+                  );
+                else
+                  return Center(child: Container(
+                      child: Text("No books for this subject",style: TextStyle(fontFamily: "Candara",fontSize: 20),)),);
+              } else {
+                return Container(
+                  child: Center(
+                    child: CircularProgressIndicator(),
+                  ),
+                );
+              }
+            },
+          ),
+        ),
+        actions: <Widget>[
+          Center(
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                ElevatedButton(
+                  style: ButtonStyle(
+                      backgroundColor: MaterialStateProperty.all<Color>(
+                          Colors.teal)),
+                  child: Text(
+                    'Cancel',
+                    style: TextStyle(
+                      fontFamily: 'Candara',
+                    ),
+                  ),
+                  onPressed: () {
+                    Navigator.of(context).pop(SubjectAction.Confirm);
                   },
                 ),
               ],
