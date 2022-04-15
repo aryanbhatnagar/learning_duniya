@@ -278,8 +278,6 @@ class Student {
   };
 }
 
-
-
 Future<MentorApi> getMentorApi() async {
   final String apiUrl =
       "http://ec2-13-234-116-155.ap-south-1.compute.amazonaws.com/api/mentor/profile";
@@ -618,10 +616,8 @@ Future<MenteeReviewData> getMenteeRequestInvite(String id, String name) async {
   final String apiUrl =
       "http://ec2-13-234-116-155.ap-south-1.compute.amazonaws.com/api/mentor/help/sent/invition";
   final response = await http.post(Uri.parse(apiUrl),
-      headers: <String, String>{"Authorization": "Bearer $token"}, body: {
-        "id": id,
-        "status":"accepted"
-      });
+      headers: <String, String>{"Authorization": "Bearer $token"},
+      body: {"id": id, "status": "accepted"});
 
   if (response.statusCode == 200) {
     print(response.statusCode.toString());
@@ -631,11 +627,8 @@ Future<MenteeReviewData> getMenteeRequestInvite(String id, String name) async {
     AlertDialog(
       content: Center(
         child: Text(
-          name +'Invited!!',
-          style: TextStyle(
-              fontFamily: 'Candara',
-              fontWeight: FontWeight.bold
-          ),
+          name + 'Invited!!',
+          style: TextStyle(fontFamily: 'Candara', fontWeight: FontWeight.bold),
         ),
       ),
       actions: <Widget>[
@@ -680,7 +673,7 @@ Future<MenteeReviewData> getMenteeRequestReject(String id, String name) async {
     "Authorization": "Bearer $token",
   }, body: {
     "id": id,
-    "status":"rejected"
+    "status": "rejected"
   });
 
   if (response.statusCode == 200) {
@@ -691,11 +684,8 @@ Future<MenteeReviewData> getMenteeRequestReject(String id, String name) async {
     AlertDialog(
       content: Center(
         child: Text(
-          name +'Rejected!!',
-          style: TextStyle(
-              fontFamily: 'Candara',
-              fontWeight: FontWeight.bold
-          ),
+          name + 'Rejected!!',
+          style: TextStyle(fontFamily: 'Candara', fontWeight: FontWeight.bold),
         ),
       ),
       actions: <Widget>[
@@ -720,7 +710,7 @@ String capitalize(String s) => s[0].toUpperCase() + s.substring(1);
 String convMin(int minute) {
   String min;
 
-  if(minute~/10 == 0)
+  if (minute ~/ 10 == 0)
     min = '0' + minute.toString();
   else
     min = minute.toString();
@@ -729,9 +719,9 @@ String convMin(int minute) {
 }
 
 String convMon(int mth) {
-  String month='';
+  String month = '';
 
-  switch(mth){
+  switch (mth) {
     case 1:
       month = "Jan";
       break;
@@ -779,35 +769,65 @@ class profile extends StatefulWidget {
 }
 
 class _profileState extends State<profile> {
+  TextEditingController searchText = new TextEditingController();
   int _selectedIndex = 1;
   int _selectedIndexMenteePage = 0;
   //late final AnimationController _controller;
   bool _visible = false;
 
   Icon getIcon(String type) {
-    Icon icon = Icon(Icons.add_call, color: Color.fromARGB(255, 59, 48, 214), size: 15,);
+    Icon icon = Icon(
+      Icons.add_call,
+      color: Color.fromARGB(255, 59, 48, 214),
+      size: 15,
+    );
 
-    if(type == "Though Audio Calls") {
-      icon = Icon(Icons.add_call, color: Color.fromARGB(255, 59, 48, 214),size: 15,);
+    if (type == "Though Audio Calls") {
+      icon = Icon(
+        Icons.add_call,
+        color: Color.fromARGB(255, 59, 48, 214),
+        size: 15,
+      );
     } else if (type == "Though Video Calls") {
-      icon = Icon(Icons.videocam, color: Color.fromARGB(255, 59, 48, 214),size: 15,);
+      icon = Icon(
+        Icons.videocam,
+        color: Color.fromARGB(255, 59, 48, 214),
+        size: 15,
+      );
     } else if (type == "Though Chat Message") {
-      icon = Icon(Icons.message, color: Color.fromARGB(255, 59, 48, 214),size: 15,);
+      icon = Icon(
+        Icons.message,
+        color: Color.fromARGB(255, 59, 48, 214),
+        size: 15,
+      );
     }
 
     return icon;
   }
 
-  Widget getUpcomingEventCard(String id,String type, String name,String mode, DateTime dt) {
+  Widget getUpcomingEventCard(
+      String id, String type, String name, String mode, DateTime dt) {
     String month = "-";
-    Icon icon = Icon(Icons.add_call, color: Colors.blue,);
+    Icon icon = Icon(
+      Icons.add_call,
+      color: Colors.blue,
+    );
 
-    if(type == "Audio Calls") {
-      icon = Icon(Icons.add_call, color: Colors.blue,);
+    if (type == "Audio Calls") {
+      icon = Icon(
+        Icons.add_call,
+        color: Colors.blue,
+      );
     } else if (type == "Video Calls") {
-      icon = Icon(Icons.videocam, color: Colors.blue,);
+      icon = Icon(
+        Icons.videocam,
+        color: Colors.blue,
+      );
     } else if (type == "Chat Message") {
-      icon = Icon(Icons.message, color: Colors.blueAccent,);
+      icon = Icon(
+        Icons.message,
+        color: Colors.blueAccent,
+      );
     }
 
     month = convMon(dt.month);
@@ -826,7 +846,13 @@ class _profileState extends State<profile> {
                   ),
                   child: Center(
                     child: Text(
-                      dt.day.toString() + ' ' + month + '\n' + dt.hour.toString() + ":" + convMin(dt.minute),
+                      dt.day.toString() +
+                          ' ' +
+                          month +
+                          '\n' +
+                          dt.hour.toString() +
+                          ":" +
+                          convMin(dt.minute),
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                       textAlign: TextAlign.center,
@@ -853,11 +879,8 @@ class _profileState extends State<profile> {
                     ),
                     GestureDetector(
                       onTap: () async {
-                        final Future<ConfirmAction3?>
-                        action =
-                        await _asyncConfirmDialog2(
-                            context,
-                            id, dt);
+                        final Future<ConfirmAction3?> action =
+                        await _asyncConfirmDialog2(context, id, dt);
                       },
                       child: Text(
                         'View Details',
@@ -879,7 +902,7 @@ class _profileState extends State<profile> {
               child: GestureDetector(
                 onTap: () {},
                 child: Container(
-                  margin: const EdgeInsets.only(left: 5,right: 5),
+                  margin: const EdgeInsets.only(left: 5, right: 5),
                   padding: const EdgeInsets.all(15),
                   decoration: BoxDecoration(
                     border: Border.all(color: Colors.grey),
@@ -897,236 +920,6 @@ class _profileState extends State<profile> {
 
   @override
   Widget build(BuildContext context) {
-
-
-    /*List<Widget> upComingEvents = <Widget>[];*/
-    /*upComingEvents.add(*/
-    /*Row(
-      children: [
-        Expanded(
-          flex: 13,
-          child: Container(
-              margin: const EdgeInsets.all(5),
-              padding: const EdgeInsets.all(5),
-              decoration: BoxDecoration(
-                border: Border.all(color: Colors.grey),
-                borderRadius: BorderRadius.circular(5),
-              ),
-              child: Center(
-                child: Text(
-                  "Date TIME",
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(fontFamily: "Candara", color: Colors.grey),
-                ),
-              )),
-        ),
-        Expanded(
-          flex: 50,
-          child: Container(
-            margin: const EdgeInsets.only(top: 5, bottom: 5, left: 2),
-            padding: const EdgeInsets.all(8),
-            decoration: BoxDecoration(
-              border: Border.all(color: Colors.grey),
-              borderRadius: BorderRadius.circular(5),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: [
-                Text(
-                  'Audio Call With X',
-                  style: TextStyle(fontFamily: "Candara", color: Colors.grey),
-                ),
-                GestureDetector(
-                  onTap: () {},
-                  child: Text(
-                    'View Details',
-                    style: TextStyle(
-                      fontFamily: "Candara",
-                      color: Colors.grey,
-                      decoration: TextDecoration.underline,
-                      fontSize: 11,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-        Expanded(
-          flex: 13,
-          child: GestureDetector(
-            onTap: () {},
-            child: Container(
-              margin: const EdgeInsets.only(right: 5),
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                border: Border.all(color: Colors.grey),
-                borderRadius: BorderRadius.circular(5),
-              ),
-              child: Center(
-                  child: Icon(
-                Icons.phone,
-                color: Colors.grey,
-              )),
-            ),
-          ),
-        ),
-      ],
-    ));
-    upComingEvents.add(Row(
-      children: [
-        Expanded(
-          flex: 13,
-          child: Container(
-              margin: const EdgeInsets.all(5),
-              padding: const EdgeInsets.all(5),
-              decoration: BoxDecoration(
-                border: Border.all(color: Colors.grey),
-                borderRadius: BorderRadius.circular(5),
-              ),
-              child: Center(
-                child: Text(
-                  "Date TIME",
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(fontFamily: "Candara", color: Colors.grey),
-                ),
-              )),
-        ),
-        Expanded(
-          flex: 50,
-          child: Container(
-            margin: const EdgeInsets.only(top: 5, bottom: 5, left: 2),
-            padding: const EdgeInsets.all(8),
-            decoration: BoxDecoration(
-              border: Border.all(color: Colors.grey),
-              borderRadius: BorderRadius.circular(5),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: [
-                Text(
-                  'Video Call With X',
-                  style: TextStyle(fontFamily: "Candara", color: Colors.grey),
-                ),
-                GestureDetector(
-                  onTap: () {},
-                  child: Text(
-                    'View Details',
-                    style: TextStyle(
-                      fontFamily: "Candara",
-                      color: Colors.grey,
-                      decoration: TextDecoration.underline,
-                      fontSize: 11,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-        Expanded(
-          flex: 13,
-          child: GestureDetector(
-            onTap: () {},
-            child: Container(
-              margin: const EdgeInsets.only(right: 5),
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                border: Border.all(color: Colors.grey),
-                borderRadius: BorderRadius.circular(5),
-              ),
-              child: Center(
-                  child: Icon(
-                Icons.videocam,
-                color: Colors.grey,
-              )),
-            ),
-          ),
-        ),
-      ],
-    ));
-    upComingEvents.add(Row(
-      children: [
-        Expanded(
-          flex: 13,
-          child: Container(
-              margin: const EdgeInsets.all(5),
-              padding: const EdgeInsets.all(5),
-              decoration: BoxDecoration(
-                border: Border.all(color: Colors.grey),
-                borderRadius: BorderRadius.circular(5),
-              ),
-              child: Center(
-                child: Text(
-                  "Date TIME",
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(fontFamily: "Candara", color: Colors.grey),
-                ),
-              )),
-        ),
-        Expanded(
-          flex: 50,
-          child: Container(
-            margin: const EdgeInsets.only(top: 5, bottom: 5, left: 2),
-            padding: const EdgeInsets.all(8),
-            decoration: BoxDecoration(
-              border: Border.all(color: Colors.grey),
-              borderRadius: BorderRadius.circular(5),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: [
-                Text(
-                  'Chat With X',
-                  style: TextStyle(fontFamily: "Candara", color: Colors.grey),
-                ),
-                GestureDetector(
-                  onTap: () {},
-                  child: Text(
-                    'View Details',
-                    style: TextStyle(
-                      fontFamily: "Candara",
-                      color: Colors.grey,
-                      decoration: TextDecoration.underline,
-                      fontSize: 11,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-        Expanded(
-          flex: 13,
-          child: GestureDetector(
-            onTap: () {},
-            child: Container(
-              margin: const EdgeInsets.only(right: 5),
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                border: Border.all(color: Colors.grey),
-                borderRadius: BorderRadius.circular(5),
-              ),
-              child: Center(
-                  child: Icon(
-                Icons.message_outlined,
-                color: Colors.grey,
-              )),
-            ),
-          ),
-        ),*/
-    /*],*/
-    /*));*/
-
     var pageData;
     List<Widget> menteePage = <Widget>[];
     var menteeData;
@@ -1142,6 +935,87 @@ class _profileState extends State<profile> {
         else if (index == 2) title = 'Mentees';
       });
     }
+
+    List<Map<String, dynamic>> allMentees;
+    List<Map<String, dynamic>> foundMentees;
+
+    /*GestureDetector(
+      onTap: () {
+        /*Navigator.push(context, MaterialPageRoute(
+                              builder: (context) => k12_det(snapshot.data!.data2.subjects2[i].id.toString(),"images/english.png")));*/
+      },
+      child: Container(
+        //color: Colors.deepPurple,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment:
+          CrossAxisAlignment.center,
+          children: [
+            CircleAvatar(
+                radius: 50,
+                backgroundImage: NetworkImage(
+                    '${snapshot.data!.data1.mentees1[i].img.toString()}')),
+            SizedBox(height: 10),
+            Text(
+              "${snapshot.data!.data1.mentees1[i].name.toString()}",
+              style: TextStyle(
+                  color: Colors.black,
+                  fontSize: 15,
+                  fontFamily: "Candara",
+                  fontWeight: FontWeight.bold),
+            ),
+            Text(
+              "${snapshot.data!.data1.mentees1[i].email.toString()}",
+              style: TextStyle(
+                  color: Colors.grey,
+                  fontSize: 10,
+                  fontFamily: "Candara",
+                  fontWeight: FontWeight.bold),
+            ),
+          ],
+        ),
+      ),
+    ),*/
+
+    /*FutureBuilder(
+        future: getMenteeData(),
+        builder: (context, AsyncSnapshot<MenteeData> snapshot) {
+          if (snapshot.hasData) {
+            if (snapshot.data!.data1.mentees1.length != 0)
+              return SingleChildScrollView(
+                child: GridView.count(
+                  shrinkWrap: true,
+                  primary: false,
+                  padding: const EdgeInsets.all(20),
+                  crossAxisSpacing: 10,
+                  mainAxisSpacing: 10,
+                  crossAxisCount: 2,
+                  children: <Widget>[
+                    for (var i = 0;
+                    i < snapshot.data!.data1.mentees1.length;
+                    i++)
+                        allMentees
+                  ],
+                ),
+              );
+            else
+              return Center(
+                child: Text(
+                  'No Mentee Data Available',
+                  style: TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.bold,
+                    fontFamily: 'Candara',
+                  ),
+                ),
+              );
+          } else
+            return Center(
+              child: Container(
+                child: CircularProgressIndicator(),
+              ),
+            );
+        });*/
 
     List<Widget> homePage = <Widget>[
       DefaultTabController(
@@ -1177,7 +1051,6 @@ class _profileState extends State<profile> {
                 //Builder(builder: (context){final index = DefaultTabController.of(context).index;})
               ],
             ),
-
             body: TabBarView(
               physics: NeverScrollableScrollPhysics(),
               children: [
@@ -1186,7 +1059,7 @@ class _profileState extends State<profile> {
                   builder:
                       (context, AsyncSnapshot<MenteeRequestData> snapshot) {
                     if (snapshot.hasData) {
-                      if(snapshot.data!.data2.mentees2.length != 0)
+                      if (snapshot.data!.data2.mentees2.length != 0)
                         return SingleChildScrollView(
                           child: Padding(
                             padding: const EdgeInsets.all(10.0),
@@ -1197,16 +1070,20 @@ class _profileState extends State<profile> {
                                 SizedBox(
                                   height: 10,
                                 ),
-                                for(int i=0; i<snapshot.data!.data2.mentees2.length; i++)
+                                for (int i = 0;
+                                i < snapshot.data!.data2.mentees2.length;
+                                i++)
                                   SingleChildScrollView(
                                     scrollDirection: Axis.horizontal,
                                     child: Row(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      crossAxisAlignment:
+                                      CrossAxisAlignment.start,
                                       children: [
                                         Center(
                                           child: CircleAvatar(
                                             backgroundImage: NetworkImage(
-                                                snapshot.data!.data2.mentees2[i].img),
+                                                snapshot.data!.data2.mentees2[i]
+                                                    .img),
                                             radius: 30,
                                           ),
                                         ),
@@ -1237,8 +1114,8 @@ class _profileState extends State<profile> {
                                                     fontSize: 11,
                                                   ),
                                                   maxLines: 5,
-                                                  overflow: TextOverflow.ellipsis
-                                              ),
+                                                  overflow:
+                                                  TextOverflow.ellipsis),
                                               RichText(
                                                 text: TextSpan(
                                                   text: "Through ",
@@ -1253,8 +1130,12 @@ class _profileState extends State<profile> {
                                                         text:
                                                         '${snapshot.data!.data2.mentees2[i].mode}',
                                                         style: TextStyle(
-                                                            color: Color.fromARGB(
-                                                                255, 59, 48, 214))),
+                                                            color:
+                                                            Color.fromARGB(
+                                                                255,
+                                                                59,
+                                                                48,
+                                                                214))),
                                                   ],
                                                 ),
                                               ),
@@ -1272,7 +1153,8 @@ class _profileState extends State<profile> {
                                                       ),
                                                     ),
                                                     onPressed: () async {
-                                                      final Future<ConfirmAction?>
+                                                      final Future<
+                                                          ConfirmAction?>
                                                       action =
                                                       await _asyncConfirmDialog(
                                                           context,
@@ -1286,10 +1168,13 @@ class _profileState extends State<profile> {
                                                   ElevatedButton(
                                                     style: ButtonStyle(
                                                         backgroundColor:
-                                                        MaterialStateProperty.all<
-                                                            Color>(
-                                                            Color.fromARGB(
-                                                                255, 59, 48, 214))),
+                                                        MaterialStateProperty
+                                                            .all<Color>(Color
+                                                            .fromARGB(
+                                                            255,
+                                                            59,
+                                                            48,
+                                                            214))),
                                                     child: Text(
                                                       'Invite',
                                                       style: TextStyle(
@@ -1297,9 +1182,19 @@ class _profileState extends State<profile> {
                                                       ),
                                                     ),
                                                     onPressed: () {
-                                                      getMenteeRequestInvite(snapshot.data!.data2.mentees2[i].id.toString(), snapshot.data!.data2.mentees2[i].studentName);
+                                                      getMenteeRequestInvite(
+                                                          snapshot.data!.data2
+                                                              .mentees2[i].id
+                                                              .toString(),
+                                                          snapshot
+                                                              .data!
+                                                              .data2
+                                                              .mentees2[i]
+                                                              .studentName);
                                                       setState(() {
-                                                        Fluttertoast.showToast(msg: "Invite Request Accepted for ${snapshot.data!.data2.mentees2[i].studentName} !!!");
+                                                        Fluttertoast.showToast(
+                                                            msg:
+                                                            "Invite Request Accepted for ${snapshot.data!.data2.mentees2[i].studentName} !!!");
                                                       });
                                                       //Navigator.of(context).pop(ConfirmAction.Invite);
                                                     },
@@ -1316,13 +1211,16 @@ class _profileState extends State<profile> {
                             ),
                           ),
                         );
-                      else{
+                      else {
                         return Center(
-                          child: Text('No New Mentee Request!', style: TextStyle(
-                            fontSize: 15,
-                            fontWeight: FontWeight.bold,
-                            fontFamily: 'Candara',
-                          ),),
+                          child: Text(
+                            'No New Mentee Request!',
+                            style: TextStyle(
+                              fontSize: 15,
+                              fontWeight: FontWeight.bold,
+                              fontFamily: 'Candara',
+                            ),
+                          ),
                         );
                       }
                     } else
@@ -1338,7 +1236,7 @@ class _profileState extends State<profile> {
                   builder:
                       (context, AsyncSnapshot<MenteeRequestData> snapshot) {
                     if (snapshot.hasData) {
-                      if(snapshot.data!.data2.mentees2.length != 0)
+                      if (snapshot.data!.data2.mentees2.length != 0)
                         return SingleChildScrollView(
                             child: Padding(
                               padding: const EdgeInsets.all(10.0),
@@ -1346,18 +1244,23 @@ class _profileState extends State<profile> {
                                 mainAxisAlignment: MainAxisAlignment.start,
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  for(int i=0; i<snapshot.data!.data2.mentees2.length; i++)
+                                  for (int i = 0;
+                                  i < snapshot.data!.data2.mentees2.length;
+                                  i++)
                                     GestureDetector(
                                       child: SingleChildScrollView(
                                         scrollDirection: Axis.horizontal,
                                         child: Row(
-                                          mainAxisAlignment: MainAxisAlignment.spaceAround,
-                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          mainAxisAlignment:
+                                          MainAxisAlignment.spaceAround,
+                                          crossAxisAlignment:
+                                          CrossAxisAlignment.start,
                                           children: [
                                             Center(
                                               child: CircleAvatar(
                                                 backgroundImage: NetworkImage(
-                                                    snapshot.data!.data2.mentees2[i].img),
+                                                    snapshot.data!.data2.mentees2[i]
+                                                        .img),
                                                 radius: 30,
                                               ),
                                             ),
@@ -1385,17 +1288,21 @@ class _profileState extends State<profile> {
                                                         fontSize: 11,
                                                       ),
                                                       maxLines: 5,
-                                                      overflow: TextOverflow.ellipsis),
+                                                      overflow:
+                                                      TextOverflow.ellipsis),
                                                   Row(
                                                     children: [
-                                                      getIcon(snapshot.data!.data2.mentees2[i].mode.toString()),
+                                                      getIcon(snapshot.data!.data2
+                                                          .mentees2[i].mode
+                                                          .toString()),
                                                       //Text(snapshot.data!.data2.mentees2[i].mode.toString()),
                                                       RichText(
                                                         text: TextSpan(
                                                           //text: "Through ",
                                                           style: TextStyle(
                                                             color: Colors.grey,
-                                                            fontWeight: FontWeight.bold,
+                                                            fontWeight:
+                                                            FontWeight.bold,
                                                             fontFamily: 'Candara',
                                                             fontSize: 11,
                                                           ),
@@ -1404,20 +1311,34 @@ class _profileState extends State<profile> {
                                                                 text:
                                                                 '  ${snapshot.data!.data2.mentees2[i].mode}  ',
                                                                 style: TextStyle(
-                                                                    color: Color.fromARGB(
-                                                                        255, 59, 48, 214))),
+                                                                    color: Color
+                                                                        .fromARGB(
+                                                                        255,
+                                                                        59,
+                                                                        48,
+                                                                        214))),
                                                           ],
                                                         ),
                                                       ),
-
                                                     ],
                                                   ),
                                                   Text(
                                                     '${snapshot.data!.data2.mentees2[i].datetime.day}/' +
-                                                        convMon(snapshot.data!.data2.mentees2[i].datetime.month)+'/' +
+                                                        convMon(snapshot
+                                                            .data!
+                                                            .data2
+                                                            .mentees2[i]
+                                                            .datetime
+                                                            .month) +
+                                                        '/' +
                                                         '${snapshot.data!.data2.mentees2[i].datetime.year}  ' +
                                                         '${snapshot.data!.data2.mentees2[i].datetime.hour}:' +
-                                                        convMin(snapshot.data!.data2.mentees2[i].datetime.minute),
+                                                        convMin(snapshot
+                                                            .data!
+                                                            .data2
+                                                            .mentees2[i]
+                                                            .datetime
+                                                            .minute),
                                                     style: TextStyle(
                                                       fontWeight: FontWeight.bold,
                                                       fontFamily: 'Candara',
@@ -1434,24 +1355,27 @@ class _profileState extends State<profile> {
                                         ),
                                       ),
                                       onTap: () async {
-                                        final Future<ConfirmAction2?>
-                                        action =
+                                        final Future<ConfirmAction2?> action =
                                         await _asyncConfirmDialog1(
                                             context,
-                                            '${snapshot.data!.data2.mentees2[i].id}', snapshot.data!.data2.mentees2[i].datetime);
+                                            '${snapshot.data!.data2.mentees2[i].id}',
+                                            snapshot.data!.data2.mentees2[i]
+                                                .datetime);
                                       },
                                     )
                                 ],
                               ),
-                            )
-                        );
-                      else{
+                            ));
+                      else {
                         return Center(
-                          child: Text('No Old Mentee Request!', style: TextStyle(
-                            fontSize: 15,
-                            fontWeight: FontWeight.bold,
-                            fontFamily: 'Candara',
-                          ),),
+                          child: Text(
+                            'No Old Mentee Request!',
+                            style: TextStyle(
+                              fontSize: 15,
+                              fontWeight: FontWeight.bold,
+                              fontFamily: 'Candara',
+                            ),
+                          ),
                         );
                       }
                     } else
@@ -1556,7 +1480,7 @@ class _profileState extends State<profile> {
                       SizedBox(
                         height: 20,
                       ),
-                      if(snapshot.data!.data.pendingHelpRequest != '0')
+                      if (snapshot.data!.data.pendingHelpRequest != '0')
                         GestureDetector(
                           onTap: () {},
                           child: Container(
@@ -1589,7 +1513,8 @@ class _profileState extends State<profile> {
                                         width: 10,
                                       ),
                                       Text(
-                                        snapshot.data!.data.pendingHelpRequest + " Pending Help Request",
+                                        snapshot.data!.data.pendingHelpRequest +
+                                            " Pending Help Request",
                                         style: TextStyle(
                                             fontFamily: 'Candara',
                                             color: Colors.orange,
@@ -1622,9 +1547,7 @@ class _profileState extends State<profile> {
                                     fontFamily: "Candara")),
                             onTap: () {
                               _selectedIndex = 0;
-                              setState(() {
-
-                              });
+                              setState(() {});
                               /*Navigator.push(
                         context,
                         MaterialPageRoute(
@@ -1639,9 +1562,42 @@ class _profileState extends State<profile> {
                           scrollDirection: Axis.vertical,
                           child: Column(
                             children: [
-                              getUpcomingEventCard(snapshot.data!.data.upcomingEvent.audioMode.id.toString(),snapshot.data!.data.upcomingEvent.audioMode.modeCommunication, snapshot.data!.data.upcomingEvent.audioMode.student.name.toString(), snapshot.data!.data.upcomingEvent.audioMode.modeCommunication, snapshot.data!.data.upcomingEvent.audioMode.dateTime),
-                              getUpcomingEventCard(snapshot.data!.data.upcomingEvent.videoMode.id.toString(),snapshot.data!.data.upcomingEvent.videoMode.modeCommunication, snapshot.data!.data.upcomingEvent.videoMode.student.name.toString(), snapshot.data!.data.upcomingEvent.videoMode.modeCommunication, snapshot.data!.data.upcomingEvent.videoMode.dateTime),
-                              getUpcomingEventCard(snapshot.data!.data.upcomingEvent.chatMode.id.toString(),snapshot.data!.data.upcomingEvent.chatMode.modeCommunication, snapshot.data!.data.upcomingEvent.chatMode.student.name.toString(),snapshot.data!.data.upcomingEvent.chatMode.modeCommunication, snapshot.data!.data.upcomingEvent.chatMode.dateTime),
+                              getUpcomingEventCard(
+                                  snapshot.data!.data.upcomingEvent.audioMode.id
+                                      .toString(),
+                                  snapshot.data!.data.upcomingEvent.audioMode
+                                      .modeCommunication,
+                                  snapshot.data!.data.upcomingEvent.audioMode
+                                      .student.name
+                                      .toString(),
+                                  snapshot.data!.data.upcomingEvent.audioMode
+                                      .modeCommunication,
+                                  snapshot.data!.data.upcomingEvent.audioMode
+                                      .dateTime),
+                              getUpcomingEventCard(
+                                  snapshot.data!.data.upcomingEvent.videoMode.id
+                                      .toString(),
+                                  snapshot.data!.data.upcomingEvent.videoMode
+                                      .modeCommunication,
+                                  snapshot.data!.data.upcomingEvent.videoMode
+                                      .student.name
+                                      .toString(),
+                                  snapshot.data!.data.upcomingEvent.videoMode
+                                      .modeCommunication,
+                                  snapshot.data!.data.upcomingEvent.videoMode
+                                      .dateTime),
+                              getUpcomingEventCard(
+                                  snapshot.data!.data.upcomingEvent.chatMode.id
+                                      .toString(),
+                                  snapshot.data!.data.upcomingEvent.chatMode
+                                      .modeCommunication,
+                                  snapshot.data!.data.upcomingEvent.chatMode
+                                      .student.name
+                                      .toString(),
+                                  snapshot.data!.data.upcomingEvent.chatMode
+                                      .modeCommunication,
+                                  snapshot.data!.data.upcomingEvent.chatMode
+                                      .dateTime),
                             ],
                           )),
                       SizedBox(height: 20),
@@ -1664,9 +1620,7 @@ class _profileState extends State<profile> {
                                       fontFamily: "Candara")),
                               onTap: () {
                                 _selectedIndex = 2;
-                                setState(() {
-
-                                });
+                                setState(() {});
                                 /*Navigator.push(
                         context,
                         MaterialPageRoute(
@@ -1742,77 +1696,143 @@ class _profileState extends State<profile> {
                 ),
               );
           }),
-      FutureBuilder(
-          future: getMenteeData(),
-          builder: (context, AsyncSnapshot<MenteeData> snapshot) {
-            if (snapshot.hasData) {
-              if(snapshot.data!.data1.mentees1.length != 0)
-                return SingleChildScrollView(
-                  child: GridView.count(
-                    shrinkWrap: true,
-                    primary: false,
-                    padding: const EdgeInsets.all(20),
-                    crossAxisSpacing: 10,
-                    mainAxisSpacing: 10,
-                    crossAxisCount: 2,
-                    children: <Widget>[
-                      for (var i = 0;
-                      i < snapshot.data!.data1.mentees1.length;
-                      i++)
-                        GestureDetector(
-                          onTap: () {
-                            /*Navigator.push(context, MaterialPageRoute(
-                            builder: (context) => k12_det(snapshot.data!.data2.subjects2[i].id.toString(),"images/english.png")));*/
-                          },
-                          child: Container(
-                            //color: Colors.deepPurple,
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                CircleAvatar(
-                                    radius: 50,
-                                    backgroundImage: NetworkImage(
-                                        '${snapshot.data!.data1.mentees1[i].img.toString()}')),
-                                SizedBox(height: 10),
-                                Text(
-                                  "${snapshot.data!.data1.mentees1[i].name.toString()}",
-                                  style: TextStyle(
-                                      color: Colors.black,
-                                      fontSize: 15,
-                                      fontFamily: "Candara",
-                                      fontWeight: FontWeight.bold),
-                                ),
-                                Text(
-                                  "${snapshot.data!.data1.mentees1[i].email.toString()}",
-                                  style: TextStyle(
-                                      color: Colors.grey,
-                                      fontSize: 10,
-                                      fontFamily: "Candara",
-                                      fontWeight: FontWeight.bold),
-                                ),
-                              ],
+      Container(
+        padding: EdgeInsets.all(10),
+        child: SingleChildScrollView(
+          child: Column(
+            children: [
+              TextField(
+                controller: searchText,
+                onChanged: (value) => {
+
+                },
+                decoration: const InputDecoration(
+                  labelText: 'Search',
+                  suffixIcon: Icon(Icons.search),
+                ),
+              ),
+              SizedBox(height: 20,),
+              FutureBuilder(
+                  future: getMenteeData(),
+                  builder: (context, AsyncSnapshot<MenteeData> snapshot) {
+                    if (snapshot.hasData) {
+                      if (snapshot.data!.data1.mentees1.length != 0)
+                        return SingleChildScrollView(
+                          child: GridView.count(
+                            shrinkWrap: true,
+                            primary: false,
+                            padding: const EdgeInsets.all(20),
+                            crossAxisSpacing: 10,
+                            mainAxisSpacing: 10,
+                            crossAxisCount: 2,
+                            children: <Widget>[
+                              if(searchText.text == '')
+                                for(var i = 0; i< snapshot.data!.data1.mentees1.length; i++)
+                                  GestureDetector(
+                                    onTap: () {
+                                      /*Navigator.push(context, MaterialPageRoute(
+                              builder: (context) => k12_det(snapshot.data!.data2.subjects2[i].id.toString(),"images/english.png")));*/
+                                    },
+                                    child: Container(
+                                      //color: Colors.deepPurple,
+                                      child: Column(
+                                        mainAxisAlignment: MainAxisAlignment.center,
+                                        crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                        children: [
+                                          CircleAvatar(
+                                              radius: 50,
+                                              backgroundImage: NetworkImage(
+                                                  '${snapshot.data!.data1.mentees1[i].img.toString()}')),
+                                          SizedBox(height: 10),
+                                          Text(
+                                            "${snapshot.data!.data1.mentees1[i].name.toString()}",
+                                            style: TextStyle(
+                                                color: Colors.black,
+                                                fontSize: 15,
+                                                fontFamily: "Candara",
+                                                fontWeight: FontWeight.bold),
+                                          ),
+                                          Text(
+                                            "${snapshot.data!.data1.mentees1[i].email.toString()}",
+                                            style: TextStyle(
+                                                color: Colors.grey,
+                                                fontSize: 10,
+                                                fontFamily: "Candara",
+                                                fontWeight: FontWeight.bold),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  )
+                              else
+                                for (var i = 0;
+                                i < snapshot.data!.data1.mentees1.length;
+                                i++)
+                                  if(snapshot.data!.data1.mentees1[i].name.toString().toLowerCase().contains(searchText.text.toLowerCase()))
+                                    GestureDetector(
+                                      onTap: () {
+                                        /*Navigator.push(context, MaterialPageRoute(
+                              builder: (context) => k12_det(snapshot.data!.data2.subjects2[i].id.toString(),"images/english.png")));*/
+                                      },
+                                      child: Container(
+                                        //color: Colors.deepPurple,
+                                        child: Column(
+                                          mainAxisAlignment: MainAxisAlignment.center,
+                                          crossAxisAlignment:
+                                          CrossAxisAlignment.center,
+                                          children: [
+                                            CircleAvatar(
+                                                radius: 50,
+                                                backgroundImage: NetworkImage(
+                                                    '${snapshot.data!.data1.mentees1[i].img.toString()}')),
+                                            SizedBox(height: 10),
+                                            Text(
+                                              "${snapshot.data!.data1.mentees1[i].name.toString()}",
+                                              style: TextStyle(
+                                                  color: Colors.black,
+                                                  fontSize: 15,
+                                                  fontFamily: "Candara",
+                                                  fontWeight: FontWeight.bold),
+                                            ),
+                                            Text(
+                                              "${snapshot.data!.data1.mentees1[i].email.toString()}",
+                                              style: TextStyle(
+                                                  color: Colors.grey,
+                                                  fontSize: 10,
+                                                  fontFamily: "Candara",
+                                                  fontWeight: FontWeight.bold),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+
+                            ],
+                          ),
+                        );
+                      else
+                        return Center(
+                          child: Text(
+                            'No Mentee Data Available',
+                            style: TextStyle(
+                              fontSize: 15,
+                              fontWeight: FontWeight.bold,
+                              fontFamily: 'Candara',
                             ),
                           ),
+                        );
+                    } else
+                      return Center(
+                        child: Container(
+                          child: CircularProgressIndicator(),
                         ),
-                    ],
-                  ),
-                );
-              else
-                return Center(
-                  child: Text('No Mentee Data Available', style: TextStyle(
-                    fontSize: 15,
-                    fontWeight: FontWeight.bold,
-                    fontFamily: 'Candara',
-                  ),),
-                );
-            } else
-              return Center(
-                child: Container(
-                  child: CircularProgressIndicator(),
-                ),
-              );
-          })
+                      );
+                  })
+            ],
+          ),
+        ),
+      ),
     ];
 
     void _onItemTappedRequestPage(int index) {
@@ -1828,7 +1848,8 @@ class _profileState extends State<profile> {
         title: Text(
           title,
           style: TextStyle(fontFamily: "Candara"),
-        ), centerTitle: true,
+        ),
+        centerTitle: true,
         leading: Builder(
           builder: (BuildContext context) {
             return IconButton(
@@ -1865,29 +1886,29 @@ class _profileState extends State<profile> {
               ),
               child: Text('MENU'),
             ),
-            if(token!="")
+            if (token != "")
               ListTile(
-              title: const Text('Profile'),
-              onTap: () {
-                Navigator.pop(context);
-              },
-            ),
-            if(token!="")
+                title: const Text('Profile'),
+                onTap: () {
+                  Navigator.pop(context);
+                },
+              ),
+            if (token != "")
               ListTile(
-              title: const Text('Logout'),
-              onTap: () {
-                setState(() {
-                  userName = "";
-                  userEmail = "";
-                  userId = 0;
-                  token = "";
-                  classId = "";
-                });
-                Navigator.pop(context);
-                Navigator.pushReplacement(context,
-                    MaterialPageRoute(builder: (context) => landing()));
-              },
-            ),
+                title: const Text('Logout'),
+                onTap: () {
+                  setState(() {
+                    userName = "";
+                    userEmail = "";
+                    userId = 0;
+                    token = "";
+                    classId = "";
+                  });
+                  Navigator.pop(context);
+                  Navigator.pushReplacement(context,
+                      MaterialPageRoute(builder: (context) => landing()));
+                },
+              ),
           ],
         ),
       ),
@@ -2053,8 +2074,11 @@ Future<Future<ConfirmAction?>> _asyncConfirmDialog(
                         ),
                         onPressed: () {
                           //Fluttertoast.showToast(msg: snapshot.data!.data3.helpRequests.studentName.toString() + ' Reviewed');
-                          getMenteeRequestReject(id, snapshot.data!.data3.helpRequests.studentName);
-                          Fluttertoast.showToast(msg: "Invite Request Rejected for ${snapshot.data!.data3.helpRequests.studentName} !!!");
+                          getMenteeRequestReject(id,
+                              snapshot.data!.data3.helpRequests.studentName);
+                          Fluttertoast.showToast(
+                              msg:
+                              "Invite Request Rejected for ${snapshot.data!.data3.helpRequests.studentName} !!!");
                           Navigator.of(context).pop(ConfirmAction.Reject);
                         },
                       ),
@@ -2072,8 +2096,11 @@ Future<Future<ConfirmAction?>> _asyncConfirmDialog(
                           ),
                         ),
                         onPressed: () {
-                          getMenteeRequestInvite(id, snapshot.data!.data3.helpRequests.studentName);
-                          Fluttertoast.showToast(msg: "Invite Request Accepted for ${snapshot.data!.data3.helpRequests.studentName} !!!");
+                          getMenteeRequestInvite(id,
+                              snapshot.data!.data3.helpRequests.studentName);
+                          Fluttertoast.showToast(
+                              msg:
+                              "Invite Request Accepted for ${snapshot.data!.data3.helpRequests.studentName} !!!");
                           Navigator.of(context).pop(ConfirmAction.Invite);
                         },
                       ),
@@ -2093,7 +2120,7 @@ Future<Future<ConfirmAction?>> _asyncConfirmDialog(
   );
 }
 
-enum ConfirmAction2 {OK}
+enum ConfirmAction2 { OK }
 Future<Future<ConfirmAction2?>> _asyncConfirmDialog1(
     BuildContext context, String id, DateTime dt) async {
   return showDialog<ConfirmAction2>(
@@ -2158,7 +2185,15 @@ Future<Future<ConfirmAction2?>> _asyncConfirmDialog1(
                         SizedBox(
                           height: 10,
                         ),
-                        Text(dt.hour.toString() + ":" + convMin(dt.minute) + '  ' + dt.day.toString() + '-' + convMon(dt.month) + '-' + dt.year.toString()),
+                        Text(dt.hour.toString() +
+                            ":" +
+                            convMin(dt.minute) +
+                            '  ' +
+                            dt.day.toString() +
+                            '-' +
+                            convMon(dt.month) +
+                            '-' +
+                            dt.year.toString()),
                       ],
                     ),
                     /*Divider(
@@ -2236,12 +2271,13 @@ Future<Future<ConfirmAction2?>> _asyncConfirmDialog1(
                     child: Text(
                       'OK',
                       style: TextStyle(
-                          fontFamily: 'Candara',
-                          fontWeight: FontWeight.bold
-                      ),
+                          fontFamily: 'Candara', fontWeight: FontWeight.bold),
                     ),
                     onPressed: () {
-                      Fluttertoast.showToast(msg: snapshot.data!.data3.helpRequests.studentName.toString() + ' Reviewed');
+                      Fluttertoast.showToast(
+                          msg: snapshot.data!.data3.helpRequests.studentName
+                              .toString() +
+                              ' Reviewed');
                       Navigator.of(context).pop(ConfirmAction2.OK);
                       //getMenteeRequestInvite(id);
                       /*showDialog(context: context, builder: (context) => AlertDialog(
@@ -2271,7 +2307,7 @@ Future<Future<ConfirmAction2?>> _asyncConfirmDialog1(
   );
 }
 
-enum ConfirmAction3 {OK}
+enum ConfirmAction3 { OK }
 Future<Future<ConfirmAction3?>> _asyncConfirmDialog2(
     BuildContext context, String id, DateTime dt) async {
   return showDialog<ConfirmAction3>(
@@ -2385,14 +2421,23 @@ Future<Future<ConfirmAction3?>> _asyncConfirmDialog2(
                         ),
                         SizedBox(height: 20),
                         //Text(dt.hour.toString() + ":" + dt.minute.toString() + '  ' + dt.day.toString() + '-' + dt.month.toString() + '-' + dt.year.toString()),
-                        Text('Time & Date',
+                        Text(
+                          'Time & Date',
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
                             fontFamily: 'Candara',
                           ),
                         ),
                         Text(
-                          dt.hour.toString() + ":" + convMin(dt.minute) +'  ' + dt.day.toString() + '-' + convMon(dt.month) + '-' + dt.year.toString(),
+                          dt.hour.toString() +
+                              ":" +
+                              convMin(dt.minute) +
+                              '  ' +
+                              dt.day.toString() +
+                              '-' +
+                              convMon(dt.month) +
+                              '-' +
+                              dt.year.toString(),
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
                             color: Colors.grey,
@@ -2413,9 +2458,7 @@ Future<Future<ConfirmAction3?>> _asyncConfirmDialog2(
                     child: Text(
                       'OK',
                       style: TextStyle(
-                          fontFamily: 'Candara',
-                          fontWeight: FontWeight.bold
-                      ),
+                          fontFamily: 'Candara', fontWeight: FontWeight.bold),
                     ),
                     onPressed: () {
                       //Fluttertoast.showToast(msg: snapshot.data!.data3.helpRequests.studentName.toString() + ' Reviewed');

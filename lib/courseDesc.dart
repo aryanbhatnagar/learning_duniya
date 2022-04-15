@@ -1,3 +1,6 @@
+
+import 'package:audioplayers/audioplayers.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:favorite_button/favorite_button.dart';
 import 'package:group_button/group_button.dart';
@@ -329,18 +332,46 @@ class _courseDescPageState extends State<courseDescPage> {
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
                                 Flexible(child: Text(k12!.data.chapterDetails.chapterName,style: TextStyle(fontSize: 22,fontFamily: "Candara",color: Colors.black))),
+                                Row(
+                                  children: [
+                                    GestureDetector(
+                                      onTap:() async {
+                                        Future action = await _showMyDialog(context,k12!.data.chapterDetails.fileName);
+                                      },
+                                      child: Card(elevation: 2,child: Padding(
+                                        padding: const EdgeInsets.all(3),
+                                        child: Icon(Icons.mic,color: Colors.red, size: 22),
+                                      )),
+                                    ),
+
+                                  ],
+                                )
                               ],
                             ),
-
+                            SizedBox(height: 10,),
                             Row(
                               mainAxisAlignment: MainAxisAlignment.start,
                               children: [
                                 Icon(Icons.favorite,color: Colors.red,size: 22),
                                 Text(" ${k12.data.chapterDetails.likes}",style: TextStyle(fontSize:15,fontFamily: "Candara",color: Colors.teal)),
-                                SizedBox(width: 30),
+                                SizedBox(width: 20),
                                 Icon(Icons.people,color: Colors.yellow,size: 25),
-                                Text(" ${k12.data.chapterDetails.visitors}",style: TextStyle(fontSize:15,fontFamily: "Candara",color: Colors.grey))
-                           ],
+                                Text(" ${k12.data.chapterDetails.visitors}",style: TextStyle(fontSize:15,fontFamily: "Candara",color: Colors.grey)),
+                                SizedBox(width: 20,),
+                                GestureDetector(
+                                    child:Card(elevation: 2,child: Padding(
+                                      padding: const EdgeInsets.all(3),
+                                      child: Icon(Icons.download_rounded,color: Colors.blue, size: 22),
+                                    ))),
+                                Text(" Book",style: TextStyle(fontSize:15,fontFamily: "Candara",color: Colors.grey)),
+                                SizedBox(width: 20,),
+                                GestureDetector(child: Card(elevation: 2,child: Padding(
+                                  padding: const EdgeInsets.all(3),
+                                  child: Icon(Icons.download_rounded,color: Colors.green, size: 22),
+                                ))),
+                                Text(" Soln.",style: TextStyle(fontSize:15,fontFamily: "Candara",color: Colors.grey)),
+
+                              ],
                             ),
                             SizedBox(height: 20),
                             if(k12!.data.chapterDetails.description.toString()!="null")
@@ -398,8 +429,8 @@ class _courseDescPageState extends State<courseDescPage> {
                               child: ToggleButtons(
 
                                 children: <Widget>[
-                                  Text(" Curriculum ",style: TextStyle(fontSize: 20,fontFamily: "Candara",color: Colors.black)),
-                                  Text("      MCQ      ",style: TextStyle(fontSize: 20,fontFamily: "Candara",color: Colors.black)),
+                                  Text(" Curriculum ",style: TextStyle(fontSize: 20,fontFamily: "Candara",)),
+                                  Text("      MCQ      ",style: TextStyle(fontSize: 20,fontFamily: "Candara",)),
                                 ],
                                 selectedBorderColor: Colors.teal,
                                 selectedColor: Colors.white,
@@ -575,3 +606,104 @@ class _courseDescPageState extends State<courseDescPage> {
   }
 }
 
+Future _showMyDialog(BuildContext context, String URL) async {
+
+  Duration _duration = Duration();
+  Duration _position = Duration();
+  AudioPlayer audioPlayer = AudioPlayer();
+  bool playing=false;
+
+  return showDialog(
+    barrierDismissible: false,
+    context: context,
+    builder: (BuildContext context) {
+      return StatefulBuilder(builder: (context, setState) {
+        return Dialog(
+          child: SingleChildScrollView(
+            child: Column(
+              children: [
+                Container(
+
+                  child: Text("Some Audio",style: TextStyle(fontFamily: "Candara"),)
+                ),
+                Slider.adaptive(
+                  onChanged: (double value) {
+                    setState(() {
+                      audioPlayer.seek(Duration(seconds: value.toInt()));
+                    });
+                  },
+                  min: 0.0,
+                  max: _duration.inSeconds.toDouble(),
+                  value: _position.inSeconds.toDouble(),
+                ),
+                InkWell(
+                  onTap: () async {
+                    var url =
+                        "http://ec2-13-234-116-155.ap-south-1.compute.amazonaws.com/uploads/${URL}";
+
+                    if (playing) {
+                      var res = await audioPlayer.pause();
+                      if (res == 1) {
+                        setState(() {
+                          playing = false;
+                        });
+                      }
+                    } else {
+                      var res = await audioPlayer.play(url, isLocal: true);
+                      if (res == 1) {
+                        setState(() {
+                          playing = true;
+                        });
+                      }
+                    }
+                    audioPlayer.onDurationChanged.listen((Duration duration) {
+                      setState(() {
+                        _duration = duration;
+                      });
+                    });
+
+                    audioPlayer.onAudioPositionChanged
+                        .listen((Duration duration) {
+                      setState(() {
+                        _position = duration;
+                      });
+                    });
+                  },
+                  child:
+                  Icon(playing == false ? Icons.play_arrow : Icons.pause),
+                ),
+                SizedBox(height: 10,)
+              ],
+            ),
+          ),
+        );
+      });
+    },
+  );
+}
+
+/*Future<String> downloadFile(String url, String fileName, String dir) async {
+  HttpClient httpClient = new HttpClient();
+  File file;
+  String filePath = '';
+  String myUrl = '';
+
+  try {
+    myUrl = url+'/'+fileName;
+    var request = await httpClient.getUrl(Uri.parse(myUrl));
+    var response = await request.close();
+    if(response.statusCode == 200) {
+      var bytes = await consolidateHttpClientResponseBytes(response);
+      filePath = '$dir/$fileName';
+      file = File(filePath);
+      await file.writeAsBytes(bytes);
+    }
+    else
+      filePath = 'Error code: '+response.statusCode.toString();
+  }
+  catch(ex){
+    filePath = 'Can not fetch url';
+  }
+
+  return filePath;
+}*/

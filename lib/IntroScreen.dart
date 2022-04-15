@@ -69,7 +69,7 @@ class _IntroScreenState extends State<IntroScreen>
     debugPrint(token);
     debugPrint(ROLE);
     if(token!="")
-      Navigator.push(context,MaterialPageRoute(builder: (context)=>landing()));
+      Navigator.pushReplacement(context,MaterialPageRoute(builder: (context)=>landing()));
     // Do what you want
     else
     Navigator.pushReplacementNamed(context, "Landing");

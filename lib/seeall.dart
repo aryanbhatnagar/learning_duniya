@@ -709,7 +709,7 @@ class _seeallpageState extends State<seeallpage> {
                            onTap:(){
                              Navigator.push(
                                  context, MaterialPageRoute(builder: (context) =>
-                                 assess(snapshot.data!.data1.assessments[i].id,"images/english.png")));
+                                 assess(snapshot.data!.data1.assessments[i].id,snapshot.data!.data1.assessments[i].img)));
                            },
                            child: Card(
                              elevation: 5,

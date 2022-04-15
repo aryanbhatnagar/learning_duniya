@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:learning_duniya/Login2.dart';
 import 'package:learning_duniya/quiz_assessment.dart';
+import 'package:learning_duniya/screen1%20(2).dart';
 
 import 'globals.dart';
 
@@ -439,7 +440,7 @@ class _ass_chapState extends State<ass_chap> {
                                       Navigator.pushReplacement(
                                           context,
                                           MaterialPageRoute(
-                                              builder: (context) => quiz_assessment(snapshot.data!.data.chapter.id,snapshot.data!.data.assessment.id,snapshot.data!.data.questionTypes[i].id)));}
+                                              builder: (context) => screen12(snapshot.data!.data.chapter.id,snapshot.data!.data.assessment.id,snapshot.data!.data.questionTypes[i].id)));}
                                     else{
                                       Navigator.push(
                                           context, MaterialPageRoute(builder: (context) => Login2()));

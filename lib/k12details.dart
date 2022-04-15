@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:learning_duniya/courseDesc.dart';
+import 'package:audioplayers/audioplayers.dart';
 
 K12Api k12ApiFromJson(String str) => K12Api.fromJson(json.decode(str));
 String courseID="1";
@@ -251,6 +252,7 @@ class _k12detailState extends State<k12detail> {
                                           fontFamily: "Candara",
                                           color: Colors.black)),
                                 ),
+
                               ],
                             ),
                             Row(
@@ -421,4 +423,5 @@ class _k12detailState extends State<k12detail> {
     );
   }
 }
+
 

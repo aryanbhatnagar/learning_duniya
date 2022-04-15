@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:intro_slider/intro_slider.dart';
 import 'package:learning_duniya/IntroScreen.dart';
 import 'package:learning_duniya/Login.dart';
@@ -19,6 +20,10 @@ Login1? log1=null;
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
+    statusBarColor: Colors.transparent,
+  ));
+  SystemChrome.setEnabledSystemUIOverlays([]);
   runApp(MyApp());
 }
 

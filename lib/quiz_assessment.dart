@@ -779,7 +779,6 @@ class _quizpageState extends State<quizpage> with TickerProviderStateMixin {
                                                       j -= 1;
                                                     else
                                                       debugPrint("No Previous Question");
-
                                                     setState(() {
                                                       if(j+1 == que.data.questions.length) {
                                                         submitVis = true;

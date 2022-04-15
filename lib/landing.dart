@@ -1,7 +1,10 @@
 import 'dart:convert';
+import 'dart:io';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:favorite_button/favorite_button.dart';
+import 'package:flutter/services.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:learning_duniya/Dashboard.dart';
 import 'package:learning_duniya/assessment.dart';
 import 'package:learning_duniya/courseDesc.dart';
@@ -13,6 +16,7 @@ import 'package:learning_duniya/navigationScreen.dart';
 import 'package:learning_duniya/profile.dart';
 import 'package:learning_duniya/quiz.dart';
 import 'package:group_button/group_button.dart';
+import 'package:learning_duniya/screen1%20(1).dart';
 import 'package:learning_duniya/seeall.dart';
 import 'package:learning_duniya/test.dart';
 import 'package:toggle_switch/toggle_switch.dart';
@@ -37,9 +41,127 @@ Future<K12Card> getMentorApi(String cls, String sub) async {
   }
 }
 
+var mentorDataMap = <String, dynamic>{};
+var Mcode=0;
+bool formvis=true;
+
+Studentdp studentdpFromJson(String str) => Studentdp.fromJson(json.decode(str));
+String studentdpToJson(Studentdp data4) => json.encode(data4.toJson());
+class Studentdp {
+  Studentdp({
+    required this.data4,
+    required this.status,
+  });
+
+  Data4 data4;
+  var status;
+
+  factory Studentdp.fromJson(Map<String, dynamic> json) => Studentdp(
+    data4: Data4.fromJson(json["data"]),
+    status: json["status"],
+  );
+
+  Map<String, dynamic> toJson() => {
+    "data": data4.toJson(),
+    "status": status,
+  };
+}
+class Data4 {
+  Data4({
+    required this.id,
+    required this.name,
+    required this.email,
+    required this.contactNo,
+    required this.img,
+    required this.registerRegion,
+    required this.registerCity,
+    required this.role,
+    required this.school,
+    required this.isOnline,
+    required this.classId,
+  });
+
+  var id;
+  var name;
+  var email;
+  var contactNo;
+  var img;
+  dynamic registerRegion;
+  var registerCity;
+  var role;
+  var school;
+  var isOnline;
+  var classId;
+
+  factory Data4.fromJson(Map<String, dynamic> json) => Data4(
+    id: json["id"],
+    name: json["name"],
+    email: json["email"],
+    contactNo: json["contact_no"],
+    img: json["img"],
+    registerRegion: json["register_region"],
+    registerCity: json["register_city"],
+    role: json["role"],
+    school: json["school"],
+    isOnline: json["is_online"],
+    classId: json["class_id"],
+  );
+
+  Map<String, dynamic> toJson() => {
+    "id": id,
+    "name": name,
+    "email": email,
+    "contact_no": contactNo,
+    "img": img,
+    "register_region": registerRegion,
+    "register_city": registerCity,
+    "role": role,
+    "school": school,
+    "is_online": isOnline,
+    "class_id": classId,
+  };
+}
+
+
+Future createStuDp(Map mentorData, File image) async {
+  int responseCode;
+  Map<String, String> headers = {"Authorization": "Bearer $token"};
+  const String apiUrl =
+      "http://ec2-13-234-116-155.ap-south-1.compute.amazonaws.com/api/profile";
+  var uri = Uri.parse(apiUrl);
+
+  var request = http.MultipartRequest("POST", uri);
+  request.headers.addAll(headers);
+
+  http.MultipartFile multipartFile =
+  await http.MultipartFile.fromPath('img', image.path);
+  request.files.add(multipartFile);
+  request.fields["school"] = mentorData['school'];
+  request.fields["city"] = mentorData['city'];
+
+
+  // listen for response
+  http.Response response = await http.Response.fromStream(await request.send());
+  print("Result: ${response.statusCode}");
+  //return response.body;
+
+  if (response.statusCode == 200) {
+    Mcode=200;
+    final String responseString = response.body;
+    debugPrint(responseString.toString());
+    //debugPrint(response.stream..toString());
+    return studentdpFromJson(responseString);
+
+  }
+  if (response.statusCode == 404) {
+    return throw Exception("failed");
+  }
+
+}
 
 
 var CLASSid;
+//dynamic imageTemp;
 StuDashboard stuDashboardFromJson(String str) => StuDashboard.fromJson(json.decode(str));
 String stuDashboardToJson(StuDashboard data) => json.encode(data.toJson());
 
@@ -658,7 +780,36 @@ class _landingPageState extends State<landingPage> {
       _selectedIndex=i;
     });
   }
+  final schoolController = TextEditingController();
+  final cityController = TextEditingController();
 
+
+
+  File? image;
+  Future pickImage() async {
+    try {
+      final image = await ImagePicker().pickImage(source: ImageSource.gallery);
+
+      if (image == null) return;
+      final imageTemp = File(image.path);
+
+      setState(() => this.image = imageTemp);
+    } on PlatformException catch (e) {
+      debugPrint('Failed to pick image: $e');
+    }
+  }
+  Future pickImageCamera() async {
+    try {
+      final image = await ImagePicker().pickImage(source: ImageSource.camera);
+
+      if (image == null) return;
+      final imageTemp = File(image.path);
+
+      setState(() => this.image = imageTemp);
+    } on PlatformException catch (e) {
+      debugPrint('Failed to pick image: $e');
+    }
+  }
 
   Future<void> _onItemTapped(int index) async {
     if(index==1)
@@ -686,6 +837,9 @@ class _landingPageState extends State<landingPage> {
   void initState()  {
     super.initState();
   }
+
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -1563,9 +1717,7 @@ class _landingPageState extends State<landingPage> {
                                         fontFamily: "Candara")),
                                 RaisedButton(
                                   onPressed: () {
-                                    Navigator.push(
-                                        context, MaterialPageRoute(builder: (context) =>navigationScreenPage()));
-
+                                    Navigator.push(context, MaterialPageRoute(builder: (context) => navigationScreenPage()));
                                   },
                                   child: Text('Browse all mock tests',
                                       style: TextStyle(
@@ -1697,8 +1849,10 @@ class _landingPageState extends State<landingPage> {
                                             padding:
                                             const EdgeInsets.only(left: 10, right: 10, bottom: 10),
                                             child: RaisedButton(
-                                              onPressed: () {},
-                                              child: Text('PRACTICE AGAIN',
+                                              onPressed: () {
+                                                Navigator.push(context, MaterialPageRoute(builder: (context) => screen1()));
+                                              },
+                                              child: Text('Analyze your Performance',
                                                   style: TextStyle(
                                                       color: Colors.white,
                                                       fontSize: 15.0,
@@ -2056,16 +2210,282 @@ class _landingPageState extends State<landingPage> {
           child: ListView(
             padding: EdgeInsets.zero,
             children: [
-              const DrawerHeader(
+              if(token!="")
+                DrawerHeader(
                 decoration: BoxDecoration(
-                  color: Colors.teal,
+                  color: Colors.transparent,
                 ),
-                child: Text('MENU'),
+                child: Container(
+                  child: GestureDetector(
+                    child: Column(
+                      children: [
+                        CircleAvatar(
+                          backgroundColor: Colors.deepPurple,
+                          radius: 60,
+                          backgroundImage: image!= null
+                              ? FileImage(image!)
+                              : AssetImage('images/mentorProfile.jpeg')
+                          as ImageProvider,
+                          /*child: Container(
+                                    padding: EdgeInsets.all(5),
+                                    child: ClipRRect(
+                                      borderRadius: BorderRadius.circular(25),
+                                      child: image != null
+                                          ? Image.file(image!)
+                                          : Image.asset('images/mentorProfile.jpeg'),
+                                    ),
+                                  ),*/
+                        ),
+                      ],
+                    ),
+                    onTap: () {
+                      //pickImage();
+                      showDialog(
+                          context: context,
+                          builder: (BuildContext context) {
+                            return AlertDialog(
+                              title: Center(
+                                  child: Text('Select Image',
+                                      style:
+                                      TextStyle(fontFamily: 'Candara'))),
+                              content: SingleChildScrollView(
+                                child: ListBody(
+                                  children: <Widget>[
+                                    ElevatedButton(
+                                        style: ButtonStyle(
+                                            backgroundColor:
+                                            MaterialStateProperty.all<
+                                                Color>(Colors.deepPurple),
+                                            shape: MaterialStateProperty.all<
+                                                RoundedRectangleBorder>(
+                                                RoundedRectangleBorder(
+                                                    borderRadius:
+                                                    BorderRadius.circular(
+                                                        10),
+                                                    side: BorderSide(
+                                                        color: Colors
+                                                            .deepPurple)))),
+                                        onPressed: () {
+                                          pickImage();
+                                          Navigator.of(context).pop();
+                                        },
+                                        child: Wrap(
+                                          children: <Widget>[
+                                            Icon(
+                                              Icons.image,
+                                              color: Colors.white,
+                                            ),
+                                            SizedBox(
+                                              width: 10,
+                                            ),
+                                            Text('Gallery',
+                                                style: TextStyle(
+                                                    fontFamily: 'Candara',
+                                                    fontSize: 18))
+                                          ],
+                                        )),
+                                    ElevatedButton(
+                                        style: ButtonStyle(
+                                            backgroundColor:
+                                            MaterialStateProperty.all<
+                                                Color>(Colors.deepPurple),
+                                            shape: MaterialStateProperty.all<
+                                                RoundedRectangleBorder>(
+                                                RoundedRectangleBorder(
+                                                    borderRadius:
+                                                    BorderRadius.circular(
+                                                        10),
+                                                    side: BorderSide(
+                                                        color: Colors
+                                                            .deepPurple)))),
+                                        onPressed: () {
+                                          pickImageCamera();
+                                          Navigator.of(context).pop();
+                                        },
+                                        child: Wrap(
+                                          children: <Widget>[
+                                            Icon(
+                                              Icons.camera,
+                                              color: Colors.white,
+                                            ),
+                                            SizedBox(
+                                              width: 10,
+                                            ),
+                                            Text('Camera',
+                                                style: TextStyle(
+                                                    fontFamily: 'Candara',
+                                                    fontSize: 18))
+                                          ],
+                                        )),
+                                  ],
+                                ),
+                              ),
+                            );
+                          });
+                    },
+                  ),
+                ),
               ),
+              if(token!="")
+                Visibility(
+                  visible: formvis,
+                  child: Container(
+                  padding: EdgeInsets.all(10),
+                  width: double.infinity,
+                  //height: Wrap(),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      if(image!=null)
+                        SizedBox(
+                          height: 5,
+                        ),
+                      if(image!=null)
+                        Text(
+                          'School Name',
+                          style: TextStyle(fontFamily: 'Candara'),
+                        ),
+                      SizedBox(
+                        height: 5,
+                      ),
+                      if(image!=null)
+                        TextFormField(
+                          controller: schoolController,
+                          textInputAction: TextInputAction.next,
+                          keyboardType: TextInputType.name,
+                          decoration: InputDecoration(
+                            border: OutlineInputBorder(),
+                            hintText: 'School',
+                            hintStyle: TextStyle(fontFamily: 'Candara'),
+                          ),
+                        ),
+                      SizedBox(
+                        height: 20,
+                      ),
+                      if(image!=null)
+                        Text(
+                          'City',
+                          style: TextStyle(fontFamily: 'Candara'),
+                        ),
+                      SizedBox(
+                        height: 5,
+                      ),
+                      if(image!=null)
+                        TextFormField(
+                          controller: cityController,
+                          textInputAction: TextInputAction.next,
+                          keyboardType: TextInputType.emailAddress,
+                          decoration: InputDecoration(
+                            border: OutlineInputBorder(),
+                            hintText: 'City',
+                            hintStyle: TextStyle(fontFamily: 'Candara'),
+                          ),
+                        ),
+                      if(image!=null)
+                        Center(
+                          child: ElevatedButton(
+                            style: ButtonStyle(
+                                backgroundColor: MaterialStateProperty.all<Color>(
+                                    Colors.deepPurple),
+                                shape: MaterialStateProperty.all<
+                                    RoundedRectangleBorder>(
+                                    RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(10),
+                                        side: BorderSide(color: Colors.deepPurple)))),
+                            onPressed: () async {
+                              if (cityController.text.isEmpty ||
+                                  schoolController.text.isEmpty ) {
+                                showDialog(
+                                    context: context,
+                                    builder: (BuildContext context) {
+                                      return AlertDialog(
+                                        title: Text('Error'),
+                                        content: Text('Please fill all the fields'),
+                                        actions: <Widget>[
+                                          ElevatedButton(
+                                            child: Text('Ok'),
+                                            onPressed: () {
+                                              Navigator.of(context).pop();
+                                            },
+                                          )
+                                        ],
+                                      );
+                                    });
+                              } else  {
+
+                                mentorDataMap['img'] = image;
+                                mentorDataMap['school'] = schoolController.text;
+                                mentorDataMap['city'] = cityController.text;
+                                debugPrint(mentorDataMap.toString());
+
+                                if(image!=null){
+                                  Studentdp s =await createStuDp(mentorDataMap, image!);
+                                  debugPrint(s.toString());
+                                  if(Mcode==200)
+                                    {
+                                      showDialog(
+                                        barrierDismissible: false,
+                                          context: context,
+                                          builder: (BuildContext context) {
+                                            return AlertDialog(
+                                              title: Text('Thank you'),
+                                              content: Text('Profile Updated Successfully'),
+                                              actions: <Widget>[
+                                                ElevatedButton(
+                                                  child: Text('Close'),
+                                                  onPressed: () {
+                                                    setState(() {
+                                                      formvis=false;
+                                                    });
+                                                    Navigator.pushReplacement(context,MaterialPageRoute(builder: (context)=>landing()));
+                                                    Navigator.of(context).pop();
+                                                  },
+                                                )
+                                              ],
+                                            );
+                                          });
+                                    }
+
+                                }
+                                else
+                                  showDialog(
+                                      context: context,
+                                      builder: (BuildContext context) {
+                                        return AlertDialog(
+                                          title: Text('Error'),
+                                          content: Text('Please enter an image'),
+                                          actions: <Widget>[
+                                            ElevatedButton(
+                                              child: Text('Close'),
+                                              onPressed: () {
+                                                Navigator.of(context).pop();
+                                              },
+                                            )
+                                          ],
+                                        );
+                                      });
+                              }
+                            },
+                            child: Text(
+                              'UPDATE PROFILE',
+                              style: TextStyle(
+                                  fontFamily: 'Candara',
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.w500),
+                            )),
+                        ),
+                    ],
+                  ),
+              ),
+                ),
               if(token!="")
                 ListTile(
                 title: const Text('Profile'),
-                onTap: () {
+                onTap: () async {
+                  Future<StudentAction?> action =
+                      await _asyncStudentDialog(context,);
                   // Update the state of the app
                   // ...
                   // Then close the drawer
@@ -2076,6 +2496,7 @@ class _landingPageState extends State<landingPage> {
                 ListTile(
                 title: const Text('Logout'),
                 onTap: () {
+
                   setState(()  {
                     userName = "";
                     userEmail = "";
@@ -2094,7 +2515,8 @@ class _landingPageState extends State<landingPage> {
                     Navigator.push(context, MaterialPageRoute(
                         builder: (context) => Login()));
                   },
-                )
+                ),
+
             ],
           ),
         ),
@@ -2240,6 +2662,7 @@ Future<Future<ConfirmAction?>> _asyncConfirmDialog(
                           isEmpty: _currentSelectedValue == '',
                           child: DropdownButtonHideUnderline(
                             child: DropdownButton(
+                              menuMaxHeight: 200,
                               hint: _dropDownValue == null
                                   ? Text('Dropdown')
                                   : Text(
@@ -2458,6 +2881,57 @@ Future<Future<SubjectAction?>> _asyncSubjectDialog(
           ),
         ],
       );
+    },
+  );
+}
+
+enum StudentAction { Confirm }
+Future<Future<StudentAction?>> _asyncStudentDialog(
+    BuildContext context,
+    ) async {
+
+
+
+
+  return showDialog<StudentAction?>(
+    context: context,
+    barrierDismissible: false, // user must tap button for close dialog!
+    builder: (BuildContext context1) {
+      String _currentSelectedVakue='';
+
+      return StatefulBuilder(builder: (context1, setState) {
+        _landingPageState f = new _landingPageState();
+
+        return AlertDialog(
+          //title: Text('Delete This Contact?'),
+          shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.all(Radius.circular(15))),
+          title: Text("UPDATE YOUR PROFILE"),
+          actions: <Widget>[
+            Center(
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  ElevatedButton(
+                    style: ButtonStyle(
+                        backgroundColor: MaterialStateProperty.all<Color>(
+                            Colors.teal)),
+                    child: Text(
+                      'Cancel',
+                      style: TextStyle(
+                        fontFamily: 'Candara',
+                      ),
+                    ),
+                    onPressed: () {
+                      Navigator.of(context).pop(StudentAction.Confirm);
+                    },
+                  ),
+                ],
+              ),
+            ),
+          ],
+        );
+      });
     },
   );
 }

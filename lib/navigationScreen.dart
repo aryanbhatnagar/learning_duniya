@@ -1,4 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:learning_duniya/screen1%20(2).dart';
+import 'package:learning_duniya/screen2%20(1).dart';
+import 'package:learning_duniya/screen3%20(1).dart';
+import 'package:learning_duniya/screen4.dart';
+import 'package:learning_duniya/screen5.dart';
 import 'screen2.dart';
 import 'screen1 (1).dart';
 import 'screen3.dart';
@@ -23,14 +28,19 @@ class _navigationScreenPageState extends State<navigationScreenPage> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             ElevatedButton(onPressed: () {
-              Navigator.push(context, MaterialPageRoute(builder: (context) => screen1()));
-            }, child: Text('Screen 1')),
+             }, child: Text('Screen 1')),
             ElevatedButton(onPressed: () {
-              Navigator.push(context, MaterialPageRoute(builder: (context) => screen2()));
+              Navigator.push(context, MaterialPageRoute(builder: (context) => screen22()));
             }, child: Text('Screen 2')),
             ElevatedButton(onPressed: () {
-              Navigator.push(context, MaterialPageRoute(builder: (context) => screen3()));
+              Navigator.push(context, MaterialPageRoute(builder: (context) => screen32()));
             }, child: Text('Screen 3')),
+            ElevatedButton(onPressed: () {
+              Navigator.push(context, MaterialPageRoute(builder: (context) => screen4()));
+            }, child: Text('Screen 4')),
+            ElevatedButton(onPressed: () {
+              Navigator.push(context, MaterialPageRoute(builder: (context) => screen5()));
+            }, child: Text('Screen 5')),
           ],
         ),
       ),

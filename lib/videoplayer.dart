@@ -1,11 +1,14 @@
 import 'dart:convert';
+import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 import 'package:favorite_button/favorite_button.dart';
 import 'package:flutter/material.dart';
+import 'package:learning_duniya/Dashboard.dart';
 import 'package:video_player/video_player.dart';
 import 'package:flutter/cupertino.dart';
 import 'globals.dart';
 import 'package:wakelock/wakelock.dart';
+import 'package:chewie/chewie.dart';
 
 Videolike videolikeFromJson(String str) => Videolike.fromJson(json.decode(str));
 String videolikeToJson(Videolike data) => json.encode(data.toJson());
@@ -95,26 +98,27 @@ class _videoState extends State<video> {
 
 
   late VideoPlayerController _controller;
+  late ChewieController _chewieController;
+  double _aspectRatio = 16 / 9;
 
   @override
   void initState() {
     super.initState();
     _controller = VideoPlayerController.network(_url);
         _controller.addListener(() {
-      setState(() {
-      });
+     setState(() {
+     });
     });
-
     _controller.setLooping(true);
+    _controller.setVolume(1);
     _controller.initialize().then((_) => setState(() {}));
-    _controller.play();
-
-
+   _controller.play();
 
   }
 
   @override
   Widget build(BuildContext context) {
+    Size size =MediaQuery.of(context).size;
     dispLike=_like;
     video_id=_vid;
     if (count==0) {
@@ -126,7 +130,7 @@ class _videoState extends State<video> {
     return MaterialApp(
       title: 'Video Demo',
       home: Scaffold(
-        appBar: AppBar(
+       /* appBar: AppBar(
           backgroundColor: Colors.teal,
           centerTitle: true,
             leading: IconButton(icon: Icon(Icons.arrow_back), onPressed: () { Navigator.pop(context); },),
@@ -138,75 +142,79 @@ class _videoState extends State<video> {
                     fontSize: 15),
             maxLines: 1,
             overflow: TextOverflow.ellipsis,)
-        ),
-        body: Container(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Align(
-                alignment: Alignment.bottomCenter,
-                child: _controller.value.isInitialized
-                    ? AspectRatio(
-                        aspectRatio: _controller.value.aspectRatio,
-                        child: Stack(
-                          alignment: Alignment.bottomCenter,
-                          children: <Widget>[
-                            VideoPlayer(_controller),
-                            _ControlsOverlay(controller: _controller),
-                            VideoProgressIndicator(_controller, allowScrubbing: true),
-                          ],
-                        )
-                )
-                    :Container(
-                  child: Center(child: CircularProgressIndicator(color: Colors.teal,),),
-                ),
-              ),
-              SizedBox(height: 10),
-              Container(
-                padding: EdgeInsets.all(10),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Flexible(child: Text(_name,style: TextStyle(fontFamily: "Candara",fontSize: 20),maxLines: 2,overflow: TextOverflow.ellipsis)),
-                    FavoriteButton(
-                      iconSize: 40,
-                      isFavorite: false,
-                      valueChanged: (_isFavorite) async {
-                        if(_isFavorite==true){
-                          Videolike Abc=await createVideovisit(video_id);
-                          if(like==1)
-                            print("video like successfull");
-                          setState(() {
-                            dispLike++;
-                          });
-                        }
-                        else
-                          setState(() {
-                            dispLike--;
-                          });
+        )*/
+        body: SingleChildScrollView(
+          child: Container(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Align(
+                  alignment: Alignment.bottomCenter,
+                  child: _controller.value.isInitialized
+                      ? AspectRatio(
+                          aspectRatio: 7/5,
+                          child: Stack(
+                            alignment: Alignment.bottomCenter,
+                            children: <Widget>[
 
-                        print('Is Favorite : $_isFavorite');
-                      },
-                    )
-                  ],
+                              VideoPlayer(_controller),
+                              _ControlsOverlay(controller: _controller),
+                              VideoProgressIndicator(_controller, allowScrubbing: true),
+                            ],
+                          )
+                  )
+                      :Container(
+                    child: Center(child: CircularProgressIndicator(color: Colors.teal,),),
+                  ),
                 ),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(10),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    Icon(Icons.favorite,color: Colors.red,size: 22),
-                    Text(dispLike.toString(),style: TextStyle(fontSize:15,fontFamily: "Candara",color: Colors.teal)),
-                    SizedBox(width: 30),
-                    Icon(Icons.play_arrow_rounded,color: Colors.blue,size: 27),
-                    Text(_visit.toString(),style: TextStyle(fontSize:15,fontFamily: "Candara",color: Colors.grey))
-                  ],
+                SizedBox(height: 10),
+                Container(
+                  padding: EdgeInsets.all(10),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Flexible(child: Text(_name,style: TextStyle(fontFamily: "Candara",fontSize: 20),maxLines: 2,overflow: TextOverflow.ellipsis)),
+                      FavoriteButton(
+                        iconSize: 40,
+                        isFavorite: false,
+                        valueChanged: (_isFavorite) async {
+                          if(_isFavorite==true){
+                            Videolike Abc=await createVideovisit(video_id);
+                            if(like==1)
+                              print("video like successfull");
+                            setState(() {
+                              dispLike++;
+                            });
+                          }
+                          else
+                            setState(() {
+                              dispLike--;
+                            });
+
+                          print('Is Favorite : $_isFavorite');
+                        },
+                      )
+                    ],
+                  ),
                 ),
-              ),
-              Padding(padding: EdgeInsets.fromLTRB(10,10,10,0),
-              child: Text(_description,style: TextStyle(fontFamily: "Candara",fontSize: 16,color: Colors.grey)),),
-            ],
+                Padding(
+                  padding: const EdgeInsets.all(10),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      Icon(Icons.favorite,color: Colors.red,size: 22),
+                      Text(dispLike.toString(),style: TextStyle(fontSize:15,fontFamily: "Candara",color: Colors.teal)),
+                      SizedBox(width: 30),
+                      Icon(Icons.play_arrow_rounded,color: Colors.blue,size: 27),
+                      Text(_visit.toString(),style: TextStyle(fontSize:15,fontFamily: "Candara",color: Colors.grey))
+                    ],
+                  ),
+                ),
+                Padding(padding: EdgeInsets.fromLTRB(10,10,10,0),
+                child: Text(_description,style: TextStyle(fontFamily: "Candara",fontSize: 16,color: Colors.grey)),),
+                SizedBox(height: 30,)
+              ],
+            ),
           ),
         ),
 
@@ -276,7 +284,7 @@ class _ControlsOverlay extends StatelessWidget {
           },
         ),
         Align(
-          alignment: Alignment.bottomRight,
+          alignment: Alignment.bottomLeft,
           child: Padding(
             padding: const EdgeInsets.all(8.0),
             child: Container(
