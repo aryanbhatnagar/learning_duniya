@@ -300,7 +300,7 @@ class _needHelpPageState extends State<need_help_page> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: <Widget>[
                           Text(
-                            userName,
+                            mentor,
                             style: TextStyle(
                                 fontSize: 18,
                                 fontWeight: FontWeight.bold,

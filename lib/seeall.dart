@@ -270,6 +270,7 @@ class _seeallpageState extends State<seeallpage> {
   List<Widget> k12 = <Widget>[];
   List<Widget> comp_e = <Widget>[];
   List<Widget> mento = <Widget>[];
+  TextEditingController searchText = new TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -542,7 +543,22 @@ class _seeallpageState extends State<seeallpage> {
     if (code == 4)
       return Scaffold(
         appBar: AppBar(
-          title: Text(title),
+          toolbarHeight: 70,
+          title: TextFormField(
+            controller: searchText,
+            cursorColor: Colors.white,
+            style: TextStyle(color: Colors.white),
+            onChanged: (value) => {
+
+            },
+            decoration: InputDecoration(
+              labelText: 'Search',
+              focusColor: Colors.white,
+
+              labelStyle: TextStyle(color: Colors.white),
+              suffixIcon: Icon(Icons.search,color: Colors.white,),
+            ),
+          ),
           backgroundColor: Colors.teal,
           centerTitle: true,
         ),
@@ -556,8 +572,11 @@ class _seeallpageState extends State<seeallpage> {
                       color: Colors.grey[200],
                       child: Column(
                         children: [
-                          for(var i=0;i<snapshot.data!.data.mentors.length;i++)
-                            GestureDetector(
+                          Text("All ${title}",style: TextStyle(fontFamily: "Candara",fontSize: 22,fontWeight: FontWeight.bold),),
+                          SizedBox(height: 10,),
+                          if(searchText.text=="")
+                            for(var i=0;i<snapshot.data!.data.mentors.length;i++)
+                              GestureDetector(
                               onTap:(){
                                 Navigator.push(
                                     context, MaterialPageRoute(builder: (context) => mentor(snapshot.data!.data.mentors[i].id)));
@@ -668,16 +687,123 @@ class _seeallpageState extends State<seeallpage> {
                                   ),
                                 ),
                               ),
-                            )
-                          /* new Expanded(
-                            child: GridView.count(
-                              childAspectRatio: 0.77,
-                              crossAxisCount: 2,
-                              children: <Widget>[
-
-                              ],
                             ),
-                          ),*/
+                          if(searchText.text!="")
+                            for(var i=0;i<snapshot.data!.data.mentors.length;i++)
+                              if(snapshot.data!.data.mentors[i].eduName.toString().toLowerCase().contains(searchText.text.toLowerCase()))
+                                GestureDetector(
+                                onTap:(){
+                                  Navigator.push(
+                                      context, MaterialPageRoute(builder: (context) => mentor(snapshot.data!.data.mentors[i].id)));
+                                },
+                                child: Card(
+                                  elevation: 5,
+                                  shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.all(Radius.circular(10))),
+                                  child: Container(
+                                    padding: EdgeInsets.all(8),
+                                    child: Row(
+                                      mainAxisAlignment: MainAxisAlignment.start,
+                                      crossAxisAlignment: CrossAxisAlignment.center,
+                                      children: [
+                                        Center(
+                                          child: CircleAvatar(
+                                            backgroundImage: NetworkImage("${snapshot.data!.data.mentors[i].img}"),
+                                            radius: 30,
+                                          ),
+                                        ),
+                                        SizedBox(width: 10,),
+                                        Card(
+                                          elevation: 0,
+                                          color: Colors.transparent,
+                                          child: Column(
+                                            crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                            children: [
+                                              Text(
+                                                '${snapshot.data!.data.mentors[i].eduName}',
+                                                style: TextStyle(
+                                                  fontWeight: FontWeight.bold,
+                                                  fontFamily: 'Candara',
+                                                  fontSize: 18,
+                                                ),
+                                              ),
+                                              Row(
+                                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                children: [
+                                                  Text(
+                                                      '${snapshot.data!.data.mentors[i].specilization}  |  ',
+                                                      style: TextStyle(
+                                                        fontWeight: FontWeight.bold,
+                                                        fontFamily: 'Candara',
+                                                        color: Colors.grey,
+                                                        fontSize: 12,
+                                                      ),
+                                                      maxLines: 5,
+                                                      overflow: TextOverflow.ellipsis),
+                                                  Text(
+                                                      '${snapshot.data!.data.mentors[i].exp} yrs',
+                                                      style: TextStyle(
+                                                        fontWeight: FontWeight.bold,
+                                                        fontFamily: 'Candara',
+                                                        color: Colors.grey,
+                                                        fontSize: 12,
+                                                      ),
+                                                      maxLines: 5,
+                                                      overflow: TextOverflow.ellipsis),
+                                                ],
+                                              ),
+                                              Row(
+                                                children: [
+                                                  //getIcon(snapshot.data!.data2.mentees2[i].mode.toString()),
+                                                  //Text(snapshot.data!.data2.mentees2[i].mode.toString()),
+                                                  RichText(
+                                                    text: TextSpan(
+                                                      text: "City: ",
+                                                      style: TextStyle(
+                                                        color: Colors.grey,
+                                                        fontWeight: FontWeight.bold,
+                                                        fontFamily: 'Candara',
+                                                        fontSize: 10,
+                                                      ),
+                                                      children: <TextSpan>[
+                                                        TextSpan(
+                                                            text:
+                                                            '  ${snapshot.data!.data.mentors[i].city}  ',
+                                                            style: TextStyle(
+                                                                fontSize: 10,
+                                                                color: Color.fromARGB(
+                                                                    255, 59, 48, 214))),
+                                                      ],
+                                                    ),
+                                                  ),
+
+                                                ],
+                                              ),
+                                              /*Text(
+                                             '${snapshot.data!.data2.mentees2[i].datetime.day}/' +
+                                                 convMon(snapshot.data!.data2.mentees2[i].datetime.month)+'/' +
+                                                 '${snapshot.data!.data2.mentees2[i].datetime.year}  ' +
+                                                 '${snapshot.data!.data2.mentees2[i].datetime.hour}:' +
+                                                 convMin(snapshot.data!.data2.mentees2[i].datetime.minute),
+                                             style: TextStyle(
+                                               fontWeight: FontWeight.bold,
+                                               fontFamily: 'Candara',
+                                               fontSize: 11,
+                                             ),
+                                           ),*/
+                                              SizedBox(
+                                                height: 10,
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              ),
+
                         ],
                       )),
                 );
@@ -690,9 +816,24 @@ class _seeallpageState extends State<seeallpage> {
     else
       return Scaffold(
         appBar: AppBar(
+          toolbarHeight: 70,
           backgroundColor: Colors.teal,
           centerTitle: true,
-          title: Text(title),
+          title: TextFormField(
+            controller: searchText,
+            cursorColor: Colors.white,
+            style: TextStyle(color: Colors.white),
+            onChanged: (value) => {
+
+            },
+            decoration: InputDecoration(
+              labelText: 'Search',
+              focusColor: Colors.white,
+
+              labelStyle: TextStyle(color: Colors.white),
+              suffixIcon: Icon(Icons.search,color: Colors.white,),
+            ),
+          ),
         ),
         body: FutureBuilder(
             future: getAllAsses(),
@@ -704,8 +845,11 @@ class _seeallpageState extends State<seeallpage> {
                     color: Colors.grey[200],
                     child: Column(
                       children: [
-                       for(var i=0;i<snapshot.data!.data1.assessments.length;i++)
-                         GestureDetector(
+                        Text("All ${title}s",style: TextStyle(fontFamily: "Candara",fontSize: 22,fontWeight: FontWeight.bold),),
+                       SizedBox(height: 10,),
+                       if(searchText.text=="")
+                         for(var i=0;i<snapshot.data!.data1.assessments.length;i++)
+                           GestureDetector(
                            onTap:(){
                              Navigator.push(
                                  context, MaterialPageRoute(builder: (context) =>
@@ -802,7 +946,110 @@ class _seeallpageState extends State<seeallpage> {
                                ),
                              ),
                            ),
-                         )
+                         ),
+                       if(searchText.text!="")
+                         for(var i=0;i<snapshot.data!.data1.assessments.length;i++)
+                           if(snapshot.data!.data1.assessments[i].assessmentName.toString().toLowerCase().contains(searchText.text.toLowerCase())
+                           || snapshot.data!.data1.assessments[i].subject.toString().toLowerCase().contains(searchText.text.toLowerCase()))
+                             GestureDetector(
+                             onTap:(){
+                               Navigator.push(
+                                   context, MaterialPageRoute(builder: (context) =>
+                                   assess(snapshot.data!.data1.assessments[i].id,snapshot.data!.data1.assessments[i].img)));
+                             },
+                             child: Card(
+                               elevation: 5,
+                               shape: RoundedRectangleBorder(
+                                   borderRadius: BorderRadius.all(Radius.circular(10))),
+                               child: Container(
+                                 padding: EdgeInsets.all(8),
+                                 child: Row(
+                                   mainAxisAlignment: MainAxisAlignment.start,
+                                   crossAxisAlignment: CrossAxisAlignment.center,
+                                   children: [
+                                     Center(
+                                       child: CircleAvatar(
+                                         backgroundImage: NetworkImage("${snapshot.data!.data1.assessments[i].img.toString()}"),
+                                         radius: 30,
+                                       ),
+                                     ),
+                                     SizedBox(width: 10,),
+                                     Card(
+                                       elevation: 0,
+                                       color: Colors.transparent,
+                                       child: Column(
+                                         crossAxisAlignment:
+                                         CrossAxisAlignment.start,
+                                         children: [
+                                           Text(
+                                             '${snapshot.data!.data1.assessments[i].assessmentName}',
+                                             style: TextStyle(
+                                               fontWeight: FontWeight.bold,
+                                               fontFamily: 'Candara',
+                                               fontSize: 18,
+                                             ),
+                                           ),
+                                           Text(
+                                               '${snapshot.data!.data1.assessments[i].subject}',
+                                               style: TextStyle(
+                                                 //fontWeight: FontWeight.bold,
+                                                 fontFamily: 'Candara',
+                                                 color: Colors.grey,
+                                                 fontSize: 13 ,
+                                               ),
+                                               maxLines: 5,
+                                               overflow: TextOverflow.ellipsis),
+                                           Row(
+                                             children: [
+                                               //getIcon(snapshot.data!.data2.mentees2[i].mode.toString()),
+                                               //Text(snapshot.data!.data2.mentees2[i].mode.toString()),
+                                               RichText(
+                                                 text: TextSpan(
+                                                   text: "Class: ",
+                                                   style: TextStyle(
+                                                     color: Colors.grey,
+                                                     fontWeight: FontWeight.bold,
+                                                     fontFamily: 'Candara',
+                                                     fontSize: 10,
+                                                   ),
+                                                   children: <TextSpan>[
+                                                     TextSpan(
+                                                         text:
+                                                         '  ${snapshot.data!.data1.assessments[i].Class}  ',
+                                                         style: TextStyle(
+                                                             fontSize: 10,
+                                                             color: Color.fromARGB(
+                                                                 255, 59, 48, 214))),
+                                                   ],
+                                                 ),
+                                               ),
+
+                                             ],
+                                           ),
+                                           /*Text(
+                                           '${snapshot.data!.data2.mentees2[i].datetime.day}/' +
+                                               convMon(snapshot.data!.data2.mentees2[i].datetime.month)+'/' +
+                                               '${snapshot.data!.data2.mentees2[i].datetime.year}  ' +
+                                               '${snapshot.data!.data2.mentees2[i].datetime.hour}:' +
+                                               convMin(snapshot.data!.data2.mentees2[i].datetime.minute),
+                                           style: TextStyle(
+                                             fontWeight: FontWeight.bold,
+                                             fontFamily: 'Candara',
+                                             fontSize: 11,
+                                           ),
+                                         ),*/
+                                           SizedBox(
+                                             height: 10,
+                                           ),
+                                         ],
+                                       ),
+                                     ),
+                                   ],
+                                 ),
+                               ),
+                             ),
+                           ),
+
                        /* new Expanded(
                           child: GridView.count(
                             childAspectRatio: 0.77,

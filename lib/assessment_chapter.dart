@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:learning_duniya/Login2.dart';
+import 'package:learning_duniya/quiz_ass.dart';
 import 'package:learning_duniya/quiz_assessment.dart';
-import 'package:learning_duniya/screen1%20(2).dart';
+//import 'package:learning_duniya/screen1%20(2).dart';
 
 import 'globals.dart';
 

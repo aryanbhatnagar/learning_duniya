@@ -2,12 +2,28 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:http/http.dart' as http;
 import 'package:learning_duniya/landing.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'globals.dart';
 //import 'helprequest.dart';
 import 'dart:convert';
 
 MentorApi mentorApiFromJson(String str) => MentorApi.fromJson(json.decode(str));
 String mentorApiToJson(MentorApi data) => json.encode(data.toJson());
+
+Future<void> _logout() async {
+  /*final SharedPreferences prefs = await SharedPreferences.getInstance();
+  prefs.remove('role');
+  prefs.remove('token');*/
+  SharedPreferences.getInstance().then(
+        (prefs) {
+      prefs.remove("is_logged_in");
+      prefs.remove("token");
+      prefs.remove("role");
+      prefs.clear();
+    },
+  );
+
+}
 
 class MentorApi {
   MentorApi({
@@ -17,8 +33,8 @@ class MentorApi {
   });
 
   Data data;
-  String message;
-  int status;
+  var message;
+  var status;
 
   factory MentorApi.fromJson(Map<String, dynamic> json) => MentorApi(
     data: Data.fromJson(json["data"]),
@@ -43,21 +59,21 @@ class Data {
 
   Profile profile;
   List<Mentee> mentees;
-  UpcomingEvent upcomingEvent;
-  String pendingHelpRequest;
+  List<UpcomingEvent> upcomingEvent;
+  var pendingHelpRequest;
 
   factory Data.fromJson(Map<String, dynamic> json) => Data(
     profile: Profile.fromJson(json["profile"]),
     mentees:
     List<Mentee>.from(json["mentees"].map((x) => Mentee.fromJson(x))),
-    upcomingEvent: UpcomingEvent.fromJson(json["upcoming_event"]),
+    upcomingEvent: List<UpcomingEvent>.from(json["upcoming_event"].map((x) => UpcomingEvent.fromJson(x))),
     pendingHelpRequest: json["pending_help_request"],
   );
 
   Map<String, dynamic> toJson() => {
     "profile": profile.toJson(),
     "mentees": List<dynamic>.from(mentees.map((x) => x.toJson())),
-    "upcoming_event": upcomingEvent.toJson(),
+    "upcoming_event": List<dynamic>.from(upcomingEvent.map((x) => x.toJson())),
     "pending_help_request": pendingHelpRequest,
   };
 }
@@ -204,31 +220,8 @@ class Profile {
 
 class UpcomingEvent {
   UpcomingEvent({
-    required this.audioMode,
-    required this.videoMode,
-    required this.chatMode,
-  });
-
-  Mode audioMode;
-  Mode videoMode;
-  Mode chatMode;
-
-  factory UpcomingEvent.fromJson(Map<String, dynamic> json) => UpcomingEvent(
-    audioMode: Mode.fromJson(json["audio_mode"]),
-    videoMode: Mode.fromJson(json["video_mode"]),
-    chatMode: Mode.fromJson(json["chat_mode"]),
-  );
-
-  Map<String, dynamic> toJson() => {
-    "audio_mode": audioMode.toJson(),
-    "video_mode": videoMode.toJson(),
-    "chat_mode": chatMode.toJson(),
-  };
-}
-
-class Mode {
-  Mode({
     this.id,
+    this.userId,
     this.modeCommunication,
     this.message,
     required this.dateTime,
@@ -236,13 +229,15 @@ class Mode {
   });
 
   var id;
+  var userId;
   var modeCommunication;
   var message;
-  DateTime dateTime;
+  dynamic dateTime;
   Student student;
 
-  factory Mode.fromJson(Map<String, dynamic> json) => Mode(
+  factory UpcomingEvent.fromJson(Map<String, dynamic> json) => UpcomingEvent(
     id: json["id"],
+    userId: json["user_id"],
     modeCommunication: json["mode_communication"],
     message: json["message"],
     dateTime: DateTime.parse(json["date_time"]),
@@ -251,9 +246,42 @@ class Mode {
 
   Map<String, dynamic> toJson() => {
     "id": id,
+    "user_id": userId,
     "mode_communication": modeCommunication,
     "message": message,
     "date_time": dateTime.toIso8601String(),
+    "student": student.toJson(),
+  };
+}
+
+class Mode {
+  Mode({
+    this.id,
+    this.modeCommunication,
+    this.message,
+    this.dateTime,
+    this.student,
+  });
+
+  var id;
+  var modeCommunication;
+  var message;
+  var dateTime;
+  dynamic student;
+
+  factory Mode.fromJson(Map<String, dynamic> json) => Mode(
+    id: json["id"],
+    modeCommunication: json["mode_communication"],
+    message: json["message"],
+    dateTime: json["date_time"],
+    student: Student.fromJson(json["student"]),
+  );
+
+  Map<String, dynamic> toJson() => {
+    "id": id,
+    "mode_communication": modeCommunication,
+    "message": message,
+    "date_time": dateTime,
     "student": student.toJson(),
   };
 }
@@ -307,8 +335,8 @@ class MenteeData {
   });
 
   Data1 data1;
-  String message;
-  int status;
+  var message;
+  var status;
 
   factory MenteeData.fromJson(Map<String, dynamic> json) => MenteeData(
     data1: Data1.fromJson(json["data"]),
@@ -709,7 +737,6 @@ String capitalize(String s) => s[0].toUpperCase() + s.substring(1);
 
 String convMin(int minute) {
   String min;
-
   if (minute ~/ 10 == 0)
     min = '0' + minute.toString();
   else
@@ -774,6 +801,7 @@ class _profileState extends State<profile> {
   int _selectedIndexMenteePage = 0;
   //late final AnimationController _controller;
   bool _visible = false;
+  var k=1;
 
   Icon getIcon(String type) {
     Icon icon = Icon(
@@ -810,23 +838,23 @@ class _profileState extends State<profile> {
     String month = "-";
     Icon icon = Icon(
       Icons.add_call,
-      color: Colors.blue,
+      color: Color.fromARGB(255, 59, 48, 214),
     );
 
     if (type == "Audio Calls") {
       icon = Icon(
         Icons.add_call,
-        color: Colors.blue,
+        color: Color.fromARGB(255, 59, 48, 214),
       );
     } else if (type == "Video Calls") {
       icon = Icon(
         Icons.videocam,
-        color: Colors.blue,
+        color: Color.fromARGB(255, 59, 48, 214),
       );
     } else if (type == "Chat Message") {
       icon = Icon(
         Icons.message,
-        color: Colors.blueAccent,
+        color: Color.fromARGB(255, 59, 48, 214),
       );
     }
 
@@ -920,6 +948,7 @@ class _profileState extends State<profile> {
 
   @override
   Widget build(BuildContext context) {
+
     var pageData;
     List<Widget> menteePage = <Widget>[];
     var menteeData;
@@ -929,10 +958,18 @@ class _profileState extends State<profile> {
         _selectedIndex = index;
 
         if (index == 0)
-          title = 'Help Request';
+          {
+            k=0;
+            title = 'Help Request';
+          }
+
         else if (index == 1)
-          title = 'Mentor Profile';
-        else if (index == 2) title = 'Mentees';
+          {
+            k=1;
+            title = 'Mentor Profile';
+          }
+        else if (index == 2)
+          k=2;
       });
     }
 
@@ -1395,6 +1432,7 @@ class _profileState extends State<profile> {
           future: getMentorApi(),
           builder: (context, AsyncSnapshot<MentorApi> snapshot) {
             if (snapshot.hasData) {
+              var s=snapshot.data!.data.upcomingEvent;
               return Container(
                 padding: EdgeInsets.all(15),
                 child: SingleChildScrollView(
@@ -1466,12 +1504,12 @@ class _profileState extends State<profile> {
                                     MaterialStateProperty.all<Color>(
                                         Color.fromARGB(255, 59, 48, 214))),
                                 child: Container(
-                                    padding: EdgeInsets.all(15),
+                                    padding: EdgeInsets.all(12),
                                     child: Text(
                                       'Availability',
                                       style: TextStyle(
                                           fontFamily: 'Candara',
-                                          fontWeight: FontWeight.w900),
+                                          ),
                                     )),
                                 onPressed: () {},
                               )),
@@ -1562,42 +1600,14 @@ class _profileState extends State<profile> {
                           scrollDirection: Axis.vertical,
                           child: Column(
                             children: [
-                              getUpcomingEventCard(
-                                  snapshot.data!.data.upcomingEvent.audioMode.id
-                                      .toString(),
-                                  snapshot.data!.data.upcomingEvent.audioMode
-                                      .modeCommunication,
-                                  snapshot.data!.data.upcomingEvent.audioMode
-                                      .student.name
-                                      .toString(),
-                                  snapshot.data!.data.upcomingEvent.audioMode
-                                      .modeCommunication,
-                                  snapshot.data!.data.upcomingEvent.audioMode
-                                      .dateTime),
-                              getUpcomingEventCard(
-                                  snapshot.data!.data.upcomingEvent.videoMode.id
-                                      .toString(),
-                                  snapshot.data!.data.upcomingEvent.videoMode
-                                      .modeCommunication,
-                                  snapshot.data!.data.upcomingEvent.videoMode
-                                      .student.name
-                                      .toString(),
-                                  snapshot.data!.data.upcomingEvent.videoMode
-                                      .modeCommunication,
-                                  snapshot.data!.data.upcomingEvent.videoMode
-                                      .dateTime),
-                              getUpcomingEventCard(
-                                  snapshot.data!.data.upcomingEvent.chatMode.id
-                                      .toString(),
-                                  snapshot.data!.data.upcomingEvent.chatMode
-                                      .modeCommunication,
-                                  snapshot.data!.data.upcomingEvent.chatMode
-                                      .student.name
-                                      .toString(),
-                                  snapshot.data!.data.upcomingEvent.chatMode
-                                      .modeCommunication,
-                                  snapshot.data!.data.upcomingEvent.chatMode
-                                      .dateTime),
+                              for(var k=0;k<s.length;k++)
+                              getUpcomingEventCard(s[k].id.toString(),
+                                  snapshot.data!.data.upcomingEvent[k].modeCommunication,
+                                  snapshot.data!.data.upcomingEvent[k].student.name,
+                                  snapshot.data!.data.upcomingEvent[k].modeCommunication,
+                                  snapshot.data!.data.upcomingEvent[k].dateTime),
+
+
                             ],
                           )),
                       SizedBox(height: 20),
@@ -1701,16 +1711,7 @@ class _profileState extends State<profile> {
         child: SingleChildScrollView(
           child: Column(
             children: [
-              TextField(
-                controller: searchText,
-                onChanged: (value) => {
 
-                },
-                decoration: const InputDecoration(
-                  labelText: 'Search',
-                  suffixIcon: Icon(Icons.search),
-                ),
-              ),
               SizedBox(height: 20,),
               FutureBuilder(
                   future: getMenteeData(),
@@ -1841,89 +1842,143 @@ class _profileState extends State<profile> {
         menteeData = menteePage[index];
       });
     }
-
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Color.fromARGB(0, 194, 193, 193),
-        title: Text(
-          title,
-          style: TextStyle(fontFamily: "Candara"),
-        ),
-        centerTitle: true,
-        leading: Builder(
-          builder: (BuildContext context) {
-            return IconButton(
-              onPressed: () {
-                Scaffold.of(context).openDrawer();
-              },
-              icon: Icon(
-                Icons.menu,
-                color: Colors.white,
-              ),
-            );
-          },
-        ),
-        actions: <Widget>[
-          /*Padding(
-              padding: EdgeInsets.only(right: 20.0),
-              child: GestureDetector(
-                onTap: () {},
-                child: Icon(
-                  Icons.search,
-                  size: 26.0,
-                ),
-              )),*/
-        ],
+    List <Widget> appbartitle=<Widget>[
+      Text(
+        title,
+        style: TextStyle(fontFamily: "Candara"),
       ),
-      drawer: Drawer(
-        elevation: 5,
-        child: ListView(
-          padding: EdgeInsets.zero,
-          children: [
-            const DrawerHeader(
-              decoration: BoxDecoration(
-                color: Color.fromARGB(255, 59, 48, 214),
-              ),
-              child: Text('MENU'),
-            ),
-            if (token != "")
-              ListTile(
-                title: const Text('Profile'),
-                onTap: () {
-                  Navigator.pop(context);
+      Text(
+        title,
+        style: TextStyle(fontFamily: "Candara"),
+      ),
+      TextFormField(
+        controller: searchText,
+        onChanged: (value) => {
+
+        },
+        decoration: const InputDecoration(
+          labelText: 'Search',
+          suffixIcon: Icon(Icons.search),
+        ),
+      ),
+    ];
+
+    return WillPopScope(
+      onWillPop: () async => false,
+      child: Scaffold(
+        appBar: AppBar(
+          toolbarHeight: k==1 || k==0 ? 60 : 70,
+          backgroundColor: Color.fromARGB(0, 194, 193, 193),
+          title: appbartitle[k],
+          centerTitle: true,
+          leading: Builder(
+            builder: (BuildContext context) {
+              return IconButton(
+                onPressed: () {
+                  Scaffold.of(context).openDrawer();
                 },
-              ),
-            if (token != "")
-              ListTile(
-                title: const Text('Logout'),
-                onTap: () {
-                  setState(() {
-                    userName = "";
-                    userEmail = "";
-                    userId = 0;
-                    token = "";
-                    classId = "";
-                  });
-                  Navigator.pop(context);
-                  Navigator.pushReplacement(context,
-                      MaterialPageRoute(builder: (context) => landing()));
-                },
-              ),
+                icon: Icon(
+                  Icons.menu,
+                  color: Colors.white,
+                ),
+              );
+            },
+          ),
+          actions: <Widget>[
+            /*Padding(
+                padding: EdgeInsets.only(right: 20.0),
+                child: GestureDetector(
+                  onTap: () {},
+                  child: Icon(
+                    Icons.search,
+                    size: 26.0,
+                  ),
+                )),*/
           ],
         ),
-      ),
-      body: homePage.elementAt(_selectedIndex),
-      bottomNavigationBar: BottomNavigationBar(
-        items: const <BottomNavigationBarItem>[
-          BottomNavigationBarItem(
-              icon: Icon(Icons.notifications), label: 'Notification'),
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
-          BottomNavigationBarItem(icon: Icon(Icons.people), label: 'Mentees')
-        ],
-        currentIndex: _selectedIndex, //_selectedIndex,
-        selectedItemColor: Color.fromARGB(255, 59, 48, 214),
-        selectedFontSize: 12,
-        onTap: _onItemTapped,
+        drawer: Drawer(
+          elevation: 5,
+          child: ListView(
+            padding: EdgeInsets.zero,
+            children: [
+              DrawerHeader(
+                decoration: BoxDecoration(
+                  color: Color.fromARGB(255, 59, 48, 214),
+                ),
+                child: FutureBuilder(
+                    future: getMentorApi(),
+                    builder: (context, AsyncSnapshot<MentorApi> snapshot1) {
+
+                      return Container(
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            CircleAvatar(
+                                backgroundColor: Colors.deepPurple,
+                                radius: 45,
+                                backgroundImage: NetworkImage("${snapshot1.data!.data.profile.img.toString()}")
+                              /*child: Container(
+                                              padding: EdgeInsets.all(5),
+                                              child: ClipRRect(
+                                                borderRadius: BorderRadius.circular(25),
+                                                child: image != null
+                                                    ? Image.file(image!)
+                                                    : Image.asset('images/mentorProfile.jpeg'),
+                                              ),
+                                            ),*/
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Text("${snapshot1.data!.data.profile.eduName.toString()} | ${snapshot1.data!.data.profile.specilization.toString()}",style: TextStyle(fontFamily: "Candara",color: Colors.white),),
+                            )
+                          ],
+                        ),
+                      );
+
+                    }
+
+                ),
+              ),
+              if (token != "")
+                ListTile(
+                  title: const Text('Profile'),
+                  onTap: () {
+                    Navigator.pop(context);
+                  },
+                ),
+              if (token != "")
+                ListTile(
+                  title: const Text('Logout'),
+                  onTap: () async {
+                    await _logout();
+                    setState(() {
+                      userName = "";
+                      userEmail = "";
+                      userId = 0;
+                      token = "";
+                      classId = "";
+                    });
+                    Navigator.pop(context);
+                    Navigator.pushReplacement(context,
+                        MaterialPageRoute(builder: (context) => landing()));
+                  },
+                ),
+            ],
+          ),
+        ),
+        body: homePage.elementAt(_selectedIndex),
+        bottomNavigationBar: BottomNavigationBar(
+          items: const <BottomNavigationBarItem>[
+            BottomNavigationBarItem(
+                icon: Icon(Icons.notifications), label: 'Notification'),
+            BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
+            BottomNavigationBarItem(icon: Icon(Icons.people), label: 'Mentees')
+          ],
+          currentIndex: _selectedIndex, //_selectedIndex,
+          selectedItemColor: Color.fromARGB(255, 59, 48, 214),
+          selectedFontSize: 12,
+          onTap: _onItemTapped,
+        ),
       ),
     );
   }
@@ -2047,7 +2102,7 @@ Future<Future<ConfirmAction?>> _asyncConfirmDialog(
                           ),
                         ),
                         Text(
-                          snapshot.data!.data3.helpRequests.status,
+                          snapshot.data!.data3.helpRequests.message,
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
                             color: Colors.grey,

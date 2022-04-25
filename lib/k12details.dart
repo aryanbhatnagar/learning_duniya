@@ -5,10 +5,9 @@ import 'package:learning_duniya/courseDesc.dart';
 import 'package:audioplayers/audioplayers.dart';
 
 K12Api k12ApiFromJson(String str) => K12Api.fromJson(json.decode(str));
+String k12ApiToJson(K12Api data) => json.encode(data.toJson());
 String courseID="1";
 String cImg="";
-String k12ApiToJson(K12Api data) => json.encode(data.toJson());
-
 class K12Api {
   K12Api({
     required this.success,
@@ -32,7 +31,6 @@ class K12Api {
     "message": message,
   };
 }
-
 class Data {
   Data({
     required this.k12,
@@ -52,7 +50,6 @@ class Data {
     "k12_details": List<dynamic>.from(k12Details.map((x) => x.toJson())),
   };
 }
-
 class K12 {
   K12({
     required this.img,
@@ -130,7 +127,6 @@ class K12 {
     "likes": likes
   };
 }
-
 class K12Detail {
   K12Detail({
     required this.id,

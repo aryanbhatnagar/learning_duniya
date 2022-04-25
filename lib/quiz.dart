@@ -399,8 +399,11 @@ class quiz extends StatelessWidget {
   Widget build(BuildContext context) {
     quizId = id.toString();
     qtype= qid.toString();
-    return MaterialApp(
-      home: quizpage(id),
+    return WillPopScope(
+      onWillPop: () async => false,
+      child: MaterialApp(
+        home: quizpage(id),
+      ),
     );
   }
 }
@@ -427,7 +430,7 @@ class _quizpageState extends State<quizpage> with TickerProviderStateMixin {
   bool quesState = false;
   bool prevVis = false;
   bool nextVis = true;
-  bool submitVis = false;
+  bool submitVis = true;
 
   var answers = [];
 
@@ -457,452 +460,511 @@ class _quizpageState extends State<quizpage> with TickerProviderStateMixin {
       ),
     ];
 
-    return Scaffold(
-      /*appBar: AppBar(
-          title: Text('Quiz'),
-          centerTitle: true,
-        ),*/
-        body: FutureBuilder(
-          future: createQuestions(quizId,qtype),
-          builder: (context, AsyncSnapshot<Questions> snapshot) {
-            int noq=0;
-            if (snapshot.hasData) {
-              print(quizId);
-              Questions? que = snapshot.data;
-              debugPrint(snapshot.data.toString());
-              late VideoPlayerController _controller;
-              noq = que!.data.questions.length;
-              debugPrint(noq.toString() + ' Number of questions');
+    return WillPopScope(
+      onWillPop: () async => false,
+      child: Scaffold(
+        /*appBar: AppBar(
+            title: Text('Quiz'),
+            centerTitle: true,
+          ),*/
+          body: FutureBuilder(
+            future: createQuestions(quizId,qtype),
+            builder: (context, AsyncSnapshot<Questions> snapshot) {
+              int noq=0;
+              if (snapshot.hasData) {
+                print(quizId);
+                Questions? que = snapshot.data;
+                debugPrint(snapshot.data.toString());
+                late VideoPlayerController _controller;
+                noq = que!.data.questions.length;
+                debugPrint(noq.toString() + ' Number of questions');
 
-              if(timeData.isEmpty)
-                for(int i = 0; i < noq; i++) {
-                  timeData.add(0);
-                }
+                if(timeData.isEmpty)
+                  for(int i = 0; i < noq; i++) {
+                    timeData.add(0);
+                  }
 
-              debugPrint(timeData.toString());
+                debugPrint(timeData.toString());
 
-              if(noq>0){
-                return Stack(
-                  children: [
-                    Container(
-                      padding: EdgeInsets.all(20),
-                      //height: (size.height) / 4,
-                      width: (size.width),
-                      decoration: BoxDecoration(
-                        color: Colors.lightGreen,
-                        //image: DecorationImage(image: AssetImage("images/"),fit: BoxFit.fill)
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text("test",
-                              style: TextStyle(
-                                  fontSize: 25,
-                                  fontFamily: "Candara",
-                                  color: Colors.white)),
-                          Text("chapter name",
-                              style: TextStyle(
-                                  fontSize: 20,
-                                  fontFamily: "Candara",
-                                  color: Colors.black)),
-                          SizedBox(height: 10),
-                        ],
-                      ),
-                    ),
-                    Align(
-                      alignment: Alignment.bottomCenter,
-                      child: Container(
-                        padding: EdgeInsets.all(20),
-                        height: (size.height) - (size.height) / 5,
-                        width: (size.width),
-                        decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(34)),
-                        child: SingleChildScrollView(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.stretch,
-                              children: <Widget>[
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    /*
-                                  Center(
-                                    child: Container(
-                                      child: Stack(
-                                        alignment: Alignment.center,
-                                        children: [
-                                          AnimatedBuilder(
-                                            animation: controller,
-                                            builder: (context, child) => Text(
-                                              countText,
-                                              style: TextStyle(
-                                                fontSize: 40,
-                                                fontWeight: FontWeight.bold,
-                                              ),
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ),*/
-                                    Center(
-                                      child: Padding(
-                                        padding: const EdgeInsets.symmetric(
-                                            horizontal: 10, vertical: 20),
-                                        child: Row(
-                                          mainAxisAlignment: MainAxisAlignment.center,
-                                          children: [
-                                            Padding(
-                                              padding: EdgeInsets.all(5),
-                                              child: FlatButton(
-                                                shape: RoundedRectangleBorder(
-                                                    borderRadius: BorderRadius.all(
-                                                        Radius.circular(10))),
-                                                padding: EdgeInsets.all(10),
-                                                textColor: Colors.white,
-                                                color: Colors.orange,
-                                                child: buttonState
-                                                    ? Text(
-                                                  'START QUIZ',
-                                                  style: TextStyle(
-                                                    color: Colors.white,
-                                                    fontSize: 20.0,
-                                                  ),
-                                                )
-                                                    : Text(
-                                                  'STOP QUIZ',
-                                                  style: TextStyle(
-                                                    color: Colors.white,
-                                                    fontSize: 20.0,
-                                                  ),
-                                                ),
-                                                onPressed: () {
-                                                  start_time = DateTime.now().toString();
-                                                  ass_id = que.data.questions[0].assessChapterId.toString();
-                                                  total = noq;
-
-                                                  quesStartTime = DateTime.now().second + (DateTime.now().minute * 60);
-
-                                                  //debugPrint(DateTime.now().toString());
-                                                  debugPrint(quesStartTime.toString());
-
-                                                  /*controller.reverse(
-                                                    from: controller.value == 0
-                                                        ? 1.0
-                                                        : controller.value);*/
-                                                  setState(() {
-                                                    //isPlaying = true;
-                                                    buttonState = !buttonState;
-                                                    quesState = !quesState;
-                                                  });
-                                                },
-                                              ),
-                                            )
-                                          ],
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                SizedBox(height: 10),
-                                Container(
-                                  //width: size.width - 80,
-                                  //height: size.width - 225,
-                                  decoration: BoxDecoration(
-                                      color: Colors.lightGreen,
-                                      borderRadius: BorderRadius.circular(20)),
-                                  child: Column(
+                if(noq>0){
+                  return SingleChildScrollView(
+                      child:Container(
+                        child: Column(
+                          children: [
+                            Container(
+                              padding: EdgeInsets.all(5),
+//height: 20,
+                              color: Colors.teal,
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Column(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
-                                      Builder(
-                                          builder: (context) {
-                                            if(snapshot.data!.data.questions[j].mediaType=="Image")
-                                              return Container(
-                                                height: 150,
-                                                width: 120,
-                                                decoration: BoxDecoration(
-                                                  image: DecorationImage(image:NetworkImage("${snapshot.data!.data.questions[j].media.toString()}"), fit: BoxFit.fill),
-                                                ),
-                                              );
-                                            if(snapshot.data!.data.questions[j].mediaType=="video")
-                                            {
-                                              _controller = VideoPlayerController.network('https://flutter.github.io/assets-for-api-docs/assets/videos/butterfly.mp4',);
-                                              _controller.play();
-                                              _controller.setLooping(true);
-                                              return Container(
-                                                  height: 150,
-                                                  width: 120,
-                                                  child: AspectRatio(
-                                                      aspectRatio: _controller.value.aspectRatio,
-                                                      child: VideoPlayer(_controller)
-                                                  )
-                                              );
-                                            }
-
-                                            else
-                                              return Container();
-                                          }
+                                      Text(
+                                        "",
+                                        style: TextStyle(
+                                            fontSize: 20,
+                                            color: Colors.white,
+                                            fontWeight: FontWeight.bold),
+                                      ),
+                                      Text(
+                                        "",
+                                        style: TextStyle(fontSize: 12, color: Colors.white),
                                       ),
                                     ],
                                   ),
-                                ),
-                                SizedBox(height: 20),
-                                Visibility(
-                                    maintainState: true,
-                                    visible: quesState,
-                                    child: Container(
-                                      child: Column(children: [
-                                        Text(
-                                            "QUES: " + (j+1).toString() + " of " +
-                                                que.data.questions.length.toString(),
-                                            style: TextStyle(
-                                                fontSize: 25,
-                                                fontFamily: "Candara",
-                                                color: Colors.orange[200])),
-                                        Padding(
-                                          padding: EdgeInsets.all(10.0),
-                                          child: Center(
-                                            child: Text(
-                                              "Q." + que.data.questions[j].que,
-                                              textAlign: TextAlign.left,
-                                              style: TextStyle(
-                                                fontSize: 25.0,
-                                                color: Colors.black,
+                                  SizedBox(
+                                    width: 125,
+                                    child: ElevatedButton(
+                                      style: ButtonStyle(
+                                          backgroundColor:
+                                          MaterialStateProperty.all<Color>(Colors.blue)),
+                                      onPressed: () {
+                                        start_time = DateTime.now().toString();
+                                        //ass_id = que.data.assessment.id.toString();
+                                        total = noq;
+
+                                        quesStartTime = DateTime.now().second + (DateTime.now().minute * 60);
+
+                                        //debugPrint(DateTime.now().toString());
+                                        debugPrint(quesStartTime.toString());
+
+                                        /*controller.reverse(
+                                                      from: controller.value == 0
+                                                          ? 1.0
+                                                          : controller.value);*/
+                                        setState(() {
+                                          //isPlaying = true;
+                                          buttonState = !buttonState;
+                                          quesState = !quesState;
+                                        });
+
+                                      },
+                                      child: buttonState
+                                          ? Text(
+                                        'START QUIZ',
+                                        style: TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 14.0,
+                                        ),
+                                      )
+                                          : Text(
+                                        'STOP QUIZ',
+                                        style: TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 14.0,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            Visibility(
+                              visible: quesState,
+                              child: Container(
+                                padding: EdgeInsets.all(20),
+                                child: SingleChildScrollView(
+                                  child: Column(
+                                    children: [
+                                      SizedBox(
+                                        height: 10,
+                                      ),
+                                      Stack(
+                                        children: [
+                                          Container(
+                                            margin: EdgeInsets.all(20),
+                                            padding: EdgeInsets.all(30),
+                                            height: 200,
+                                            color: Color.fromRGBO(255, 210, 73, 1),
+                                            child: Center(
+                                              child: Text(
+                                                que.data.questions[j].que,
+                                                textAlign: TextAlign.center,
+                                                style: TextStyle(
+                                                    fontSize: 18,
+                                                    color: Color.fromRGBO(48, 48, 48, 1),
+                                                    fontWeight: FontWeight.bold),
                                               ),
                                             ),
                                           ),
+                                          Positioned(
+                                              top: 5,
+                                              right: MediaQuery.of(context).size.width / 2 - 60,
+                                              child: Container(
+                                                width: 70,
+                                                padding: EdgeInsets.all(10),
+                                                decoration: BoxDecoration(
+                                                    color: Colors.white,
+                                                    borderRadius: BorderRadius.circular(10)),
+                                                child: Center(
+                                                  child: Text(
+                                                    "${j+1}/${noq}",
+                                                    style: TextStyle(
+                                                        fontWeight: FontWeight.bold,
+                                                        color: Colors.teal),
+                                                  ),
+                                                ),
+                                              )),
+                                          Positioned(
+                                              bottom: 5,
+                                              right: MediaQuery.of(context).size.width / 2 - 40,
+                                              child: Container(
+                                                padding: EdgeInsets.all(5),
+                                                decoration: BoxDecoration(
+                                                    color: Colors.white,
+                                                    borderRadius: BorderRadius.circular(20)),
+                                                child: Icon(
+                                                  Icons.question_mark,
+                                                  color: Colors.teal,
+                                                ),
+                                              ))
+                                        ],
+                                      ),
+
+                                      /*Container(
+                                  child: Column(
+                                    children: [
+                                      SizedBox(
+                                        height: 50,
+                                        width: MediaQuery.of(context).size.width - 130,
+                                        child: Container(
+                                          decoration: BoxDecoration(
+                                              border: Border.all(color: Colors.teal),
+                                              borderRadius: BorderRadius.circular(5)),
+                                          child: ElevatedButton(
+                                            style: ButtonStyle(
+                                                backgroundColor:
+                                                MaterialStateProperty.all<Color>(
+                                                    Colors.teal)),
+                                            onPressed: () {},
+                                            child: Text(
+                                              'Sculptor',
+                                              style: TextStyle(
+                                                  fontWeight: FontWeight.bold, fontSize: 18),
+                                            ),
+                                          ),
                                         ),
-                                        GroupButton(
-                                          controller: controllerr,
-                                          buttons: [
-                                            que.data.questions[j].opt1.toString(),
-                                            que.data.questions[j].opt2.toString(),
-                                            que.data.questions[j].opt3.toString(),
-                                            que.data.questions[j].opt4.toString()
-                                          ],
-                                          onSelected: (i, selected) {
-                                            debugPrint('Button #$i $selected');
-
-                                            que_id = que.data.questions[j].id.toString();
-                                            ans = ('x').toString();
-                                            currentAns = (i+1).toString();
-                                            correctAnswer = que.data.questions[j].ans;
-                                            if(i+1 == que.data.questions[j].ans){
-                                              result = true;
-                                              correct++;
-                                            }else{
-                                              result = false;
-                                              wrong++;
-                                            }
-                                          },
-                                          selectedTextStyle: const TextStyle(
-                                              fontFamily: "Candara",
-                                              fontSize: 20,
-                                              color: Colors.white),
-                                          direction: Axis.vertical,
-                                          unselectedTextStyle: const TextStyle(
-                                              fontFamily: "Candara",
-                                              fontSize: 20,
-                                              color: Colors.black),
-                                          unselectedColor: Colors.transparent,
-                                          unselectedBorderColor: Colors.grey,
-                                          buttonWidth: size.width - 40,
-                                          selectedColor: Colors.lightGreen,
-                                          selectedShadow: const <BoxShadow>[
-                                            BoxShadow(color: Colors.transparent)
-                                          ],
-                                          unselectedShadow: const <BoxShadow>[
-                                            BoxShadow(color: Colors.transparent)
-                                          ],
-                                          borderRadius: BorderRadius.circular(10.0),
-                                          enableDeselect: true,
-                                          isRadio: true,
+                                      ),
+                                      SizedBox(
+                                        height: 20,
+                                      ),
+                                      SizedBox(
+                                        height: 50,
+                                        width: MediaQuery.of(context).size.width - 130,
+                                        child: Container(
+                                          decoration: BoxDecoration(
+                                              border: Border.all(color: Colors.teal),
+                                              borderRadius: BorderRadius.circular(5)),
+                                          child: ElevatedButton(
+                                            style: ButtonStyle(
+                                                backgroundColor:
+                                                MaterialStateProperty.all<Color>(
+                                                    Colors.white)),
+                                            onPressed: () {},
+                                            child: Text(
+                                              'Potter',
+                                              style: TextStyle(
+                                                  fontWeight: FontWeight.bold,
+                                                  fontSize: 18,
+                                                  color: Colors.teal),
+                                            ),
+                                          ),
                                         ),
-                                        SizedBox(height: 20),
-                                        Container(
-                                          child: Row(
-                                            mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
-                                            children: <Widget>[
-                                              GestureDetector(
-                                                  onTap: () {
-                                                    if (j != 0)
-                                                      j -= 1;
-                                                    else
-                                                      debugPrint("No Previous Question");
+                                      ),
+                                      SizedBox(
+                                        height: 20,
+                                      ),
+                                      SizedBox(
+                                        height: 50,
+                                        width: MediaQuery.of(context).size.width - 130,
+                                        child: Container(
+                                          decoration: BoxDecoration(
+                                              border: Border.all(color: Colors.red),
+                                              borderRadius: BorderRadius.circular(5)),
+                                          child: ElevatedButton(
+                                            style: ButtonStyle(
+                                                backgroundColor:
+                                                MaterialStateProperty.all<Color>(
+                                                    Colors.red)),
+                                            onPressed: () {},
+                                            child: Text(
+                                              'Weaver',
+                                              style: TextStyle(
+                                                  fontWeight: FontWeight.bold,
+                                                  fontSize: 18,
+                                                  color: Colors.white),
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                      SizedBox(
+                                        height: 20,
+                                      ),
+                                      SizedBox(
+                                        height: 50,
+                                        width: MediaQuery.of(context).size.width - 130,
+                                        child: Container(
+                                          decoration: BoxDecoration(
+                                              border: Border.all(color: Colors.teal),
+                                              borderRadius: BorderRadius.circular(5)),
+                                          child: ElevatedButton(
+                                            style: ButtonStyle(
+                                                backgroundColor:
+                                                MaterialStateProperty.all<Color>(
+                                                    Colors.white)),
+                                            onPressed: () {},
+                                            child: Text(
+                                              'Painter',
+                                              style: TextStyle(
+                                                  fontWeight: FontWeight.bold,
+                                                  fontSize: 18,
+                                                  color: Colors.teal),
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),*/
+                                      SizedBox(
+                                        height: 20,
+                                      ),
+                                      GroupButton(
+                                        controller: controllerr,
+                                        buttons: [
+                                          que.data.questions[j].opt1.toString(),
+                                          que.data.questions[j].opt2.toString(),
+                                          que.data.questions[j].opt3.toString(),
+                                          que.data.questions[j].opt4.toString()
+                                        ],
+                                        onSelected: (i, selected) {
+                                          debugPrint('Button #$i $selected');
 
-                                                    setState(() {
-                                                      if(j+1 == que.data.questions.length) {
-                                                        submitVis = true;
-                                                        nextVis = false;
-                                                      }
-                                                      else {
-                                                        submitVis = false;
-                                                        nextVis = true;
-                                                      }
+                                          que_id = que.data.questions[j].id.toString();
+                                          ans = ('x').toString();
+                                          currentAns = (i+1).toString();
+                                          correctAnswer = que.data.questions[j].ans;
+                                          if(i+1 == que.data.questions[j].ans){
+                                            result = true;
+                                            correct++;
+                                          }else{
+                                            result = false;
+                                            wrong++;
+                                          }
+                                        },
+                                        selectedTextStyle: const TextStyle(
+                                            fontFamily: "Candara",
+                                            fontSize: 16,
+                                            color: Colors.white),
+                                        direction: Axis.vertical,
+                                        unselectedTextStyle: const TextStyle(
+                                            fontFamily: "Candara",
+                                            fontSize: 16,
+                                            color: Colors.black),
+                                        unselectedColor: Colors.transparent,
+                                        unselectedBorderColor: Colors.grey,
+                                        textAlign: TextAlign.center,
+                                        buttonWidth: size.width - 90,
+                                        selectedColor: Colors.teal,
+                                        selectedShadow: const <BoxShadow>[
+                                          BoxShadow(color: Colors.transparent)
+                                        ],
+                                        unselectedShadow: const <BoxShadow>[
+                                          BoxShadow(color: Colors.transparent)
+                                        ],
+                                        borderRadius: BorderRadius.circular(10.0),
+                                        textPadding: EdgeInsets.all(10),
+                                        enableDeselect: true,
+                                        isRadio: true,
+                                      ),
+                                      SizedBox(height: 20,),
+                                      Row(
+                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Visibility(
+                                            visible: prevVis,
+                                            child: SizedBox(
+                                              width: 100,
+                                              child: ElevatedButton(
+                                                style: ButtonStyle(
+                                                    backgroundColor: MaterialStateProperty.all<Color>(
+                                                        Colors.teal)),
+                                                onPressed: () {
 
-                                                      if(j == 0)
-                                                        prevVis = false;
-                                                      else
-                                                        prevVis = true;
+                                                  if (j != 0)
+                                                    j -= 1;
+                                                  else
+                                                    debugPrint("No Previous Question");
 
-                                                    });
-                                                  },
-                                                  child: Visibility(
-                                                    visible: prevVis,
-                                                    child: Container(
-                                                      decoration: BoxDecoration(color:Colors.lightGreen,borderRadius: BorderRadius.circular(10)),
-                                                      padding: EdgeInsets.all(8),
-                                                      child: Text("<< PREV",
-                                                          style: TextStyle(
-                                                              fontSize: 15,
-                                                              fontFamily: "Candara",
-                                                              color: Colors.white)),
-                                                    ),
-                                                  )),
-                                              GestureDetector(
-                                                  onTap: () {
-                                                    if (j !=
-                                                        que.data.questions.length - 1){
-                                                      j += 1;
-
-                                                      debugPrint((j).toString());
-
-                                                      /*
-                                                    quizInputData.add(que_id);
-                                                    quizInputData.add(currentAns);
-                                                    quizInputData.add(correctAnswer);
-                                                    quizInputData.add(result);
-                                                    */
-
-
-                                                      quesTimeDiff = timeData[j-1];
-
-                                                      quesEndTime = DateTime.now().second + (DateTime.now().minute * 60);
-                                                      debugPrint(quesEndTime.toString());
-                                                      quesTimeDiff += (quesEndTime - quesStartTime);
-                                                      timeData[j-1] = quesTimeDiff;
-                                                      debugPrint('total time: ' + quesTimeDiff.toString());
-                                                      quesStartTime = quesEndTime;
-
-                                                      quizAns = {
-                                                        "que" : que_id,
-                                                        "ans" : currentAns,
-                                                        "correctAnswer" : correctAnswer,
-                                                        "result" : result,
-                                                        "time" : quesTimeDiff
-                                                      };
-
-                                                      allQuestionData.add(quizAns);
-
-                                                      debugPrint(quizInputData.toString());
-                                                    }else {
-
-
-
-                                                      debugPrint(
-                                                          "Max Number of Questions");
+                                                  setState(() {
+                                                    if(j+1 == que.data.questions.length) {
+                                                      submitVis = true;
+                                                      nextVis = false;
+                                                    }
+                                                    else {
+                                                      submitVis = false;
+                                                      nextVis = true;
                                                     }
 
-                                                    //quizInputData.clear();
+                                                    if(j == 0)
+                                                      prevVis = false;
+                                                    else
+                                                      prevVis = true;
 
-                                                    setState(() {
-                                                      if(j == 0)
-                                                        prevVis = false;
-                                                      else
-                                                        prevVis = true;
-
-                                                      if(j+1 == que.data.questions.length) {
-                                                        submitVis = true;
-                                                        nextVis = false;
-                                                      }
-                                                      else {
-                                                        submitVis = false;
-                                                        nextVis = true;
-                                                      }
-                                                    });
-
-                                                  },
-                                                  child: Visibility(
-                                                    visible: nextVis,
-                                                    //que.data.questions.length == j+1 ? "SUBMIT >>" :
-                                                    child: Container(
-                                                      decoration: BoxDecoration(color:Colors.lightGreen,borderRadius: BorderRadius.circular(10)),
-                                                      padding: EdgeInsets.all(8),
-                                                      child: Text("NEXT >>",
-                                                          style: TextStyle(
-                                                              fontSize: 15,
-                                                              fontFamily: "Candara",
-                                                              color: Colors.white)),
-                                                    ),
-                                                  )),
-                                            ],
-                                          ),
-                                        ),
-                                        SizedBox(height: 20),
-                                        Visibility(
-                                          visible: submitVis,
-                                          child: FlatButton(
-                                            shape: RoundedRectangleBorder(
-                                                borderRadius: BorderRadius.all(
-                                                    Radius.circular(10))),
-                                            padding: EdgeInsets.all(10),
-                                            textColor: Colors.white,
-                                            color: Colors.orange,
-                                            child: Text(
-                                              'Submit Quiz',
-                                              style: TextStyle(
-                                                color: Colors.white,
-                                                fontSize: 20.0,
+                                                  });
+                                                },
+                                                child: Text('PREV'),
                                               ),
                                             ),
-                                            onPressed: () async {
-                                              end_time = DateTime.now().toString();
-
-                                              debugPrint((j).toString());
-
-                                              quesTimeDiff = timeData[j];
-
-                                              quesEndTime = DateTime.now().second + (DateTime.now().minute * 60);
-                                              debugPrint(quesEndTime.toString());
-                                              quesTimeDiff += (quesEndTime - quesStartTime);
-                                              timeData[j] = quesTimeDiff;
-                                              debugPrint('total time: ' + quesTimeDiff.toString());
-                                              quesStartTime = quesEndTime;
-
-                                              quizAns = {
-                                                "que" : que_id,
-                                                "ans" : currentAns,
-                                                "correctAnswer" : correctAnswer,
-                                                "result" : result,
-                                                "time" : quesTimeDiff
-                                              };
-                                              allQuestionData.add(quizAns);
-                                              assignData(quizInputData);
-                                            },
                                           ),
-                                        )
-                                      ]),
-                                    )),
-                                SizedBox(height: 20),
-                              ],
-                            )),
-                      ),
-                    )
-                  ],
+                                          if(j!=snapshot.data!.data.questions.length-1)
+                                            Visibility(
+                                            visible: nextVis,
+                                            child: SizedBox(
+                                              width: 100,
+                                              child: ElevatedButton(
+                                                style: ButtonStyle(
+                                                    backgroundColor: MaterialStateProperty.all<Color>(
+                                                        Colors.teal)),
+                                                onPressed: () {
+                                                  if (j != que.data.questions.length - 1){
+                                                    j += 1;
+
+                                                    debugPrint((j).toString());
+
+                                                    /*
+                                                            quizInputData.add(que_id);
+                                                            quizInputData.add(currentAns);
+                                                            quizInputData.add(correctAnswer);
+                                                            quizInputData.add(result);
+                                                            */
+
+
+                                                    quesTimeDiff = timeData[j-1];
+
+                                                    quesEndTime = DateTime.now().second + (DateTime.now().minute * 60);
+                                                    debugPrint(quesEndTime.toString());
+                                                    quesTimeDiff += (quesEndTime - quesStartTime);
+                                                    timeData[j-1] = quesTimeDiff;
+                                                    debugPrint('total time: ' + quesTimeDiff.toString());
+                                                    quesStartTime = quesEndTime;
+
+                                                    quizAns = {
+                                                      "que" : que_id,
+                                                      "ans" : currentAns,
+                                                      "correctAnswer" : correctAnswer,
+                                                      "result" : result,
+                                                      "time" : quesTimeDiff
+                                                    };
+
+                                                    allQuestionData.add(quizAns);
+
+                                                    debugPrint(quizInputData.toString());
+                                                  }else {
+
+
+
+                                                    debugPrint(
+                                                        "Max Number of Questions");
+                                                  }
+
+                                                  //quizInputData.clear();
+
+                                                  setState(() {
+                                                    if(j == 0)
+                                                      prevVis = false;
+                                                    else
+                                                      prevVis = true;
+
+                                                    if(j+1 == que.data.questions.length) {
+                                                      submitVis = true;
+                                                      nextVis = false;
+                                                    }
+                                                    else {
+                                                      submitVis = false;
+                                                      nextVis = true;
+                                                    }
+                                                  });
+
+
+                                                },
+                                                child: Text('NEXT'),
+                                              ),
+                                            ),
+                                          ),
+                                          if(j==snapshot.data!.data.questions.length-1)
+                                            Visibility(
+                                            visible: submitVis,
+                                            child: FlatButton(
+                                              shape: RoundedRectangleBorder(
+                                                  borderRadius: BorderRadius.all(
+                                                      Radius.circular(5))),
+                                              padding: EdgeInsets.all(10),
+                                              textColor: Colors.white,
+                                              color: Colors.orange,
+                                              child: Text(
+                                                'Submit',
+                                                style: TextStyle(
+                                                  color: Colors.white,
+                                                  fontSize: 20.0,
+                                                ),
+                                              ),
+                                              onPressed: () async {
+                                                end_time = DateTime.now().toString();
+
+                                                debugPrint((j).toString());
+
+                                                quesTimeDiff = timeData[j];
+
+                                                quesEndTime = DateTime.now().second + (DateTime.now().minute * 60);
+                                                debugPrint(quesEndTime.toString());
+                                                quesTimeDiff += (quesEndTime - quesStartTime);
+                                                timeData[j] = quesTimeDiff;
+                                                debugPrint('total time: ' + quesTimeDiff.toString());
+                                                quesStartTime = quesEndTime;
+
+                                                quizAns = {
+                                                  "que" : que_id,
+                                                  "ans" : currentAns,
+                                                  "correctAnswer" : correctAnswer,
+                                                  "result" : result,
+                                                  "time" : quesTimeDiff
+                                                };
+                                                allQuestionData.add(quizAns);
+                                                assignData(quizInputData);
+                                              },
+                                            ),
+                                          )
+                                        ],
+                                      ),
+                                      SizedBox(height: 20,),
+
+
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ));
+                }
+                else
+                  return Container(child: Center(child: Text("There are no questions in this test")));
+
+              } else {
+                return Container(
+                  child: Center(
+                    child: CircularProgressIndicator(),
+                  ),
                 );
               }
-              else
-                return Container(child: Center(child: Text("There are no questions in this test")));
-
-            } else {
-              return Container(
-                child: Center(
-                  child: CircularProgressIndicator(),
-                ),
-              );
-            }
-          },
-        ));
+            },
+          )),
+    );
   }
 
   Future<void> assignData(List quizInputData) async {
@@ -966,13 +1028,11 @@ Future<Future<ConfirmActionQuiz?>> _asyncConfirmDialog(
     builder: (BuildContext context) {
       return AlertDialog(
         title:
-          Container(
+        Image.asset(
+          'images/tick.png',
           height: 50,
           width: 50,
-          decoration: BoxDecoration(
-          image: DecorationImage(image:AssetImage('images/tick.png') ,fit: BoxFit.fill),
-      ),
-      ),
+        ),
         content: Text('Test Submitted Successfully'),
         actions: <Widget>[
           ElevatedButton(

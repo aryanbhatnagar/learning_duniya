@@ -17,8 +17,10 @@ import 'package:learning_duniya/profile.dart';
 import 'package:learning_duniya/quiz.dart';
 import 'package:group_button/group_button.dart';
 import 'package:learning_duniya/screen1%20(1).dart';
+import 'package:learning_duniya/challenge_page.dart';
 import 'package:learning_duniya/seeall.dart';
 import 'package:learning_duniya/test.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:toggle_switch/toggle_switch.dart';
 import 'Login.dart';
 import 'package:http/http.dart' as http;
@@ -44,6 +46,22 @@ Future<K12Card> getMentorApi(String cls, String sub) async {
 var mentorDataMap = <String, dynamic>{};
 var Mcode=0;
 bool formvis=true;
+
+
+Future<void> _logout() async {
+  /*final SharedPreferences prefs = await SharedPreferences.getInstance();
+  prefs.remove('role');
+  prefs.remove('token');*/
+  SharedPreferences.getInstance().then(
+        (prefs) {
+      prefs.remove("is_logged_in");
+      prefs.remove("token");
+      prefs.remove("role");
+      prefs.clear();
+    },
+  );
+
+}
 
 Studentdp studentdpFromJson(String str) => Studentdp.fromJson(json.decode(str));
 String studentdpToJson(Studentdp data4) => json.encode(data4.toJson());
@@ -123,6 +141,23 @@ class Data4 {
 }
 
 
+Future<Studentdp> getProfileApi() async {
+  final String apiUrl =
+      "http://ec2-13-234-116-155.ap-south-1.compute.amazonaws.com/api/profile";
+  final response = await http.get(Uri.parse(apiUrl), headers: <String, String>{
+    "Authorization": "Bearer $token",
+  });
+
+  if (response.statusCode == 200) {
+    print(response.statusCode.toString());
+    final String responseString = response.body;
+    debugPrint(response.body);
+    return studentdpFromJson(responseString);
+  } else {
+    throw Exception('Failed to load album');
+  }
+}
+
 Future createStuDp(Map mentorData, File image) async {
   int responseCode;
   Map<String, String> headers = {"Authorization": "Bearer $token"};
@@ -191,6 +226,7 @@ class StuDashboard {
 class Data3 {
   Data3({
     required this.subjects2,
+    required this.user,
     required this.assessments1,
     required this.results,
     required this.experience,
@@ -198,12 +234,14 @@ class Data3 {
   });
 
   List<Subject2> subjects2;
+  User user;
   List<AssessmentElement> assessments1;
   Results results;
   var experience;
   List<Mentor1> mentors;
 
   factory Data3.fromJson(Map<String, dynamic> json) => Data3(
+    user: User.fromJson(json["user"]),
     subjects2: List<Subject2>.from(json["subjects"].map((x) => Subject2.fromJson(x))),
     assessments1: List<AssessmentElement>.from(json["assessments"].map((x) => AssessmentElement.fromJson(x))),
     results: Results.fromJson(json["results"]),
@@ -212,11 +250,39 @@ class Data3 {
   );
 
   Map<String, dynamic> toJson() => {
+    "user": user.toJson(),
     "subjects": List<dynamic>.from(subjects2.map((x) => x.toJson())),
     "assessments": List<dynamic>.from(assessments1.map((x) => x.toJson())),
     "results": results.toJson(),
     "exp" : experience,
     "mentors": List<dynamic>.from(mentors.map((x) => x.toJson())),
+  };
+}
+class User {
+  User({
+    this.name,
+    this.email,
+    this.img,
+    this.role,
+  });
+
+  var name;
+  var email;
+  var img;
+  var role;
+
+  factory User.fromJson(Map<String, dynamic> json) => User(
+    name: json["name"],
+    email: json["email"],
+    img: json["img"],
+    role: json["role"],
+  );
+
+  Map<String, dynamic> toJson() => {
+    "name": name,
+    "email": email,
+    "img": img,
+    "role": role,
   };
 }
 class Mentor1 {
@@ -812,7 +878,7 @@ class _landingPageState extends State<landingPage> {
   }
 
   Future<void> _onItemTapped(int index) async {
-    if(index==1)
+    if(index==1 || index==2)
     {
       if (token!="")
         if(classId=="")
@@ -827,7 +893,7 @@ class _landingPageState extends State<landingPage> {
               'None');
         }
     }
-    if(index==1 && classId!="")
+    if((index==1 || index==2) && classId!="")
       indexSelect(index);
     else
       indexSelect(index);
@@ -1496,7 +1562,7 @@ class _landingPageState extends State<landingPage> {
                     image: DecorationImage(image: AssetImage("images/login.jpg"),fit: BoxFit.fill),
                   ),
                 ),
-                Center(child: Text("Please Login to view Dashboard", style: TextStyle(
+                Center(child: Text("Please login to view Dashboard", style: TextStyle(
                     fontSize: 20,
                     fontFamily: "Candara",
                     color: Colors.teal),),),
@@ -1534,22 +1600,47 @@ class _landingPageState extends State<landingPage> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
-                          Container(
-                            padding: EdgeInsets.only(left: 25, top: 10),
-                            child: Text(
-                              'Hi $userName',
-                              style: TextStyle(
-                                  fontSize: 17.5, color: Colors.black, fontFamily: "Candara"),
-                            ),
+                          Row(
+                            children: [
+                              SizedBox(width: 25,),
+                              CircleAvatar(
+                                  backgroundColor: Colors.deepPurple,
+                                  radius: 20,
+                                  backgroundImage: NetworkImage("${snapshot.data!.data2.user.img.toString()}")
+                                /*child: Container(
+                                          padding: EdgeInsets.all(5),
+                                          child: ClipRRect(
+                                            borderRadius: BorderRadius.circular(25),
+                                            child: image != null
+                                                ? Image.file(image!)
+                                                : Image.asset('images/mentorProfile.jpeg'),
+                                          ),
+                                        ),*/
+                              ),
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Container(
+                                    padding: EdgeInsets.only(left: 10, top: 10),
+                                    child: Text(
+                                      'Hi ${snapshot.data!.data2.user.name.toString().toUpperCase()}',
+                                      style: TextStyle(
+                                          fontSize: 17.5, color: Colors.black, fontFamily: "Candara"),
+                                    ),
+                                  ),
+                                  Container(
+                                    padding: EdgeInsets.only(left: 10, bottom: 10),
+                                    child: Text(
+                                      "Choose your courses",
+                                      style: TextStyle(
+                                          fontFamily: "Candara", fontSize: 12.5, color: Colors.grey),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
                           ),
-                          Container(
-                            padding: EdgeInsets.only(left: 25, bottom: 10),
-                            child: Text(
-                              "Choose your courses",
-                              style: TextStyle(
-                                  fontFamily: "Candara", fontSize: 12.5, color: Colors.grey),
-                            ),
-                          ),
+
                           Container(
                             //height: 100,
                             padding: EdgeInsets.only(left: 1, right: 1, top: 10),
@@ -1705,7 +1796,8 @@ class _landingPageState extends State<landingPage> {
                                 )
                             ),
                           ),
-                          Padding(
+                          if(snapshot.data!.data2.results.assessment.total.toString()!="0" || snapshot.data!.data2.results.k12.total.toString()!="0")
+                            Padding(
                             padding: const EdgeInsets.only(left: 25, right: 20, bottom: 5),
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -1738,7 +1830,8 @@ class _landingPageState extends State<landingPage> {
                               child: Row(
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
-                                  Container(
+                                  if(snapshot.data!.data2.results.assessment.total.toString()!="0")
+                                    Container(
                                     padding: EdgeInsets.only(left: 20, right: 10),
                                     width: 400,
                                     height: 220,
@@ -1867,7 +1960,8 @@ class _landingPageState extends State<landingPage> {
                                       ),
                                     ),
                                   ),
-                                  Container(
+                                  if(snapshot.data!.data2.results.k12.total.toString()!="0")
+                                    Container(
                                     padding: EdgeInsets.only(left: 10, right: 20),
                                     width: 400,
                                     height: 220,
@@ -2079,6 +2173,49 @@ class _landingPageState extends State<landingPage> {
             );
         },
       ),
+      FutureBuilder(
+        future: getLanding(),
+        builder: (context,AsyncSnapshot<LandingApi> snapshot1) {
+          if (token=="")
+            return Column(
+              children: [
+                SizedBox(height: 40),
+                Container(
+                  height: 250,
+                  width: 250,
+                  decoration: BoxDecoration(
+                    image: DecorationImage(image: AssetImage("images/challenge.png"),fit: BoxFit.fill),
+                  ),
+                ),
+                SizedBox(height: 20,),
+                Center(child: Text("Please login to challenge others", style: TextStyle(
+                    fontSize: 20,
+                    fontFamily: "Candara",
+                    color: Colors.teal),),),
+                SizedBox(height: 15,),
+                Center(
+                    child:  RaisedButton(
+                      onPressed: (){
+                        Navigator.pushReplacement(
+                            context, MaterialPageRoute(builder: (context) => Login()));
+                      },
+                      child: Text('LOGIN',
+                          style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 15.0,
+                              fontFamily: "Candara")),
+                      color: Colors.deepOrange,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(5.0),
+                      ),
+                    )
+                ),
+              ],
+            );
+          else
+            return Scaffold(body: challenge_page(),);
+        },
+      ),
       SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -2210,123 +2347,187 @@ class _landingPageState extends State<landingPage> {
           child: ListView(
             padding: EdgeInsets.zero,
             children: [
-              if(token!="")
                 DrawerHeader(
                 decoration: BoxDecoration(
                   color: Colors.transparent,
                 ),
-                child: Container(
-                  child: GestureDetector(
-                    child: Column(
-                      children: [
-                        CircleAvatar(
-                          backgroundColor: Colors.deepPurple,
-                          radius: 60,
-                          backgroundImage: image!= null
-                              ? FileImage(image!)
-                              : AssetImage('images/mentorProfile.jpeg')
-                          as ImageProvider,
-                          /*child: Container(
-                                    padding: EdgeInsets.all(5),
-                                    child: ClipRRect(
-                                      borderRadius: BorderRadius.circular(25),
-                                      child: image != null
-                                          ? Image.file(image!)
-                                          : Image.asset('images/mentorProfile.jpeg'),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    if(token!="")
+                      FutureBuilder(
+                        future: getProfileApi(),
+                        builder: (context, AsyncSnapshot<Studentdp> snapshot) {
+                          userName=snapshot.data!.data4.name.toString();
+                          var im=0;
+                          if(snapshot.data!.data4.img=="http://ec2-13-234-116-155.ap-south-1.compute.amazonaws.com/uploads/no-image.jpeg")
+                            im=0;
+                          else
+                            im=1;
+                          return Container(
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                if(im==0)
+                                  GestureDetector(
+                                    child: CircleAvatar(
+                                      backgroundColor: Colors.deepPurple,
+                                      radius: 60,
+                                      backgroundImage: image!= null
+                                          ? FileImage(image!)
+                                          : AssetImage('images/mentorProfile.jpeg')
+                                      as ImageProvider,
+                                      /*child: Container(
+                                          padding: EdgeInsets.all(5),
+                                          child: ClipRRect(
+                                            borderRadius: BorderRadius.circular(25),
+                                            child: image != null
+                                                ? Image.file(image!)
+                                                : Image.asset('images/mentorProfile.jpeg'),
+                                          ),
+                                        ),*/
                                     ),
-                                  ),*/
-                        ),
-                      ],
-                    ),
-                    onTap: () {
-                      //pickImage();
-                      showDialog(
-                          context: context,
-                          builder: (BuildContext context) {
-                            return AlertDialog(
-                              title: Center(
-                                  child: Text('Select Image',
-                                      style:
-                                      TextStyle(fontFamily: 'Candara'))),
-                              content: SingleChildScrollView(
-                                child: ListBody(
-                                  children: <Widget>[
-                                    ElevatedButton(
-                                        style: ButtonStyle(
-                                            backgroundColor:
-                                            MaterialStateProperty.all<
-                                                Color>(Colors.deepPurple),
-                                            shape: MaterialStateProperty.all<
-                                                RoundedRectangleBorder>(
-                                                RoundedRectangleBorder(
-                                                    borderRadius:
-                                                    BorderRadius.circular(
-                                                        10),
-                                                    side: BorderSide(
-                                                        color: Colors
-                                                            .deepPurple)))),
-                                        onPressed: () {
-                                          pickImage();
-                                          Navigator.of(context).pop();
-                                        },
-                                        child: Wrap(
-                                          children: <Widget>[
-                                            Icon(
-                                              Icons.image,
-                                              color: Colors.white,
-                                            ),
-                                            SizedBox(
-                                              width: 10,
-                                            ),
-                                            Text('Gallery',
-                                                style: TextStyle(
-                                                    fontFamily: 'Candara',
-                                                    fontSize: 18))
-                                          ],
-                                        )),
-                                    ElevatedButton(
-                                        style: ButtonStyle(
-                                            backgroundColor:
-                                            MaterialStateProperty.all<
-                                                Color>(Colors.deepPurple),
-                                            shape: MaterialStateProperty.all<
-                                                RoundedRectangleBorder>(
-                                                RoundedRectangleBorder(
-                                                    borderRadius:
-                                                    BorderRadius.circular(
-                                                        10),
-                                                    side: BorderSide(
-                                                        color: Colors
-                                                            .deepPurple)))),
-                                        onPressed: () {
-                                          pickImageCamera();
-                                          Navigator.of(context).pop();
-                                        },
-                                        child: Wrap(
-                                          children: <Widget>[
-                                            Icon(
-                                              Icons.camera,
-                                              color: Colors.white,
-                                            ),
-                                            SizedBox(
-                                              width: 10,
-                                            ),
-                                            Text('Camera',
-                                                style: TextStyle(
-                                                    fontFamily: 'Candara',
-                                                    fontSize: 18))
-                                          ],
-                                        )),
-                                  ],
+                                    onTap: () {
+                                      //pickImage();
+                                      showDialog(
+                                          context: context,
+                                          builder: (BuildContext context) {
+                                            return AlertDialog(
+                                              title: Center(
+                                                  child: Text('Select Image',
+                                                      style:
+                                                      TextStyle(fontFamily: 'Candara'))),
+                                              content: SingleChildScrollView(
+                                                child: ListBody(
+                                                  children: <Widget>[
+                                                    ElevatedButton(
+                                                        style: ButtonStyle(
+                                                            backgroundColor:
+                                                            MaterialStateProperty.all<
+                                                                Color>(Colors.deepPurple),
+                                                            shape: MaterialStateProperty.all<
+                                                                RoundedRectangleBorder>(
+                                                                RoundedRectangleBorder(
+                                                                    borderRadius:
+                                                                    BorderRadius.circular(
+                                                                        10),
+                                                                    side: BorderSide(
+                                                                        color: Colors
+                                                                            .deepPurple)))),
+                                                        onPressed: () {
+                                                          pickImage();
+                                                          Navigator.of(context).pop();
+                                                        },
+                                                        child: Wrap(
+                                                          children: <Widget>[
+                                                            Icon(
+                                                              Icons.image,
+                                                              color: Colors.white,
+                                                            ),
+                                                            SizedBox(
+                                                              width: 10,
+                                                            ),
+                                                            Text('Gallery',
+                                                                style: TextStyle(
+                                                                    fontFamily: 'Candara',
+                                                                    fontSize: 18))
+                                                          ],
+                                                        )),
+                                                    ElevatedButton(
+                                                        style: ButtonStyle(
+                                                            backgroundColor:
+                                                            MaterialStateProperty.all<
+                                                                Color>(Colors.deepPurple),
+                                                            shape: MaterialStateProperty.all<
+                                                                RoundedRectangleBorder>(
+                                                                RoundedRectangleBorder(
+                                                                    borderRadius:
+                                                                    BorderRadius.circular(
+                                                                        10),
+                                                                    side: BorderSide(
+                                                                        color: Colors
+                                                                            .deepPurple)))),
+                                                        onPressed: () {
+                                                          pickImageCamera();
+                                                          Navigator.of(context).pop();
+                                                        },
+                                                        child: Wrap(
+                                                          children: <Widget>[
+                                                            Icon(
+                                                              Icons.camera,
+                                                              color: Colors.white,
+                                                            ),
+                                                            SizedBox(
+                                                              width: 10,
+                                                            ),
+                                                            Text('Camera',
+                                                                style: TextStyle(
+                                                                    fontFamily: 'Candara',
+                                                                    fontSize: 18))
+                                                          ],
+                                                        )),
+                                                  ],
+                                                ),
+                                              ),
+                                            );
+                                          });
+                                    },
+                                  ),
+                                if(im==1)
+                                  CircleAvatar(
+                                  backgroundColor: Colors.deepPurple,
+                                  radius: 50,
+                                  backgroundImage: NetworkImage("${snapshot.data!.data4.img.toString()}")
+                                  /*child: Container(
+                                          padding: EdgeInsets.all(5),
+                                          child: ClipRRect(
+                                            borderRadius: BorderRadius.circular(25),
+                                            child: image != null
+                                                ? Image.file(image!)
+                                                : Image.asset('images/mentorProfile.jpeg'),
+                                          ),
+                                        ),*/
                                 ),
-                              ),
+                                if(im==1)
+                                  Padding(
+                                    padding: const EdgeInsets.all(6.0),
+                                    child: Text("${snapshot.data!.data4.name} | ${snapshot.data!.data4.school}",style: TextStyle(fontWeight: FontWeight.bold,fontSize: 16,color: Colors.blueGrey),),
+                                  )
+
+                              ],
+                            ),
+                          );
+
+    }
+
+                    ),
+                    if(token=="")
+                      FutureBuilder(
+                          builder: (context, AsyncSnapshot snapshot) {
+
+                            return CircleAvatar(
+                                backgroundColor: Colors.deepPurple,
+                                radius: 60,
+                                backgroundImage: AssetImage('images/mentorProfile.jpeg')
+
+                              /*child: Container(
+                                          padding: EdgeInsets.all(5),
+                                          child: ClipRRect(
+                                            borderRadius: BorderRadius.circular(25),
+                                            child: image != null
+                                                ? Image.file(image!)
+                                                : Image.asset('images/mentorProfile.jpeg'),
+                                          ),
+                                        ),*/
                             );
-                          });
-                    },
-                  ),
+
+                          }
+
+                      ),
+
+                  ],
                 ),
               ),
-              if(token!="")
                 Visibility(
                   visible: formvis,
                   child: Container(
@@ -2484,19 +2685,15 @@ class _landingPageState extends State<landingPage> {
                 ListTile(
                 title: const Text('Profile'),
                 onTap: () async {
-                  Future<StudentAction?> action =
-                      await _asyncStudentDialog(context,);
-                  // Update the state of the app
-                  // ...
-                  // Then close the drawer
+
                   Navigator.pop(context);
                 },
               ),
               if(token!="")
                 ListTile(
                 title: const Text('Logout'),
-                onTap: () {
-
+                onTap: () async {
+                  await _logout();
                   setState(()  {
                     userName = "";
                     userEmail = "";
@@ -2583,184 +2780,165 @@ Future<Future<ConfirmAction?>> _asyncConfirmDialog(
       String _currentSelectedVakue='';
 
 
-      return AlertDialog(
-        //title: Text('Delete This Contact?'),
-        shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.all(Radius.circular(15))),
-        title: Image.asset(
-          'images/english.png',
-          height: 50,
-          width: 50,
-        ),
-        content: Container(
-          width: double.infinity,
-          //height: Wrap(),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Column(
-                children: [
-                  Text(
-                    "Please Enter your Class",
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontFamily: 'Candara',
-                    ),
-                  ),
-                  SizedBox(height: 20),
-                  /*Form(
-                    key: _formKey,
-                    child: Container(
-                      padding: EdgeInsets.only(left: 10,right: 10),
-                      child: TextFormField(
-
-                        controller: classController,
-                        validator: (input) {
-                          if (input!.isEmpty) return 'Enter Class';
-                        },
-                        decoration: InputDecoration(
-//fillColor: Colors.white,
-
-                          enabledBorder:OutlineInputBorder(
-                              borderSide: const BorderSide(color: Colors.grey, width: 2.0),
-                              borderRadius: BorderRadius.circular(5)),
-                          focusedBorder: OutlineInputBorder(
-                              borderSide: const BorderSide(color: Colors.teal,width: 2.0),
-                              borderRadius: BorderRadius.circular(5)
-                          ),
-                          labelText: 'CLASS',
-                          labelStyle: TextStyle(fontFamily: "Candara"),
-                          prefixIcon: Icon(Icons.school,color: Colors.teal),
-                          fillColor: Colors.grey,
-                          focusColor: Colors.grey,
-                        ),
-// onSaved: (input) => _email = input!
+      return WillPopScope(
+        onWillPop: () async => false,
+        child: AlertDialog(
+          //title: Text('Delete This Contact?'),
+          shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.all(Radius.circular(15))),
+          title: Image.asset(
+            'images/english.png',
+            height: 50,
+            width: 50,
+          ),
+          content: Container(
+            width: double.infinity,
+            //height: Wrap(),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Column(
+                  children: [
+                    Text(
+                      "Please Enter your Class",
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontFamily: 'Candara',
                       ),
                     ),
-                  ),*/
-                  FormField<String>(
-                    builder: (FormFieldState<String> state) {
-                      String _currentSelectedValue='';
-                      return Container(
-                        height: 60,
+                    SizedBox(height: 20),
+                    /*Form(
+                      key: _formKey,
+                      child: Container(
                         padding: EdgeInsets.only(left: 10,right: 10),
-                        child: InputDecorator(
+                        child: TextFormField(
+
+                          controller: classController,
+                          validator: (input) {
+                            if (input!.isEmpty) return 'Enter Class';
+                          },
                           decoration: InputDecoration(
-                            //labelText: 'CLASS',
-                              prefixIcon: Icon(Icons.school,color: Colors.teal),
-                              labelStyle: TextStyle(fontFamily: "Candara"),
-                              errorStyle: TextStyle(fontFamily:"Candara",color: Colors.redAccent, fontSize: 16.0),
-                              //hintText: 'Please select expense',
-                              enabledBorder:OutlineInputBorder(
-                                  borderSide: const BorderSide(color: Colors.grey, width: 2.0),
-                                  borderRadius: BorderRadius.circular(5)),
-                              focusedBorder: OutlineInputBorder(
-                                  borderSide: const BorderSide(color: Colors.teal,width: 2.0),
-                                  borderRadius: BorderRadius.circular(5)
-                              )),
-                              //border: OutlineInputBorder(borderRadius: BorderRadius.circular(5.0))),
-                          isEmpty: _currentSelectedValue == '',
-                          child: DropdownButtonHideUnderline(
-                            child: DropdownButton(
-                              menuMaxHeight: 200,
-                              hint: _dropDownValue == null
-                                  ? Text('Dropdown')
-                                  : Text(
-                                _dropDownValue,
-                                style: TextStyle(fontFamily: "Candara",color: Colors.black,fontSize: 16),
-                              ),
-                              isExpanded: false,
-                              iconSize: 30.0,
-                              style: TextStyle(color: Colors.black),
-                              items: ["LKG","UKG","1", "2","3", "4","5", "6","7", "8","9", "10","11", "12"].map(
-                                    (val) {
-                                  return DropdownMenuItem<String>(
-                                    value: val,
-                                    child: Text(val),
-                                  );
-                                },
-                              ).toList(),
-                              onChanged: (String? val) {
-                                _dropDownValue = val!;
-                                (context as Element).markNeedsBuild();
+//fillColor: Colors.white,
 
-                              },
-                            )
+                            enabledBorder:OutlineInputBorder(
+                                borderSide: const BorderSide(color: Colors.grey, width: 2.0),
+                                borderRadius: BorderRadius.circular(5)),
+                            focusedBorder: OutlineInputBorder(
+                                borderSide: const BorderSide(color: Colors.teal,width: 2.0),
+                                borderRadius: BorderRadius.circular(5)
+                            ),
+                            labelText: 'CLASS',
+                            labelStyle: TextStyle(fontFamily: "Candara"),
+                            prefixIcon: Icon(Icons.school,color: Colors.teal),
+                            fillColor: Colors.grey,
+                            focusColor: Colors.grey,
                           ),
+// onSaved: (input) => _email = input!
                         ),
-                      );
-                    },
-                  ),
+                      ),
+                    ),*/
+                    FormField<String>(
+                      builder: (FormFieldState<String> state) {
+                        String _currentSelectedValue='';
+                        return Container(
+                          height: 60,
+                          padding: EdgeInsets.only(left: 10,right: 10),
+                          child: InputDecorator(
+                            decoration: InputDecoration(
+                              //labelText: 'CLASS',
+                                prefixIcon: Icon(Icons.school,color: Colors.teal),
+                                labelStyle: TextStyle(fontFamily: "Candara"),
+                                errorStyle: TextStyle(fontFamily:"Candara",color: Colors.redAccent, fontSize: 16.0),
+                                //hintText: 'Please select expense',
+                                enabledBorder:OutlineInputBorder(
+                                    borderSide: const BorderSide(color: Colors.grey, width: 2.0),
+                                    borderRadius: BorderRadius.circular(5)),
+                                focusedBorder: OutlineInputBorder(
+                                    borderSide: const BorderSide(color: Colors.teal,width: 2.0),
+                                    borderRadius: BorderRadius.circular(5)
+                                )),
+                                //border: OutlineInputBorder(borderRadius: BorderRadius.circular(5.0))),
+                            isEmpty: _currentSelectedValue == '',
+                            child: DropdownButtonHideUnderline(
+                              child: DropdownButton(
+                                menuMaxHeight: 200,
+                                hint: _dropDownValue == null
+                                    ? Text('Dropdown')
+                                    : Text(
+                                  _dropDownValue,
+                                  style: TextStyle(fontFamily: "Candara",color: Colors.black,fontSize: 16),
+                                ),
+                                isExpanded: false,
+                                iconSize: 30.0,
+                                style: TextStyle(color: Colors.black),
+                                items: ["LKG","UKG","1", "2","3", "4","5", "6","7", "8","9", "10","11", "12"].map(
+                                      (val) {
+                                    return DropdownMenuItem<String>(
+                                      value: val,
+                                      child: Text(val),
+                                    );
+                                  },
+                                ).toList(),
+                                onChanged: (String? val) {
+                                  _dropDownValue = val!;
+                                  (context as Element).markNeedsBuild();
 
-                ],
-              ),
-              /*Divider(
-                color: Colors.grey,
-              ),
-              SizedBox(height: 10),*/
-
-            ],
-          ),
-        ),
-        actions: <Widget>[
-          Center(
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                ElevatedButton(
-                  style: ButtonStyle(
-                      backgroundColor: MaterialStateProperty.all<Color>(
-                          Colors.deepOrange)),
-                  child: Text(
-                    'Cancel',
-                    style: TextStyle(
-                      fontFamily: 'Candara',
+                                },
+                              )
+                            ),
+                          ),
+                        );
+                      },
                     ),
-                  ),
-                  onPressed: () {
 
-                        //Navigator.of(context).pop(ConfirmAction.Confirm);
-                        Navigator.pushReplacement(
-                            context, MaterialPageRoute(builder: (context) => landing()));
-
-
-
-
-                    //Navigator.of(context).pop(ConfirmAction.Confirm);
-                  },
+                  ],
                 ),
-                SizedBox(width: 10),
-                ElevatedButton(
-                  style: ButtonStyle(
-                      backgroundColor: MaterialStateProperty.all<Color>(
-                          Colors.teal)),
-                  child: Text(
-                    'CONFIRM',
-                    style: TextStyle(
-                      fontFamily: 'Candara',
-                    ),
-                  ),
-                  onPressed: () {
-                    print(_dropDownValue);
-                    if(_dropDownValue!="")
-                    {
-                      classId=_dropDownValue;
-                      if(classId!="")
-                      {
-                        //Navigator.of(context).pop(ConfirmAction.Confirm);
-                        Navigator.pushReplacement(
-                            context, MaterialPageRoute(builder: (context) => landing()));
-                      }
-
-
-                    }
-                    //Navigator.of(context).pop(ConfirmAction.Confirm);
-                  },
+                /*Divider(
+                  color: Colors.grey,
                 ),
+                SizedBox(height: 10),*/
+
               ],
             ),
           ),
-        ],
+          actions: <Widget>[
+            Center(
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  SizedBox(width: 10),
+                  ElevatedButton(
+                    style: ButtonStyle(
+                        backgroundColor: MaterialStateProperty.all<Color>(
+                            Colors.teal)),
+                    child: Text(
+                      'CONFIRM',
+                      style: TextStyle(
+                        fontFamily: 'Candara',
+                      ),
+                    ),
+                    onPressed: () {
+                      print(_dropDownValue);
+                      if(_dropDownValue!="")
+                      {
+                        classId=_dropDownValue;
+                        if(classId!="")
+                        {
+                          //Navigator.of(context).pop(ConfirmAction.Confirm);
+                          Navigator.pushReplacement(
+                              context, MaterialPageRoute(builder: (context) => landing()));
+                        }
+
+
+                      }
+                      //Navigator.of(context).pop(ConfirmAction.Confirm);
+                    },
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
       );
     },
   );
@@ -2807,6 +2985,7 @@ Future<Future<SubjectAction?>> _asyncSubjectDialog(
                                   padding: const EdgeInsets.fromLTRB(0,10,0,0),
                                   child: GestureDetector(
                                     onTap:(){
+                                      Navigator.of(context).pop(SubjectAction.Confirm);
                                       Navigator.push(context, MaterialPageRoute(
                                           builder: (context) => k12_det(snapshot.data!.data1.k12[i].id.toString(),"images/english.png")));
 
@@ -2885,53 +3064,3 @@ Future<Future<SubjectAction?>> _asyncSubjectDialog(
   );
 }
 
-enum StudentAction { Confirm }
-Future<Future<StudentAction?>> _asyncStudentDialog(
-    BuildContext context,
-    ) async {
-
-
-
-
-  return showDialog<StudentAction?>(
-    context: context,
-    barrierDismissible: false, // user must tap button for close dialog!
-    builder: (BuildContext context1) {
-      String _currentSelectedVakue='';
-
-      return StatefulBuilder(builder: (context1, setState) {
-        _landingPageState f = new _landingPageState();
-
-        return AlertDialog(
-          //title: Text('Delete This Contact?'),
-          shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.all(Radius.circular(15))),
-          title: Text("UPDATE YOUR PROFILE"),
-          actions: <Widget>[
-            Center(
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  ElevatedButton(
-                    style: ButtonStyle(
-                        backgroundColor: MaterialStateProperty.all<Color>(
-                            Colors.teal)),
-                    child: Text(
-                      'Cancel',
-                      style: TextStyle(
-                        fontFamily: 'Candara',
-                      ),
-                    ),
-                    onPressed: () {
-                      Navigator.of(context).pop(StudentAction.Confirm);
-                    },
-                  ),
-                ],
-              ),
-            ),
-          ],
-        );
-      });
-    },
-  );
-}

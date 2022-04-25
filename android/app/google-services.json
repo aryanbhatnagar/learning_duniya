@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "338450556475",
+    "project_id": "learning-duniya",
+    "storage_bucket": "learning-duniya.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:338450556475:android:723f04c402299ce45c5e1e",
+        "android_client_info": {
+          "package_name": "com.example.learning_duniya"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "338450556475-u57uobklradimp5jrc8rqm5b37qusf6m.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.learning_duniya",
+            "certificate_hash": "b0e5f2e29e9f95a11c9cafb5e95fd3be28481811"
+          }
+        },
+        {
+          "client_id": "338450556475-jqpu66hndpg4tggm5iirjv21ucmfssda.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCsVyVHF0ZA-rP_GSq5gQzKUHkOgtjp3gg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "338450556475-jqpu66hndpg4tggm5iirjv21ucmfssda.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

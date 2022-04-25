@@ -11,6 +11,7 @@ import 'package:learning_duniya/profile.dart';
 import 'globals.dart';
 import 'main.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:platform_device_id/platform_device_id.dart';
 
 import 'landing.dart';
 
@@ -120,12 +121,16 @@ class User {
 }
 
 Future<void> _incrementCounter(int role) async {
-  final SharedPreferences prefs = await SharedPreferences.getInstance();
-  prefs.clear();
+  /*final SharedPreferences prefs = await SharedPreferences.getInstance();
   prefs.setString('role', role.toString());
-  prefs.setString('token', token);
-  prefs.setString('username', userName);
-
+  prefs.setString('token', token);*/
+  SharedPreferences.getInstance().then(
+        (prefs) {
+      prefs.setBool("is_logged_in", true);
+      prefs.setString("token", token);
+      prefs.setInt("role", role);
+    },
+  );
 }
 
 class Login extends StatefulWidget {
@@ -137,14 +142,18 @@ class Login extends StatefulWidget {
 
 
 Future<Login1> createLogin(String email, String password) async{
+
+  String? deviceId = await PlatformDeviceId.getDeviceId;
   final String apiUrl = "http://ec2-13-234-116-155.ap-south-1.compute.amazonaws.com/api/login";
 
   final response = await http.post(Uri.parse(apiUrl), body: {
     "email": email,
-    "password": password
+    "password": password,
+    "device_id" : deviceId
   });
 
   if(response.statusCode == 200) {
+    debugPrint(deviceId);
     loginCode=200;
     x=jsonDecode(response.body);
     token=x["token"];
@@ -319,6 +328,7 @@ class _LoginPageState extends State<Login> {
                                                         Dashboard(classId)));
                                           }
                                           else {
+                                            await _incrementCounter(1);
                                             final Future<
                                                 ConfirmAction?> action =
                                             await _asyncConfirmDialog(
@@ -428,161 +438,164 @@ Future<Future<ConfirmAction?>> _asyncConfirmDialog(
       String _currentSelectedVakue='';
 
 
-      return AlertDialog(
-        //title: Text('Delete This Contact?'),
-        shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.all(Radius.circular(15))),
-        title: Image.asset(
-          'images/english.png',
-          height: 50,
-          width: 50,
-        ),
-        content: Container(
-          width: double.infinity,
-          //height: Wrap(),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Column(
-                children: [
-                  Text(
-                    "Please Enter your Class",
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontFamily: 'Candara',
-                    ),
-                  ),
-                  SizedBox(height: 20),
-                  /*Form(
-                    key: _formKey,
-                    child: Container(
-                      padding: EdgeInsets.only(left: 10,right: 10),
-                      child: TextFormField(
-
-                        controller: classController,
-                        validator: (input) {
-                          if (input!.isEmpty) return 'Enter Class';
-                        },
-                        decoration: InputDecoration(
-//fillColor: Colors.white,
-
-                          enabledBorder:OutlineInputBorder(
-                              borderSide: const BorderSide(color: Colors.grey, width: 2.0),
-                              borderRadius: BorderRadius.circular(5)),
-                          focusedBorder: OutlineInputBorder(
-                              borderSide: const BorderSide(color: Colors.teal,width: 2.0),
-                              borderRadius: BorderRadius.circular(5)
-                          ),
-                          labelText: 'CLASS',
-                          labelStyle: TextStyle(fontFamily: "Candara"),
-                          prefixIcon: Icon(Icons.school,color: Colors.teal),
-                          fillColor: Colors.grey,
-                          focusColor: Colors.grey,
-                        ),
-// onSaved: (input) => _email = input!
+      return WillPopScope(
+        onWillPop: () async => false,
+        child: AlertDialog(
+          //title: Text('Delete This Contact?'),
+          shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.all(Radius.circular(15))),
+          title: Image.asset(
+            'images/english.png',
+            height: 50,
+            width: 50,
+          ),
+          content: Container(
+            width: double.infinity,
+            //height: Wrap(),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Column(
+                  children: [
+                    Text(
+                      "Please Enter your Class",
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontFamily: 'Candara',
                       ),
                     ),
-                  ),*/
-                  FormField<String>(
-                    builder: (FormFieldState<String> state) {
-                      String _currentSelectedValue='';
-                      return Container(
-                        height: 60,
+                    SizedBox(height: 20),
+                    /*Form(
+                      key: _formKey,
+                      child: Container(
                         padding: EdgeInsets.only(left: 10,right: 10),
-                        child: InputDecorator(
+                        child: TextFormField(
+
+                          controller: classController,
+                          validator: (input) {
+                            if (input!.isEmpty) return 'Enter Class';
+                          },
                           decoration: InputDecoration(
-                            //labelText: 'CLASS',
-                              prefixIcon: Icon(Icons.school,color: Colors.teal),
-                              labelStyle: TextStyle(fontFamily: "Candara"),
-                              errorStyle: TextStyle(fontFamily:"Candara",color: Colors.redAccent, fontSize: 16.0),
-                              //hintText: 'Please select expense',
-                              enabledBorder:OutlineInputBorder(
-                                  borderSide: const BorderSide(color: Colors.grey, width: 2.0),
-                                  borderRadius: BorderRadius.circular(5)),
-                              focusedBorder: OutlineInputBorder(
-                                  borderSide: const BorderSide(color: Colors.teal,width: 2.0),
-                                  borderRadius: BorderRadius.circular(5)
-                              )),
-                          //border: OutlineInputBorder(borderRadius: BorderRadius.circular(5.0))),
-                          isEmpty: _currentSelectedValue == '',
-                          child: DropdownButtonHideUnderline(
-                              child: DropdownButton(
-                                menuMaxHeight: 200,
-                                hint: _dropDownValue == null
-                                    ? Text('Dropdown')
-                                    : Text(
-                                  _dropDownValue,
-                                  style: TextStyle(fontFamily: "Candara",color: Colors.black,fontSize: 16),
-                                ),
-                                isExpanded: false,
-                                iconSize: 30.0,
-                                style: TextStyle(color: Colors.black),
-                                items: ["LKG","UKG","1", "2","3", "4","5", "6","7", "8","9", "10","11", "12"].map(
-                                      (val) {
-                                    return DropdownMenuItem<String>(
-                                      value: val,
-                                      child: Text(val),
-                                    );
-                                  },
-                                ).toList(),
-                                onChanged: (String? val) {
-                                  _dropDownValue = val!;
-                                  (context as Element).markNeedsBuild();
+//fillColor: Colors.white,
 
-                                },
-                              )
+                            enabledBorder:OutlineInputBorder(
+                                borderSide: const BorderSide(color: Colors.grey, width: 2.0),
+                                borderRadius: BorderRadius.circular(5)),
+                            focusedBorder: OutlineInputBorder(
+                                borderSide: const BorderSide(color: Colors.teal,width: 2.0),
+                                borderRadius: BorderRadius.circular(5)
+                            ),
+                            labelText: 'CLASS',
+                            labelStyle: TextStyle(fontFamily: "Candara"),
+                            prefixIcon: Icon(Icons.school,color: Colors.teal),
+                            fillColor: Colors.grey,
+                            focusColor: Colors.grey,
                           ),
+// onSaved: (input) => _email = input!
                         ),
-                      );
-                    },
-                  ),
+                      ),
+                    ),*/
+                    FormField<String>(
+                      builder: (FormFieldState<String> state) {
+                        String _currentSelectedValue='';
+                        return Container(
+                          height: 60,
+                          padding: EdgeInsets.only(left: 10,right: 10),
+                          child: InputDecorator(
+                            decoration: InputDecoration(
+                              //labelText: 'CLASS',
+                                prefixIcon: Icon(Icons.school,color: Colors.teal),
+                                labelStyle: TextStyle(fontFamily: "Candara"),
+                                errorStyle: TextStyle(fontFamily:"Candara",color: Colors.redAccent, fontSize: 16.0),
+                                //hintText: 'Please select expense',
+                                enabledBorder:OutlineInputBorder(
+                                    borderSide: const BorderSide(color: Colors.grey, width: 2.0),
+                                    borderRadius: BorderRadius.circular(5)),
+                                focusedBorder: OutlineInputBorder(
+                                    borderSide: const BorderSide(color: Colors.teal,width: 2.0),
+                                    borderRadius: BorderRadius.circular(5)
+                                )),
+                            //border: OutlineInputBorder(borderRadius: BorderRadius.circular(5.0))),
+                            isEmpty: _currentSelectedValue == '',
+                            child: DropdownButtonHideUnderline(
+                                child: DropdownButton(
+                                  menuMaxHeight: 200,
+                                  hint: _dropDownValue == null
+                                      ? Text('Dropdown')
+                                      : Text(
+                                    _dropDownValue,
+                                    style: TextStyle(fontFamily: "Candara",color: Colors.black,fontSize: 16),
+                                  ),
+                                  isExpanded: false,
+                                  iconSize: 30.0,
+                                  style: TextStyle(color: Colors.black),
+                                  items: ["LKG","UKG","1", "2","3", "4","5", "6","7", "8","9", "10","11", "12"].map(
+                                        (val) {
+                                      return DropdownMenuItem<String>(
+                                        value: val,
+                                        child: Text(val),
+                                      );
+                                    },
+                                  ).toList(),
+                                  onChanged: (String? val) {
+                                    _dropDownValue = val!;
+                                    (context as Element).markNeedsBuild();
 
-                ],
-              ),
-              /*Divider(
-                color: Colors.grey,
-              ),
-              SizedBox(height: 10),*/
-
-            ],
-          ),
-        ),
-        actions: <Widget>[
-          Center(
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                ElevatedButton(
-                  style: ButtonStyle(
-                      backgroundColor: MaterialStateProperty.all<Color>(
-                          Colors.teal)),
-                  child: Text(
-                    'CONFIRM',
-                    style: TextStyle(
-                      fontFamily: 'Candara',
+                                  },
+                                )
+                            ),
+                          ),
+                        );
+                      },
                     ),
-                  ),
-                  onPressed: () {
-                    print(_dropDownValue);
-                    if(_dropDownValue!="")
-                    {
-                      classId=_dropDownValue;
-                      if(classId!="")
-                      {
-                        Navigator.of(context).pop(ConfirmAction.Confirm);
-                        Navigator.pushReplacement(
-                            context, MaterialPageRoute(builder: (context) => landing()));
-                      }
 
-
-                    }
-                    //Navigator.of(context).pop(ConfirmAction.Confirm);
-                  },
+                  ],
                 ),
+                /*Divider(
+                  color: Colors.grey,
+                ),
+                SizedBox(height: 10),*/
+
               ],
             ),
           ),
-        ],
+          actions: <Widget>[
+            Center(
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  ElevatedButton(
+                    style: ButtonStyle(
+                        backgroundColor: MaterialStateProperty.all<Color>(
+                            Colors.teal)),
+                    child: Text(
+                      'CONFIRM',
+                      style: TextStyle(
+                        fontFamily: 'Candara',
+                      ),
+                    ),
+                    onPressed: () {
+                      print(_dropDownValue);
+                      if(_dropDownValue!="")
+                      {
+                        classId=_dropDownValue;
+                        if(classId!="")
+                        {
+                          Navigator.of(context).pop(ConfirmAction.Confirm);
+                          Navigator.pushReplacement(
+                              context, MaterialPageRoute(builder: (context) => landing()));
+                        }
+
+
+                      }
+                      //Navigator.of(context).pop(ConfirmAction.Confirm);
+                    },
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
       );
     },
   );

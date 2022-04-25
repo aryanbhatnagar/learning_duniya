@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:learning_duniya/SignUp.dart';
 import 'package:learning_duniya/globals.dart';
 import 'package:learning_duniya/landing.dart';
+import 'package:learning_duniya/profile.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 class IntroScreen extends StatefulWidget {
   @override
@@ -13,13 +14,24 @@ class IntroScreen extends StatefulWidget {
 class _IntroScreenState extends State<IntroScreen>
 {
   List <Slide> slides = [];
+  late int Role=0;
 
   Future<void> _incrementCounter() async {
-    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    /*final SharedPreferences prefs = await SharedPreferences.getInstance();
     setState(() {
       token = prefs.getString('token')!;
       userName=prefs.getString('username')!;
       ROLE=prefs.getString('role')!;
+    });*/
+    setState(() {
+      SharedPreferences.getInstance().then(
+            (prefs) {
+          prefs.getBool("is_logged_in");
+          token = prefs.getString("token")!;
+          Role= prefs.getInt("role")!;
+        },
+      );
+
     });
 
   }
@@ -67,9 +79,11 @@ class _IntroScreenState extends State<IntroScreen>
 
   void onDonePress() async {
     debugPrint(token);
-    debugPrint(ROLE);
-    if(token!="")
+    debugPrint(Role.toString());
+    if(token!="" && Role==1)
       Navigator.pushReplacement(context,MaterialPageRoute(builder: (context)=>landing()));
+    else if(token!="" && Role==2)
+      Navigator.pushReplacement(context,MaterialPageRoute(builder: (context)=>profile()));
     // Do what you want
     else
     Navigator.pushReplacementNamed(context, "Landing");

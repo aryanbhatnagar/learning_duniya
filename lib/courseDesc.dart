@@ -16,8 +16,9 @@ import 'Login.dart';
 import 'globals.dart';
 
 K12Chapter k12ChapterFromJson(String str) => K12Chapter.fromJson(json.decode(str));
-String chapid="";
 String k12ChapterToJson(K12Chapter data) => json.encode(data.toJson());
+
+String chapid="";
 
 class K12Chapter {
   K12Chapter({
