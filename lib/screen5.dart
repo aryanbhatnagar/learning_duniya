@@ -62,9 +62,26 @@ class _screen5State extends State<screen5> {
                             Expanded(
                                 flex: 2,
                                 child: Container(
-                                  child: CircleAvatar(
-                                    backgroundColor: Colors.amber,
-                                  ),
+                                  child: Stack(
+                                    children: [
+                                      CircleAvatar(
+                                        radius: 50,
+                                        backgroundColor: Colors.amber,
+                                      ),
+                                      CircleAvatar(
+                                        backgroundColor: Colors.white24,
+                                        radius: 65,
+                                      ),
+                                      CircleAvatar(
+                                        radius: 80,
+                                        backgroundColor: Colors.white38,
+                                      ),
+                                      CircleAvatar(
+                                        radius: 95,
+                                        backgroundColor: Colors.white60,
+                                      ),
+                                    ],
+                                  )
                                 )),
                             SizedBox(
                               width: 10,

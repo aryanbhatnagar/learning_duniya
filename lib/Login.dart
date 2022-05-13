@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/painting.dart';
@@ -142,14 +143,14 @@ class Login extends StatefulWidget {
 
 
 Future<Login1> createLogin(String email, String password) async{
-
+  String? deviceId1 = await FirebaseMessaging.instance.getToken();
   String? deviceId = await PlatformDeviceId.getDeviceId;
   final String apiUrl = "http://ec2-13-234-116-155.ap-south-1.compute.amazonaws.com/api/login";
-
+  print(deviceId1);
   final response = await http.post(Uri.parse(apiUrl), body: {
     "email": email,
     "password": password,
-    "device_id" : deviceId
+    "device_id" : deviceId1
   });
 
   if(response.statusCode == 200) {

@@ -16,6 +16,7 @@ import 'package:learning_duniya/navigationScreen.dart';
 import 'package:learning_duniya/profile.dart';
 import 'package:learning_duniya/quiz.dart';
 import 'package:group_button/group_button.dart';
+import 'package:learning_duniya/quiz_chall.dart';
 import 'package:learning_duniya/screen1%20(1).dart';
 import 'package:learning_duniya/challenge_page.dart';
 import 'package:learning_duniya/seeall.dart';
@@ -24,7 +25,25 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:toggle_switch/toggle_switch.dart';
 import 'Login.dart';
 import 'package:http/http.dart' as http;
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'globals.dart';
+
+const AndroidNotificationChannel channel = AndroidNotificationChannel(
+  //'high_importance_channel', // id
+    'High Importance Notifications', // title
+    'This channel is used for important notifications.', // description
+    importance: Importance.high,
+    playSound: true);
+
+final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+FlutterLocalNotificationsPlugin();
+
+Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+  await Firebase.initializeApp();
+  print('A bg message just showed up :  ${message.messageId}');
+}
 
 Future<K12Card> getMentorApi(String cls, String sub) async {
   final String apiUrl =
@@ -899,11 +918,151 @@ class _landingPageState extends State<landingPage> {
       indexSelect(index);
   }
 
+  int _counter = 0;
+
   @override
   void initState()  {
     super.initState();
+    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+      RemoteNotification? notification = message.notification;
+      AndroidNotification? android = message.notification?.android;
+      if (notification != null && android != null) {
+        flutterLocalNotificationsPlugin.show(
+            notification.hashCode,
+            notification.title,
+            notification.body.toString().split("--")[0].toString(),
+            NotificationDetails(
+              android: AndroidNotificationDetails(
+                channel.id,
+                channel.name,
+                color: Colors.blue,
+                playSound: true,
+                icon: 'images/Learning_Duniya_logo.png',
+              ),
+            ));
+      }
+    });
+
+    FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
+      print('A new onMessageOpenedApp event was published!');
+      RemoteNotification? notification = message.notification;
+      AndroidNotification? android = message.notification?.android;
+      if (notification != null && android != null) {
+        BuildContext dialogContext;
+        showDialog(
+            context: context,
+            builder: (BuildContext context) {
+
+              dialogContext=context;
+              return WillPopScope(
+                onWillPop: () async => false,
+                child: AlertDialog(
+                  //title: Text('Challenge'),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(15))),
+                  title: Image.asset(
+                    'images/Learning_Duniya_logo.png',
+                    height: 50,
+                    width: 50,
+                  ),
+                  content: Container(
+                    width: double.infinity,
+                    //height: Wrap(),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Column(
+                          children: [
+                            Text(
+                              "${notification.title.toString()}",
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontFamily: 'Candara',
+                              ),
+                            ),
+                            SizedBox(height: 10),
+                            Text(
+                              "${notification.body.toString().split("--")[0].toString()}",
+                              style: TextStyle(
+                                fontFamily: 'Candara',
+                              ),
+                            ),
+                            SizedBox(height: 20),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                  actions: <Widget>[
+                    Center(
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          SizedBox(width: 10),
+                          ElevatedButton(
+                            style: ButtonStyle(
+                                backgroundColor: MaterialStateProperty.all<Color>(
+                                    Colors.deepOrange)),
+                            child: Text(
+                              'NOT NOW',
+                              style: TextStyle(
+                                fontFamily: 'Candara',
+                              ),
+                            ),
+                            onPressed: () {
+                              Navigator.pop(context);
+                              Navigator.pushReplacement(
+                                  context, MaterialPageRoute(builder: (context) => landing()));
+                            },
+                          ),
+                          SizedBox(width: 10),
+                          ElevatedButton(
+                            style: ButtonStyle(
+                                backgroundColor: MaterialStateProperty.all<Color>(
+                                    Colors.teal)),
+                            child: Text(
+                              'PLAY',
+                              style: TextStyle(
+                                fontFamily: 'Candara',
+                              ),
+                            ),
+                            onPressed: () {
+                              var chapd=notification.body.toString().split("--")[1].split("-")[2].toString();
+                              var qtd=notification.body.toString().split("--")[1].split("-")[3].toString();
+                              Navigator.pop(context);
+                              Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) =>
+                                  quiz_challenge(chapd,qtd,"Aryan","http://ec2-13-234-116-155.ap-south-1.compute.amazonaws.com/uploads/Student-1650013240.png")));
+
+                            },
+                          ),
+                        ],
+                      ),
+                    ),
+
+                  ],
+                ),
+              );
+            });
+      }
+    });
+
   }
 
+  void showNotification() {
+    setState(() {
+      _counter++;
+    });
+    flutterLocalNotificationsPlugin.show(
+        0,
+        "Testing $_counter",
+        "How you doin ?",
+        NotificationDetails(
+            android: AndroidNotificationDetails(channel.id, channel.name,
+                importance: Importance.high,
+                color: Colors.blue,
+                playSound: true,
+                icon: 'images/Learning_Duniya_logo.png')));
+  }
 
 
 
@@ -2216,6 +2375,172 @@ class _landingPageState extends State<landingPage> {
             return Scaffold(body: challenge_page(),);
         },
       ),
+      FutureBuilder(
+        future: getLanding(),
+        builder: (context,AsyncSnapshot<LandingApi> snapshot1) {
+          if (token=="")
+            return Column(
+              children: [
+                SizedBox(height: 40),
+                Container(
+                  height: 250,
+                  width: 250,
+                  decoration: BoxDecoration(
+                    image: DecorationImage(image: AssetImage("images/notificationno.png"),fit: BoxFit.fill),
+                  ),
+                ),
+                SizedBox(height: 20,),
+                Center(child: Text("No new notification!!", style: TextStyle(
+                    fontSize: 20,
+                    fontFamily: "Candara",
+                    color: Colors.teal),),),
+                SizedBox(height: 15,),
+              ],
+            );
+          else
+            return Scaffold(
+              body: Container(
+                padding: EdgeInsets.all(15),
+                child: SingleChildScrollView(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      GestureDetector(
+                        onTap:(){
+                          Navigator.push(context, MaterialPageRoute(builder: (context) =>
+                              quiz_challenge("183","1","Aryan","http://ec2-13-234-116-155.ap-south-1.compute.amazonaws.com/uploads/Student-1650013240.png")));
+                        },
+                        child: Card(
+                          elevation: 5,
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.all(Radius.circular(10))),
+                          child: Container(
+                            padding: EdgeInsets.all(8),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Center(
+                                      child: CircleAvatar(
+                                        backgroundImage: NetworkImage("http://ec2-13-234-116-155.ap-south-1.compute.amazonaws.com/uploads/Student-1650013240.png"),
+                                        radius: 35,
+                                      ),
+                                    ),
+                                    SizedBox(width: 20,),
+
+                                  ],
+                                ),
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      "Aryan Bhatnagar",
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontFamily: 'Candara',
+                                        fontSize: 15,
+                                      ),
+                                    ),
+                                    Text(
+                                        'La Martiniere College',
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          fontFamily: 'Candara',
+                                          color: Colors.grey,
+                                          fontSize: 10,
+                                        ),
+                                        maxLines: 5,
+                                        overflow: TextOverflow.ellipsis),
+
+                                    SizedBox(
+                                      height: 10,
+                                    ),
+                                    Text("CHALLENGED YOU FOR A QUIZ",style: TextStyle(fontFamily: "Candara",fontSize: 10,color: Colors.red),overflow: TextOverflow.ellipsis,maxLines: 2),
+                                    Text("Subject : English",style: TextStyle(fontFamily: "Candara",fontSize: 11,),overflow: TextOverflow.ellipsis,maxLines: 2),
+                                    Text("Chapter : Who Did Patrick's Homework?",style: TextStyle(fontFamily: "Candara",fontSize: 11,),overflow: TextOverflow.ellipsis,maxLines: 2,),
+                                    Text("Type :  Fill in the Blanks",style: TextStyle(fontFamily: "Candara",fontSize: 11,),overflow: TextOverflow.ellipsis,maxLines: 2,),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                      GestureDetector(
+                        onTap:(){
+                          Navigator.push(context, MaterialPageRoute(builder: (context) =>
+                              quiz_challenge("183","1","Aryan","http://ec2-13-234-116-155.ap-south-1.compute.amazonaws.com/uploads/Student-1650013240.png")));
+                        },
+                        child: Card(
+                          elevation: 5,
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.all(Radius.circular(10))),
+                          child: Container(
+                            padding: EdgeInsets.all(8),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Center(
+                                      child: CircleAvatar(
+                                        backgroundImage: NetworkImage("http://ec2-13-234-116-155.ap-south-1.compute.amazonaws.com/uploads/Student-1650013240.png"),
+                                        radius: 35,
+                                      ),
+                                    ),
+                                    SizedBox(width: 20,),
+
+                                  ],
+                                ),
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      "Aryan Bhatnagar",
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontFamily: 'Candara',
+                                        fontSize: 15,
+                                      ),
+                                    ),
+                                    Text(
+                                        'La Martiniere College',
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          fontFamily: 'Candara',
+                                          color: Colors.grey,
+                                          fontSize: 10,
+                                        ),
+                                        maxLines: 5,
+                                        overflow: TextOverflow.ellipsis),
+
+                                    SizedBox(
+                                      height: 10,
+                                    ),
+                                    Text("CHALLENGED YOU FOR A QUIZ",style: TextStyle(fontFamily: "Candara",fontSize: 10,color: Colors.red),overflow: TextOverflow.ellipsis,maxLines: 2),
+                                    Text("Subject : English",style: TextStyle(fontFamily: "Candara",fontSize: 11,),overflow: TextOverflow.ellipsis,maxLines: 2),
+                                    Text("Chapter : Who Did Patrick's Homework?",style: TextStyle(fontFamily: "Candara",fontSize: 11,),overflow: TextOverflow.ellipsis,maxLines: 2,),
+                                    Text("Type :  Fill in the Blanks",style: TextStyle(fontFamily: "Candara",fontSize: 11,),overflow: TextOverflow.ellipsis,maxLines: 2,),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ));
+        },
+      ),
       SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -2253,43 +2578,6 @@ class _landingPageState extends State<landingPage> {
           ],
         ),
       ),
-      SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Container(
-              color: Colors.white,
-              height: 100,
-              padding: EdgeInsets.only(left: 30, right: 30, top: 10),
-              child: Card(
-                color: Colors.orange,
-                shadowColor: Colors.grey,
-              ),
-            ),
-            SizedBox(height: 10),
-            Container(
-              color: Colors.white,
-              height: 100,
-              padding: EdgeInsets.only(left: 30, right: 30, top: 10),
-              child: Card(
-                color: Colors.orange,
-                shadowColor: Colors.grey,
-              ),
-            ),
-            SizedBox(height: 10),
-            Container(
-              color: Colors.white,
-              height: 100,
-              padding: EdgeInsets.only(left: 30, right: 30, top: 10),
-              child: Card(
-                color: Colors.orange,
-                shadowColor: Colors.grey,
-              ),
-            ),
-            SizedBox(height: 10),
-          ],
-        ),
-      )
 
     ];
 

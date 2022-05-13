@@ -98,6 +98,7 @@ flutter:
     - images/login.jpg
     - images/challenge.png
     - images/Learning_Duniya_logo.png
+    - images/notificationno.png
   #   - images/a_dot_ham.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see

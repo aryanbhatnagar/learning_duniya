@@ -1,20 +1,17 @@
-import 'dart:io';
-import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_countdown_timer/countdown_timer_controller.dart';
-import 'package:flutter_countdown_timer/current_remaining_time.dart';
-import 'dart:ui';
-import 'package:http/http.dart' as http;
-import 'dart:async';
-import 'package:flutter_countdown_timer/flutter_countdown_timer.dart';
-import 'package:group_button/group_button.dart';
-import 'package:learning_duniya/assessment.dart';
-import 'package:learning_duniya/landing.dart';
-import 'package:learning_duniya/trial.dart';
-import 'package:video_player/video_player.dart';
 import 'dart:convert';
+import 'package:http/http.dart' as http;
+import 'package:flutter/material.dart';
+import 'package:group_button/group_button.dart';
+import 'package:learning_duniya/landing.dart';
+import 'package:video_player/video_player.dart';
+
 import 'globals.dart';
-import 'main.dart';
+
+var opponent_name;
+var opponent_img;
+var chapID;
+var qtId;
+
 
 ConvJson convJsonFromJson(String str) => ConvJson.fromJson(json.decode(str));
 String convJsonToJson(ConvJson data) => json.encode(data.toJson());
@@ -50,7 +47,7 @@ class ConvJson {
     "start_time": startTime,
     "end_time": endTime,
     "ans_sheet": List<dynamic>.from(ansSheet.map((x) => x.toJson())),
-  "result": jsonEncode(this.result) ,
+    "result": jsonEncode(this.result) ,
     "status": status,
   };
 }
@@ -151,7 +148,7 @@ Future<SendData> createData(String startTime,String endTime,List ansdata,Result 
 
   final response = await http.post(Uri.parse(apiUrl),
       headers: <String, String> {
-      "Authorization": "Bearer $token",
+        "Authorization": "Bearer $token",
         'Content-Type' : 'application/json'
       },
       body:jsonEncode(allData)
@@ -389,42 +386,32 @@ class Question {
   };
 }
 
-class quiz extends StatelessWidget {
-  //const quiz({Key? key}) : super(key: key);
-  late int id;
-  late int qid;
-  quiz(this.id,this.qid);
+class quiz_challenge extends StatefulWidget {
+
+  var chapid;
+  var qtid;
+  var o_name;
+  var o_photo;
+
+  quiz_challenge(this.chapid, this.qtid, this.o_name, this.o_photo);
+ //const quiz_challenge({Key? key}) : super(key: key);
 
   @override
-  Widget build(BuildContext context) {
-    quizId = id.toString();
-    qtype= qid.toString();
-    return WillPopScope(
-      onWillPop: () async => false,
-      child: MaterialApp(
-        home: quizpage(id),
-      ),
-    );
-  }
+  State<quiz_challenge> createState() => _quiz_challengeState(chapid,qtid,o_name,o_photo);
 }
 
-class quizpage extends StatefulWidget {
-  //const quizpage({Key? key}) : super(key: key);
-  int quiz_id;
+class _quiz_challengeState extends State<quiz_challenge> {
 
-  quizpage(this.quiz_id);
-
-  @override
-  _quizpageState createState() => _quizpageState(quiz_id);
-}
-
-class _quizpageState extends State<quizpage> with TickerProviderStateMixin {
+  var chapid;
+  var qtid;
+  var o_name;
+  var o_photo;
+  _quiz_challengeState(this.chapid, this.qtid, this.o_name, this.o_photo);
 
   int qnum = 0;
   int score = 0;
-  int quiz_Id;
+  //int quiz_Id;
 
-  _quizpageState(this.quiz_Id);
 
   bool buttonState = true;
   bool quesState = false;
@@ -446,7 +433,10 @@ class _quizpageState extends State<quizpage> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
-
+    chapID=chapid;
+    qtId=qtid;
+    opponent_name=o_name;
+    opponent_img=o_photo;
     Size size = MediaQuery.of(context).size;
     final controllerr = GroupButtonController();
 
@@ -468,11 +458,11 @@ class _quizpageState extends State<quizpage> with TickerProviderStateMixin {
             centerTitle: true,
           ),*/
           body: FutureBuilder(
-            future: createQuestions(quizId,qtype),
+            future: createQuestions(chapID,qtId),
             builder: (context, AsyncSnapshot<Questions> snapshot) {
               int noq=0;
               if (snapshot.hasData) {
-                print(quizId);
+                print(chapID);
                 Questions? que = snapshot.data;
                 debugPrint(snapshot.data.toString());
                 late VideoPlayerController _controller;
@@ -493,80 +483,142 @@ class _quizpageState extends State<quizpage> with TickerProviderStateMixin {
                           children: [
                             Container(
                               padding: EdgeInsets.all(5),
-//height: 20,
+                              height: 65,
                               color: Colors.teal,
                               child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.center,
                                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: [
-                                  Column(
-                                    mainAxisAlignment: MainAxisAlignment.start,
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        "",
-                                        style: TextStyle(
-                                            fontSize: 20,
-                                            color: Colors.white,
-                                            fontWeight: FontWeight.bold),
-                                      ),
-                                      Text(
-                                        "",
-                                        style: TextStyle(fontSize: 12, color: Colors.white),
-                                      ),
-                                    ],
+                                  Container(
+                                    child: Row(
+                                      children: [
+                                        CircleAvatar(
+                                          backgroundColor: Colors.amber,
+                                        ),
+                                        SizedBox(
+                                          width: 10,
+                                        ),
+                                        Column(
+                                          mainAxisAlignment: MainAxisAlignment.center,
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              'My Name',
+                                              style: TextStyle(
+                                                  color: Colors.white,
+                                                  fontWeight: FontWeight.bold),
+                                            ),
+                                            Text(
+                                              '252',
+                                              style: TextStyle(
+                                                  color: Colors.yellow,
+                                                  fontWeight: FontWeight.bold),
+                                            ),
+                                          ],
+                                        )
+                                      ],
+                                    ),
                                   ),
-                                  SizedBox(
-                                    width: 125,
-                                    child: ElevatedButton(
-                                      style: ButtonStyle(
-                                          backgroundColor:
-                                          MaterialStateProperty.all<Color>(Colors.blue)),
-                                      onPressed: () {
-                                        start_time = DateTime.now().toString();
-                                        //ass_id = que.data.assessment.id.toString();
-                                        total = noq;
-
-                                        quesStartTime = DateTime.now().second + (DateTime.now().minute * 60);
-
-                                        //debugPrint(DateTime.now().toString());
-                                        debugPrint(quesStartTime.toString());
-
-                                        /*controller.reverse(
-                                                      from: controller.value == 0
-                                                          ? 1.0
-                                                          : controller.value);*/
-                                        setState(() {
-                                          //isPlaying = true;
-                                          buttonState = !buttonState;
-                                          quesState = !quesState;
-                                        });
-
-                                      },
-                                      child: buttonState
-                                          ? Text(
-                                        'START QUIZ',
-                                        style: TextStyle(
-                                          color: Colors.white,
-                                          fontSize: 14.0,
+                                  /*Container(
+                                    child: Column(
+                                      children: [
+                                        SizedBox(
+                                          height: 10,
                                         ),
-                                      )
-                                          : Text(
-                                        'STOP QUIZ',
-                                        style: TextStyle(
+                                        Icon(
+                                          Icons.watch_later_outlined,
                                           color: Colors.white,
-                                          fontSize: 14.0,
                                         ),
-                                      ),
+                                        Text(
+                                          '08',
+                                          style: TextStyle(color: Colors.white),
+                                        )
+                                      ],
+                                    ),
+                                  ),*/
+                                  Container(
+                                    child: Row(
+                                      children: [
+                                        Column(
+                                          mainAxisAlignment: MainAxisAlignment.center,
+                                          crossAxisAlignment: CrossAxisAlignment.end,
+                                          children: [
+                                            Text(
+                                              opponent_name,
+                                              style: TextStyle(
+                                                  color: Colors.white,
+                                                  fontWeight: FontWeight.bold),
+                                            ),
+                                            Text(
+                                              'Next',
+                                              style: TextStyle(
+                                                  color: Colors.yellow,
+                                                  fontWeight: FontWeight.bold),
+                                            ),
+                                          ],
+                                        ),
+                                        SizedBox(
+                                          width: 10,
+                                        ),
+                                        CircleAvatar(
+                                          backgroundImage: NetworkImage(opponent_img),
+                                          backgroundColor: Colors.lightGreen,
+                                        ),
+                                      ],
                                     ),
                                   ),
                                 ],
                               ),
                             ),
+                            SizedBox(height: 10,),
+                            SizedBox(
+                              //width: 125,
+                              child: ElevatedButton(
+                                style: ButtonStyle(
+                                    backgroundColor:
+                                    MaterialStateProperty.all<Color>(Colors.blue)),
+                                onPressed: () {
+                                  start_time = DateTime.now().toString();
+                                  //ass_id = que.data.assessment.id.toString();
+                                  total = noq;
 
+                                  quesStartTime = DateTime.now().second + (DateTime.now().minute * 60);
+
+                                  //debugPrint(DateTime.now().toString());
+                                  debugPrint(quesStartTime.toString());
+
+                                  /*controller.reverse(
+                                                      from: controller.value == 0
+                                                          ? 1.0
+                                                          : controller.value);*/
+                                  setState(() {
+                                    //isPlaying = true;
+                                    buttonState = !buttonState;
+                                    quesState = !quesState;
+                                  });
+
+                                },
+                                child: buttonState
+                                    ? Text(
+                                  'START QUIZ',
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 14.0,
+                                  ),
+                                )
+                                    : Text(
+                                  'STOP QUIZ',
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 14.0,
+                                  ),
+                                ),
+                              ),
+                            ),
                             Visibility(
                               visible: quesState,
                               child: Container(
-                                padding: EdgeInsets.all(20),
+                                padding: EdgeInsets.all(10),
                                 child: SingleChildScrollView(
                                   child: Column(
                                     children: [
@@ -823,20 +875,20 @@ class _quizpageState extends State<quizpage> with TickerProviderStateMixin {
                                           ),
                                           if(j!=snapshot.data!.data.questions.length-1)
                                             Visibility(
-                                            visible: nextVis,
-                                            child: SizedBox(
-                                              width: 100,
-                                              child: ElevatedButton(
-                                                style: ButtonStyle(
-                                                    backgroundColor: MaterialStateProperty.all<Color>(
-                                                        Colors.teal)),
-                                                onPressed: () {
-                                                  if (j != que.data.questions.length - 1){
-                                                    j += 1;
+                                              visible: nextVis,
+                                              child: SizedBox(
+                                                width: 100,
+                                                child: ElevatedButton(
+                                                  style: ButtonStyle(
+                                                      backgroundColor: MaterialStateProperty.all<Color>(
+                                                          Colors.teal)),
+                                                  onPressed: () {
+                                                    if (j != que.data.questions.length - 1){
+                                                      j += 1;
 
-                                                    debugPrint((j).toString());
+                                                      debugPrint((j).toString());
 
-                                                    /*
+                                                      /*
                                                             quizInputData.add(que_id);
                                                             quizInputData.add(currentAns);
                                                             quizInputData.add(correctAnswer);
@@ -844,101 +896,101 @@ class _quizpageState extends State<quizpage> with TickerProviderStateMixin {
                                                             */
 
 
-                                                    quesTimeDiff = timeData[j-1];
+                                                      quesTimeDiff = timeData[j-1];
 
-                                                    quesEndTime = DateTime.now().second + (DateTime.now().minute * 60);
-                                                    debugPrint(quesEndTime.toString());
-                                                    quesTimeDiff += (quesEndTime - quesStartTime);
-                                                    timeData[j-1] = quesTimeDiff;
-                                                    debugPrint('total time: ' + quesTimeDiff.toString());
-                                                    quesStartTime = quesEndTime;
+                                                      quesEndTime = DateTime.now().second + (DateTime.now().minute * 60);
+                                                      debugPrint(quesEndTime.toString());
+                                                      quesTimeDiff += (quesEndTime - quesStartTime);
+                                                      timeData[j-1] = quesTimeDiff;
+                                                      debugPrint('total time: ' + quesTimeDiff.toString());
+                                                      quesStartTime = quesEndTime;
 
-                                                    quizAns = {
-                                                      "que" : que_id,
-                                                      "ans" : currentAns,
-                                                      "correctAnswer" : correctAnswer,
-                                                      "result" : result,
-                                                      "time" : quesTimeDiff
-                                                    };
+                                                      quizAns = {
+                                                        "que" : que_id,
+                                                        "ans" : currentAns,
+                                                        "correctAnswer" : correctAnswer,
+                                                        "result" : result,
+                                                        "time" : quesTimeDiff
+                                                      };
 
-                                                    allQuestionData.add(quizAns);
+                                                      allQuestionData.add(quizAns);
 
-                                                    debugPrint(quizInputData.toString());
-                                                  }else {
+                                                      debugPrint(quizInputData.toString());
+                                                    }else {
 
 
 
-                                                    debugPrint(
-                                                        "Max Number of Questions");
-                                                  }
-
-                                                  //quizInputData.clear();
-
-                                                  setState(() {
-                                                    if(j == 0)
-                                                      prevVis = false;
-                                                    else
-                                                      prevVis = true;
-
-                                                    if(j+1 == que.data.questions.length) {
-                                                      submitVis = true;
-                                                      nextVis = false;
+                                                      debugPrint(
+                                                          "Max Number of Questions");
                                                     }
-                                                    else {
-                                                      submitVis = false;
-                                                      nextVis = true;
-                                                    }
-                                                  });
+
+                                                    //quizInputData.clear();
+
+                                                    setState(() {
+                                                      if(j == 0)
+                                                        prevVis = false;
+                                                      else
+                                                        prevVis = true;
+
+                                                      if(j+1 == que.data.questions.length) {
+                                                        submitVis = true;
+                                                        nextVis = false;
+                                                      }
+                                                      else {
+                                                        submitVis = false;
+                                                        nextVis = true;
+                                                      }
+                                                    });
 
 
-                                                },
-                                                child: Text('NEXT'),
-                                              ),
-                                            ),
-                                          ),
-                                          if(j==snapshot.data!.data.questions.length-1)
-                                            Visibility(
-                                            visible: submitVis,
-                                            child: FlatButton(
-                                              shape: RoundedRectangleBorder(
-                                                  borderRadius: BorderRadius.all(
-                                                      Radius.circular(5))),
-                                              padding: EdgeInsets.all(10),
-                                              textColor: Colors.white,
-                                              color: Colors.orange,
-                                              child: Text(
-                                                'Submit',
-                                                style: TextStyle(
-                                                  color: Colors.white,
-                                                  fontSize: 20.0,
+                                                  },
+                                                  child: Text('NEXT'),
                                                 ),
                                               ),
-                                              onPressed: () async {
-                                                end_time = DateTime.now().toString();
-
-                                                debugPrint((j).toString());
-
-                                                quesTimeDiff = timeData[j];
-
-                                                quesEndTime = DateTime.now().second + (DateTime.now().minute * 60);
-                                                debugPrint(quesEndTime.toString());
-                                                quesTimeDiff += (quesEndTime - quesStartTime);
-                                                timeData[j] = quesTimeDiff;
-                                                debugPrint('total time: ' + quesTimeDiff.toString());
-                                                quesStartTime = quesEndTime;
-
-                                                quizAns = {
-                                                  "que" : que_id,
-                                                  "ans" : currentAns,
-                                                  "correctAnswer" : correctAnswer,
-                                                  "result" : result,
-                                                  "time" : quesTimeDiff
-                                                };
-                                                allQuestionData.add(quizAns);
-                                                assignData(quizInputData);
-                                              },
                                             ),
-                                          )
+                                          if(j==snapshot.data!.data.questions.length-1)
+                                            Visibility(
+                                              visible: submitVis,
+                                              child: FlatButton(
+                                                shape: RoundedRectangleBorder(
+                                                    borderRadius: BorderRadius.all(
+                                                        Radius.circular(5))),
+                                                padding: EdgeInsets.all(10),
+                                                textColor: Colors.white,
+                                                color: Colors.orange,
+                                                child: Text(
+                                                  'Submit',
+                                                  style: TextStyle(
+                                                    color: Colors.white,
+                                                    fontSize: 20.0,
+                                                  ),
+                                                ),
+                                                onPressed: () async {
+                                                  end_time = DateTime.now().toString();
+
+                                                  debugPrint((j).toString());
+
+                                                  quesTimeDiff = timeData[j];
+
+                                                  quesEndTime = DateTime.now().second + (DateTime.now().minute * 60);
+                                                  debugPrint(quesEndTime.toString());
+                                                  quesTimeDiff += (quesEndTime - quesStartTime);
+                                                  timeData[j] = quesTimeDiff;
+                                                  debugPrint('total time: ' + quesTimeDiff.toString());
+                                                  quesStartTime = quesEndTime;
+
+                                                  quizAns = {
+                                                    "que" : que_id,
+                                                    "ans" : currentAns,
+                                                    "correctAnswer" : correctAnswer,
+                                                    "result" : result,
+                                                    "time" : quesTimeDiff
+                                                  };
+                                                  allQuestionData.add(quizAns);
+                                                  assignData(quizInputData);
+                                                },
+                                              ),
+                                            )
                                         ],
                                       ),
                                       SizedBox(height: 20,),
@@ -967,7 +1019,6 @@ class _quizpageState extends State<quizpage> with TickerProviderStateMixin {
           )),
     );
   }
-
   Future<void> assignData(List quizInputData) async {
 
     debugPrint(allQuestionData.toString());
@@ -980,7 +1031,7 @@ class _quizpageState extends State<quizpage> with TickerProviderStateMixin {
     };
 
     allData = {
-      "chapter_id" : quizId,
+      "chapter_id" : chapID,
       "start_time" : start_time,
       "end_time" : end_time,
       "ans_sheet":allQuestionData,

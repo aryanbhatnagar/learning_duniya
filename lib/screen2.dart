@@ -225,7 +225,7 @@ class _screen2State extends State<screen2> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Screen 2'),
+        title: Text('Analysis Report'),
         centerTitle: true,
       ),
       body: FutureBuilder(

@@ -1,9 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-
 import 'package:http/http.dart' as http;
 import 'globals.dart';
-
 import 'dart:convert';
 
 Analytics3 analytics3FromJson(String str) => Analytics3.fromJson(json.decode(str));
@@ -190,7 +188,7 @@ class _screen3State extends State<screen3> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Screen 3'),
+        title: Text('Analysis Report'),
         centerTitle: true,
       ),
       body: FutureBuilder(

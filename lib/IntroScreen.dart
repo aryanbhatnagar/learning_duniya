@@ -17,12 +17,7 @@ class _IntroScreenState extends State<IntroScreen>
   late int Role=0;
 
   Future<void> _incrementCounter() async {
-    /*final SharedPreferences prefs = await SharedPreferences.getInstance();
-    setState(() {
-      token = prefs.getString('token')!;
-      userName=prefs.getString('username')!;
-      ROLE=prefs.getString('role')!;
-    });*/
+
     setState(() {
       SharedPreferences.getInstance().then(
             (prefs) {
@@ -43,6 +38,7 @@ class _IntroScreenState extends State<IntroScreen>
     slides.add(
       new Slide(
         //title: "ERASER",
+
         description: "\n\n\n\n1. Ye indulgence unreserved connection alteration appearance. this is sample text.",
         styleDescription:
         TextStyle(color: Colors.black, fontSize: 25.0, fontFamily: 'Candara'),
