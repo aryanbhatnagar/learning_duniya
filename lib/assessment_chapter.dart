@@ -229,7 +229,7 @@ class QuestionType {
 
 Future<AssesChap> createAssessChap(String assid,String chapid ) async {
   final String apiUrl =
-      "http://ec2-13-234-116-155.ap-south-1.compute.amazonaws.com/api/assessment/chapter/details";
+      "${BASE}api/assessment/chapter/details";
   final response = await http.post(Uri.parse(apiUrl),headers: <String, String> {
     "Authorization": "Bearer $token",
   },

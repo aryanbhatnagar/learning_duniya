@@ -128,7 +128,7 @@ class Overview {
 
 Future<Analytics3> createRes3(String sub_id,String chap_id,String qt_id) async {
   final String apiUrl =
-      "http://ec2-13-234-116-155.ap-south-1.compute.amazonaws.com/api/mentee/result_analytics/assessment";
+      "${BASE}api/mentee/result_analytics/assessment";
 
   final response = await http.post(Uri.parse(apiUrl),
       headers: <String, String> {

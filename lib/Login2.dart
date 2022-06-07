@@ -143,7 +143,7 @@ class Login2 extends StatefulWidget {
 
 Future<Login1> createLogin(String email, String password) async{
   String? deviceId = await PlatformDeviceId.getDeviceId;
-  final String apiUrl = "http://ec2-13-234-116-155.ap-south-1.compute.amazonaws.com/api/login";
+  final String apiUrl = "${BASE}api/login";
 
   final response = await http.post(Uri.parse(apiUrl), body: {
     "email": email,

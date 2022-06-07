@@ -70,8 +70,8 @@ class mentorProfile extends StatefulWidget {
 Future createMentor(Map mentorData, File image) async {
   int responseCode;
 
-  const String apiUrl =
-      "http://ec2-13-234-116-155.ap-south-1.compute.amazonaws.com/api/mentor/register";
+  String apiUrl =
+      "${BASE}api/mentor/register";
   var uri = Uri.parse(apiUrl);
 
   var request = http.MultipartRequest("POST", uri);

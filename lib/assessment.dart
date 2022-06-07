@@ -19,7 +19,7 @@ var assId = "";
 var ass_Image="";
 Future<Assess> createAssess(String id) async {
   final String apiUrl =
-      "http://ec2-13-234-116-155.ap-south-1.compute.amazonaws.com/api/assessment";
+      "${BASE}api/assessment";
   final response = await http.post(Uri.parse(apiUrl), body: {"id": id});
 
   if (response.statusCode == 200) {

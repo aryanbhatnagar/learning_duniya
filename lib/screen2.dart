@@ -19,7 +19,7 @@ class screen2 extends StatefulWidget {
 
 Future<Analytics2> createRes1(String sub_id) async {
   final String apiUrl =
-      "http://ec2-13-234-116-155.ap-south-1.compute.amazonaws.com/api/mentee/result_analytics/assessment";
+      "${BASE}api/mentee/result_analytics/assessment";
 
   final response = await http.post(Uri.parse(apiUrl),
       headers: <String, String> {

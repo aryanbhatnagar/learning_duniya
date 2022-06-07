@@ -138,7 +138,7 @@ class Data {
 Future<MentorAccountDataResponse> addBankDetails(
     String name, String accountNumber, String ifscCode, String branch) async {
   final String apiUrl =
-      "http://ec2-13-234-116-155.ap-south-1.compute.amazonaws.com/api/mentor/account_details";
+      "${BASE}api/mentor/account_details";
 
   final response = await http.post(Uri.parse(apiUrl),
       headers: <String, String> {

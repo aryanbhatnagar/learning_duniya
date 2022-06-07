@@ -129,6 +129,8 @@ Future<void> _incrementCounter(int role) async {
         (prefs) {
       prefs.setBool("is_logged_in", true);
       prefs.setString("token", token);
+      prefs.setString("name", userName);
+      prefs.setString("img", userImg);
       prefs.setInt("role", role);
     },
   );
@@ -145,7 +147,7 @@ class Login extends StatefulWidget {
 Future<Login1> createLogin(String email, String password) async{
   String? deviceId1 = await FirebaseMessaging.instance.getToken();
   String? deviceId = await PlatformDeviceId.getDeviceId;
-  final String apiUrl = "http://ec2-13-234-116-155.ap-south-1.compute.amazonaws.com/api/login";
+  final String apiUrl = "${BASE}api/login";
   print(deviceId1);
   final response = await http.post(Uri.parse(apiUrl), body: {
     "email": email,

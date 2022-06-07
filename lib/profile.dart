@@ -308,7 +308,7 @@ class Student {
 
 Future<MentorApi> getMentorApi() async {
   final String apiUrl =
-      "http://ec2-13-234-116-155.ap-south-1.compute.amazonaws.com/api/mentor/profile";
+      "${BASE}api/mentor/profile";
   final response = await http.get(Uri.parse(apiUrl), headers: <String, String>{
     "Authorization": "Bearer $token",
   });
@@ -422,7 +422,7 @@ class Mentee1 {
 
 Future<MenteeData> getMenteeData() async {
   final String apiUrl =
-      "http://ec2-13-234-116-155.ap-south-1.compute.amazonaws.com/api/mentor/mentee";
+      "${BASE}api/mentor/mentee";
   final response = await http.get(Uri.parse(apiUrl), headers: <String, String>{
     "Authorization": "Bearer $token",
   });
@@ -526,7 +526,7 @@ class Mentee2 {
 
 Future<MenteeRequestData> getMenteeRequestDataNew() async {
   final String apiUrl =
-      "http://ec2-13-234-116-155.ap-south-1.compute.amazonaws.com/api/mentor/latest/help";
+      "${BASE}api/mentor/latest/help";
   final response = await http.get(Uri.parse(apiUrl), headers: <String, String>{
     "Authorization": "Bearer $token",
   });
@@ -543,7 +543,7 @@ Future<MenteeRequestData> getMenteeRequestDataNew() async {
 
 Future<MenteeRequestData> getMenteeRequestDataOld() async {
   final String apiUrl =
-      "http://ec2-13-234-116-155.ap-south-1.compute.amazonaws.com/api/mentor/old/help";
+      "${BASE}api/mentor/old/help";
   final response = await http.get(Uri.parse(apiUrl), headers: <String, String>{
     "Authorization": "Bearer $token",
   });
@@ -642,7 +642,7 @@ class HelpRequests {
 
 Future<MenteeReviewData> getMenteeRequestInvite(String id, String name) async {
   final String apiUrl =
-      "http://ec2-13-234-116-155.ap-south-1.compute.amazonaws.com/api/mentor/help/sent/invition";
+      "${BASE}api/mentor/help/sent/invition";
   final response = await http.post(Uri.parse(apiUrl),
       headers: <String, String>{"Authorization": "Bearer $token"},
       body: {"id": id, "status": "accepted"});
@@ -677,7 +677,7 @@ Future<MenteeReviewData> getMenteeRequestInvite(String id, String name) async {
 
 Future<MenteeReviewData> getMenteeRequestReview(String id) async {
   final String apiUrl =
-      "http://ec2-13-234-116-155.ap-south-1.compute.amazonaws.com/api/mentor/help/review";
+      "${BASE}api/mentor/help/review";
   final response = await http.post(Uri.parse(apiUrl), headers: <String, String>{
     "Authorization": "Bearer $token",
   }, body: {
@@ -696,7 +696,7 @@ Future<MenteeReviewData> getMenteeRequestReview(String id) async {
 
 Future<MenteeReviewData> getMenteeRequestReject(String id, String name) async {
   final String apiUrl =
-      "http://ec2-13-234-116-155.ap-south-1.compute.amazonaws.com/api/mentor/help/sent/invition";
+      "${BASE}api/mentor/help/sent/invition";
   final response = await http.post(Uri.parse(apiUrl), headers: <String, String>{
     "Authorization": "Bearer $token",
   }, body: {
@@ -1917,15 +1917,7 @@ class _profileState extends State<profile> {
                                 backgroundColor: Colors.deepPurple,
                                 radius: 45,
                                 backgroundImage: NetworkImage("${snapshot1.data!.data.profile.img.toString()}")
-                              /*child: Container(
-                                              padding: EdgeInsets.all(5),
-                                              child: ClipRRect(
-                                                borderRadius: BorderRadius.circular(25),
-                                                child: image != null
-                                                    ? Image.file(image!)
-                                                    : Image.asset('images/mentorProfile.jpeg'),
-                                              ),
-                                            ),*/
+
                             ),
                             Padding(
                               padding: const EdgeInsets.all(8.0),

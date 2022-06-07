@@ -18,7 +18,7 @@ List<String> serviceList = <String>[];
 
 Future<Mentor> createMentor(String id) async {
   final String apiUrl =
-      "http://ec2-13-234-116-155.ap-south-1.compute.amazonaws.com/api/mentor";
+      "${BASE}api/mentor";
 
   final response = await http.post(Uri.parse(apiUrl), body: {"id": id});
 
@@ -32,7 +32,7 @@ Future<Mentor> createMentor(String id) async {
 
 Future<Mentorlike> createMentorlike(String id) async {
   final String apiUrl =
-      "http://ec2-13-234-116-155.ap-south-1.compute.amazonaws.com/api/mentor/liked";
+      "${BASE}api/mentor/liked";
 
   final response = await http.post(Uri.parse(apiUrl),headers: <String, String> {
     "Authorization": "Bearer $token",

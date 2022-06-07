@@ -11,6 +11,8 @@ var opponent_name;
 var opponent_img;
 var chapID;
 var qtId;
+var challID;
+var opposchool;
 
 
 ConvJson convJsonFromJson(String str) => ConvJson.fromJson(json.decode(str));
@@ -143,7 +145,7 @@ late SendData? _sendData;
 
 Future<SendData> createData(String startTime,String endTime,List ansdata,Result result) async {
   //ConvJson con=new ConvJson(assessmentId: assId, startTime: startTime, endTime: endTime, ansSheet: ansdata, result: result, status: "successful");
-  final String apiUrl = "http://ec2-13-234-116-155.ap-south-1.compute.amazonaws.com/api/k12/ansheet";
+  final String apiUrl = "${BASE}api/challenge/ansheet";
   //debugPrint(allData.toString());
 
   final response = await http.post(Uri.parse(apiUrl),
@@ -199,51 +201,26 @@ class SendData {
 class Data {
   Data({
     required this.chapterId,
-    required this.userId,
-    required this.testToken,
-    required this.startTime,
-    required this.endTime,
-    required this.ansSheet,
-    required this.result,
-    required this.sheetStatus,
+
   });
 
   String chapterId;
-  int userId;
-  String testToken;
-  String startTime;
-  String endTime;
-  List<AnsSheet> ansSheet;
-  Result result;
-  String sheetStatus;
+
 
   factory Data.fromJson(Map<String, dynamic> json) => Data(
     chapterId: json["chapter_id"],
-    userId: json["user_id"],
-    testToken: json["test_token"],
-    startTime: json["start_time"],
-    endTime: json["end_time"],
-    ansSheet: List<AnsSheet>.from(json["ans_sheet"].map((x) => AnsSheet.fromJson(x))),
-    result: Result.fromJson(json["result"]),
-    sheetStatus: json["sheet_status"],
+
   );
 
   Map<String, dynamic> toJson() => {
     "chapter_id": chapterId,
-    "user_id": userId,
-    "test_token": testToken,
-    "start_time": startTime,
-    "end_time": endTime,
-    "ans_sheet": List<dynamic>.from(ansSheet.map((x) => x.toJson())),
-    "result": result.toJson(),
-    "sheet_status": sheetStatus,
   };
 }
 
 
 Future<Questions> createQuestions(String id,String qt_id) async {
   final String apiUrl =
-      "http://ec2-13-234-116-155.ap-south-1.compute.amazonaws.com/api/chapter/questions";
+      "${BASE}api/chapter/questions";
 
   final response = await http.post(Uri.parse(apiUrl), body: {
     "chapter_id":id,
@@ -390,23 +367,27 @@ class quiz_challenge extends StatefulWidget {
 
   var chapid;
   var qtid;
+  var challid;
   var o_name;
   var o_photo;
+  var o_school;
 
-  quiz_challenge(this.chapid, this.qtid, this.o_name, this.o_photo);
+  quiz_challenge(this.chapid, this.qtid, this.challid,this.o_name,this.o_photo);
  //const quiz_challenge({Key? key}) : super(key: key);
 
   @override
-  State<quiz_challenge> createState() => _quiz_challengeState(chapid,qtid,o_name,o_photo);
+  State<quiz_challenge> createState() => _quiz_challengeState(chapid,qtid,challid,o_name,o_photo);
 }
 
 class _quiz_challengeState extends State<quiz_challenge> {
 
   var chapid;
   var qtid;
+  var challid;
   var o_name;
   var o_photo;
-  _quiz_challengeState(this.chapid, this.qtid, this.o_name, this.o_photo);
+  var o_school;
+  _quiz_challengeState(this.chapid, this.qtid, this.challid,this.o_name,this.o_photo);
 
   int qnum = 0;
   int score = 0;
@@ -435,10 +416,12 @@ class _quiz_challengeState extends State<quiz_challenge> {
   Widget build(BuildContext context) {
     chapID=chapid;
     qtId=qtid;
+    challID=challid;
     opponent_name=o_name;
     opponent_img=o_photo;
     Size size = MediaQuery.of(context).size;
     final controllerr = GroupButtonController();
+    bool back=true;
 
     List<Widget> vid_pho = <Widget>[
       Container(
@@ -451,7 +434,7 @@ class _quiz_challengeState extends State<quiz_challenge> {
     ];
 
     return WillPopScope(
-      onWillPop: () async => false,
+      onWillPop: () async => back,
       child: Scaffold(
         /*appBar: AppBar(
             title: Text('Quiz'),
@@ -493,6 +476,7 @@ class _quiz_challengeState extends State<quiz_challenge> {
                                     child: Row(
                                       children: [
                                         CircleAvatar(
+                                          backgroundImage: NetworkImage("${userImg}"),
                                           backgroundColor: Colors.amber,
                                         ),
                                         SizedBox(
@@ -503,13 +487,14 @@ class _quiz_challengeState extends State<quiz_challenge> {
                                           crossAxisAlignment: CrossAxisAlignment.start,
                                           children: [
                                             Text(
-                                              'My Name',
+                                              "$userName",
                                               style: TextStyle(
+                                                fontSize: 20,
                                                   color: Colors.white,
                                                   fontWeight: FontWeight.bold),
                                             ),
                                             Text(
-                                              '252',
+                                              "$schools",
                                               style: TextStyle(
                                                   color: Colors.yellow,
                                                   fontWeight: FontWeight.bold),
@@ -546,11 +531,12 @@ class _quiz_challengeState extends State<quiz_challenge> {
                                             Text(
                                               opponent_name,
                                               style: TextStyle(
+                                                fontSize: 20,
                                                   color: Colors.white,
                                                   fontWeight: FontWeight.bold),
                                             ),
                                             Text(
-                                              'Next',
+                                              "",
                                               style: TextStyle(
                                                   color: Colors.yellow,
                                                   fontWeight: FontWeight.bold),
@@ -593,6 +579,7 @@ class _quiz_challengeState extends State<quiz_challenge> {
                                                           : controller.value);*/
                                   setState(() {
                                     //isPlaying = true;
+                                    back=!back;
                                     buttonState = !buttonState;
                                     quesState = !quesState;
                                   });
@@ -1032,6 +1019,8 @@ class _quiz_challengeState extends State<quiz_challenge> {
 
     allData = {
       "chapter_id" : chapID,
+      "challenge_id":challID.toString(),
+      "question_type_id": qtId,
       "start_time" : start_time,
       "end_time" : end_time,
       "ans_sheet":allQuestionData,

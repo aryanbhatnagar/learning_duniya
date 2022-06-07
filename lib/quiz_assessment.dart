@@ -143,7 +143,7 @@ late SendData? _sendData;
 
 Future<SendData> createData(String startTime,String endTime,List ansdata,Result result) async {
   //ConvJson con=new ConvJson(assessmentId: assId, startTime: startTime, endTime: endTime, ansSheet: ansdata, result: result, status: "successful");
-  final String apiUrl = "http://ec2-13-234-116-155.ap-south-1.compute.amazonaws.com/api/assessmet/ansheet";
+  final String apiUrl = "${BASE}api/assessmet/ansheet";
   //debugPrint(allData.toString());
 
   final response = await http.post(Uri.parse(apiUrl),
@@ -242,7 +242,7 @@ class Data {
 
 Future<Questions> createQuestions(String id,String assID,String qtypeId) async {
   final String apiUrl =
-      "http://ec2-13-234-116-155.ap-south-1.compute.amazonaws.com/api/question";
+      "${BASE}api/question";
 
   final response = await http.post(Uri.parse(apiUrl), body: {
     "assessment_id":assID,

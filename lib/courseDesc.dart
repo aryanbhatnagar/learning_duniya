@@ -253,7 +253,7 @@ class Video {
 
 Future<K12Chapter> createK12(String id) async {
   final String apiUrl =
-      "http://ec2-13-234-116-155.ap-south-1.compute.amazonaws.com/api/chapter/details";
+      "${BASE}api/chapter/details";
 
   final response = await http.post(Uri.parse(apiUrl), body: {
     "book_id": id

@@ -52,10 +52,10 @@ class _screen4State extends State<screen4> {
                       Stack(
                         children: [
 
-                          CircleAvatar(backgroundColor: Colors.white24, radius: 110),
-                          CircleAvatar(backgroundColor: Colors.white38, radius: 100),
-                          CircleAvatar(backgroundColor: Colors.white60, radius: 90),
-                          CircleAvatar(backgroundColor: Colors.yellow, radius: 80),
+                          CircleAvatar(backgroundColor: Colors.white24, radius: 80),
+                          CircleAvatar(backgroundColor: Colors.white38, radius: 75),
+                          CircleAvatar(backgroundColor: Colors.white60, radius: 70),
+                          CircleAvatar(backgroundColor: Colors.yellow, radius: 65),
                         ],
                       )
 
@@ -79,9 +79,9 @@ class _screen4State extends State<screen4> {
                       Stack(
                         children: [
 
-                          CircleAvatar(backgroundColor: Colors.white38, radius: 80),
-                          CircleAvatar(backgroundColor: Colors.white60, radius: 70),
-                          CircleAvatar(backgroundColor: Colors.green, radius: 60),
+                          CircleAvatar(backgroundColor: Colors.white38, radius: 60),
+                          CircleAvatar(backgroundColor: Colors.white60, radius: 55),
+                          CircleAvatar(backgroundColor: Colors.green, radius: 50),
                         ],
                       )
                     ],

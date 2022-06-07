@@ -3,6 +3,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 
+import 'globals.dart';
+
 
 Fpass fpassFromJson(String str) => Fpass.fromJson(json.decode(str));
 String fpassToJson(Fpass data) => json.encode(data.toJson());
@@ -26,7 +28,7 @@ class Fpass {
 }
 
 Future<Fpass> createfpass(String email) async{
-  final String apiUrl = "http://ec2-13-234-116-155.ap-south-1.compute.amazonaws.com/api/password/email";
+  final String apiUrl = "${BASE}api/password/email";
 
   final response = await http.post(Uri.parse(apiUrl), body: {
     "email": email

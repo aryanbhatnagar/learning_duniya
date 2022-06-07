@@ -76,6 +76,7 @@ class Overview {
     required this.totalQuestion,
     required this.correct,
     required this.wrong,
+    required this.suggest
   });
 
   var ansVeryFast;
@@ -84,6 +85,7 @@ class Overview {
   var totalQuestion;
   var correct;
   var wrong;
+  var suggest;
 
   factory Overview.fromJson(Map<String, dynamic> json) => Overview(
     ansVeryFast: json["ans_very_fast"],
@@ -92,6 +94,7 @@ class Overview {
     totalQuestion: json["total_question"],
     correct: json["correct"],
     wrong: json["wrong"],
+    suggest : json["suggest_solution"]
   );
 
   Map<String, dynamic> toJson() => {
@@ -101,6 +104,7 @@ class Overview {
     "total_question": totalQuestion,
     "correct": correct,
     "wrong": wrong,
+    "suggest_solution" : suggest
   };
 }
 class Subject {
@@ -135,7 +139,7 @@ class Subject {
 
 Future<Analytics1> createRes() async {
   final String apiUrl =
-      "http://ec2-13-234-116-155.ap-south-1.compute.amazonaws.com/api/mentee/result_analytics/assessment";
+      "${BASE}api/mentee/result_analytics/assessment";
 
   final response = await http.post(Uri.parse(apiUrl),
       headers: <String, String> {
@@ -335,11 +339,11 @@ class _screen1State extends State<screen1> {
                         mainAxisAlignment: MainAxisAlignment.start,
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text('Current Suggested Solution', style: TextStyle(color: Colors.teal, fontWeight: FontWeight.bold, fontSize: 10),),
+                          Text('Current Suggested Solution', style: TextStyle(color: Colors.teal, fontWeight: FontWeight.bold, fontSize: 12),),
                           SizedBox(
                             height: 10,
                           ),
-                          Text('If both the above percentage found. Print here solution for level 1 and level 2 from table analytic_result. If only one of the above found, print solution for level 1 if level 1 is found above or print solution for level 2, if level 2 found above', style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 10),),
+                          Text("${snapshot.data!.data.res.overview.suggest.toString()}", style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 12),),
                         ],
                       ),
                     ),

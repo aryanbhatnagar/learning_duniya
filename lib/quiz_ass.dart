@@ -132,7 +132,7 @@ late SendData? _sendData;
 
 Future<SendData> createData(String startTime,String endTime,List ansdata,Result result) async {
   //ConvJson con=new ConvJson(assessmentId: assId, startTime: startTime, endTime: endTime, ansSheet: ansdata, result: result, status: "successful");
-  final String apiUrl = "http://ec2-13-234-116-155.ap-south-1.compute.amazonaws.com/api/assessmet/ansheet";
+  final String apiUrl = "${BASE}api/assessmet/ansheet";
   //debugPrint(allData.toString());
 
   final response = await http.post(Uri.parse(apiUrl),
@@ -231,7 +231,7 @@ class Data {
 
 Future<Questions> createQuestions(String assID,String id,String qtypeId) async {
   final String apiUrl =
-      "http://ec2-13-234-116-155.ap-south-1.compute.amazonaws.com/api/question";
+      "${BASE}api/question";
 
   final response = await http.post(Uri.parse(apiUrl), body: {
     "assessment_id":assID,
@@ -454,6 +454,7 @@ class _screen12State extends State<screen12> {
   bool prevVis = false;
   bool nextVis = true;
   bool submitVis = false;
+  bool back=true;
   var answers = [];
 
   /*
@@ -474,7 +475,7 @@ class _screen12State extends State<screen12> {
     Size size = MediaQuery.of(context).size;
     final controllerr = GroupButtonController();
     return WillPopScope(
-      onWillPop: () async => false,
+      onWillPop: () async => back,
       child: Scaffold(
         body: FutureBuilder(
           future: createQuestions(quizId,ASSid,qtid),
@@ -547,6 +548,7 @@ class _screen12State extends State<screen12> {
                                                           : controller.value);*/
                                   setState(() {
                                     //isPlaying = true;
+                                    back=!back;
                                     buttonState = !buttonState;
                                     quesState = !quesState;
                                   });

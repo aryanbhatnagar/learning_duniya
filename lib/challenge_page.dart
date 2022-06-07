@@ -53,7 +53,7 @@ class Data6 {
 
 Future<SendInvite> createInvite(String stu_id,String sub_id,String book_id,String chap_id,String qt_id) async {
   final String apiUrl =
-      "http://ec2-13-234-116-155.ap-south-1.compute.amazonaws.com/api/student/challenge/invite";
+      "${BASE}api/student/challenge/invite";
 
   final response = await http.post(Uri.parse(apiUrl), headers: <String, String>{
     "Authorization": "Bearer $token",
@@ -231,7 +231,7 @@ class Subject {
 
 Future<Livestudents> createLiveStudents(String id) async {
   final String apiUrl =
-      "http://ec2-13-234-116-155.ap-south-1.compute.amazonaws.com/api/student/live";
+      "${BASE}api/student/live";
 
   final response = await http.post(Uri.parse(apiUrl), headers: <String, String>{
     "Authorization": "Bearer $token",
@@ -250,7 +250,7 @@ Future<Livestudents> createLiveStudents(String id) async {
 
 Future<K12Card> getLiveSubjects(String cls, String sub) async {
   final String apiUrl =
-      "http://ec2-13-234-116-155.ap-south-1.compute.amazonaws.com/api/getk12";
+      "${BASE}api/getk12";
   final response = await http.post(Uri.parse(apiUrl), headers: <String, String>{
     "Authorization": "Bearer $token",
   }, body: {
@@ -506,7 +506,7 @@ class K12Detail {
 
 Future<K12Api> createK12(String id) async {
   final String apiUrl =
-      "http://ec2-13-234-116-155.ap-south-1.compute.amazonaws.com/api/getk12/details";
+      "${BASE}api/getk12/details";
 
   final response = await http.post(Uri.parse(apiUrl), body: {"book_id": id});
 
@@ -758,7 +758,7 @@ class Video {
 
 Future<K12Chapter> createqt(String id) async {
   final String apiUrl =
-      "http://ec2-13-234-116-155.ap-south-1.compute.amazonaws.com/api/chapter/details";
+      "${BASE}api/chapter/details";
 
   final response = await http.post(Uri.parse(apiUrl), body: {"book_id": id});
 
@@ -1387,10 +1387,12 @@ class _challenge_pageState extends State<challenge_page> {
                                                           context,
                                                           MaterialPageRoute(
                                                               builder: (context) =>
-                                                                  quiz_challenge(idchap, idqt,
+                                                                  quiz_challenge(idchap, idqt," 0",
                                                                       snapshot.data!.data1.student[i]
                                                                           .name
                                                                           .toString(),
+
+
                                                                       "http://ec2-13-234-116-155.ap-south-1.compute.amazonaws.com/uploads/${snapshot.data!.data1.student[i].img.toString()}")));
                                                     }
 

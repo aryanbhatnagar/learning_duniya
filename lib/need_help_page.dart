@@ -128,7 +128,7 @@ Future<Comm> createComm(String edu_id, String serv_id, String commm, String msg,
       modeCommunication: commm,
       message: msg);
   final String apiUrl =
-      "http://ec2-13-234-116-155.ap-south-1.compute.amazonaws.com/api/add/communication";
+      "${BASE}api/add/communication";
 
   final response = await http.post(Uri.parse(apiUrl),
       headers: <String, String>{
@@ -208,7 +208,7 @@ class Data2 {
 
 Future<FieldData> getFormDetails(String id) async {
   final String apiUrl =
-      "http://ec2-13-234-116-155.ap-south-1.compute.amazonaws.com/api/get/service/detail";
+      "${BASE}api/get/service/detail";
   final response = await http.post(Uri.parse(apiUrl), headers: <String, String>{
     "Authorization": "Bearer $token",
   }, body: {

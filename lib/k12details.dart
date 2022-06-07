@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:learning_duniya/courseDesc.dart';
 import 'package:audioplayers/audioplayers.dart';
 
+import 'globals.dart';
+
 K12Api k12ApiFromJson(String str) => K12Api.fromJson(json.decode(str));
 String k12ApiToJson(K12Api data) => json.encode(data.toJson());
 String courseID="1";
@@ -161,7 +163,7 @@ class K12Detail {
 
 Future<K12Api> createK12(String id) async {
   final String apiUrl =
-      "http://ec2-13-234-116-155.ap-south-1.compute.amazonaws.com/api/getk12/details";
+      "${BASE}api/getk12/details";
 
   final response = await http.post(Uri.parse(apiUrl), body: {
     "book_id": id

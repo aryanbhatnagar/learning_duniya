@@ -6,6 +6,7 @@ import 'package:favorite_button/favorite_button.dart';
 import 'package:learning_duniya/Dashboard.dart';
 import 'package:learning_duniya/assessment.dart';
 import 'courseDesc.dart';
+import 'globals.dart';
 import 'mentor.dart';
 import 'quiz.dart';
 
@@ -108,7 +109,7 @@ class Mentor {
 }
 Future<Asses> getAsses() async {
 
-  final String apiUrl = "http://ec2-13-234-116-155.ap-south-1.compute.amazonaws.com/api/mentors";
+  final String apiUrl = "${BASE}api/mentors";
   final response = await http.get(Uri.parse(apiUrl));
 
   if (response.statusCode == 200) {
@@ -221,7 +222,7 @@ class Assessment {
 
 Future<AllAsses> getAllAsses() async {
 
-  final String apiUrl = "http://ec2-13-234-116-155.ap-south-1.compute.amazonaws.com/api/assessments";
+  final String apiUrl = "${BASE}api/assessments";
   final response = await http.get(Uri.parse(apiUrl));
 
   if (response.statusCode == 200) {

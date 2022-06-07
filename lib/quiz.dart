@@ -146,7 +146,7 @@ late SendData? _sendData;
 
 Future<SendData> createData(String startTime,String endTime,List ansdata,Result result) async {
   //ConvJson con=new ConvJson(assessmentId: assId, startTime: startTime, endTime: endTime, ansSheet: ansdata, result: result, status: "successful");
-  final String apiUrl = "http://ec2-13-234-116-155.ap-south-1.compute.amazonaws.com/api/k12/ansheet";
+  final String apiUrl = "${BASE}api/k12/ansheet";
   //debugPrint(allData.toString());
 
   final response = await http.post(Uri.parse(apiUrl),
@@ -246,7 +246,7 @@ class Data {
 
 Future<Questions> createQuestions(String id,String qt_id) async {
   final String apiUrl =
-      "http://ec2-13-234-116-155.ap-south-1.compute.amazonaws.com/api/chapter/questions";
+      "${BASE}api/chapter/questions";
 
   final response = await http.post(Uri.parse(apiUrl), body: {
     "chapter_id":id,
@@ -430,6 +430,7 @@ class _quizpageState extends State<quizpage> with TickerProviderStateMixin {
   bool quesState = false;
   bool prevVis = false;
   bool nextVis = true;
+  bool back=true;
   bool submitVis = true;
 
   var answers = [];
@@ -461,7 +462,7 @@ class _quizpageState extends State<quizpage> with TickerProviderStateMixin {
     ];
 
     return WillPopScope(
-      onWillPop: () async => false,
+      onWillPop: () async => back,
       child: Scaffold(
         /*appBar: AppBar(
             title: Text('Quiz'),
@@ -537,6 +538,7 @@ class _quizpageState extends State<quizpage> with TickerProviderStateMixin {
                                                           : controller.value);*/
                                         setState(() {
                                           //isPlaying = true;
+                                          back=!back;
                                           buttonState = !buttonState;
                                           quesState = !quesState;
                                         });

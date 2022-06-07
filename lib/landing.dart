@@ -4,6 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:favorite_button/favorite_button.dart';
 import 'package:flutter/services.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:learning_duniya/Dashboard.dart';
 import 'package:learning_duniya/assessment.dart';
@@ -30,24 +31,234 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'globals.dart';
 
+import 'dart:convert';
+
+var play=0;
+PlayLater playLaterFromJson(String str) => PlayLater.fromJson(json.decode(str));
+String playLaterToJson(PlayLater data) => json.encode(data.toJson());
+
+class PlayLater {
+  PlayLater({
+    required this.data7,
+    required this.message,
+    required this.status,
+  });
+
+  Data7 data7;
+  var message;
+  var status;
+
+  factory PlayLater.fromJson(Map<String, dynamic> json) => PlayLater(
+    data7: Data7.fromJson(json["data"]),
+    message: json["message"],
+    status: json["status"],
+  );
+
+  Map<String, dynamic> toJson() => {
+    "data": data7.toJson(),
+    "message": message,
+    "status": status,
+  };
+}
+class Data7 {
+  Data7({
+    required this.requests,
+  });
+
+  Requests requests;
+
+  factory Data7.fromJson(Map<String, dynamic> json) => Data7(
+    requests: Requests.fromJson(json["requests"]),
+  );
+
+  Map<String, dynamic> toJson() => {
+    "requests": requests.toJson(),
+  };
+}
+class Requests {
+  Requests({
+    this.challengeId,
+    this.subjectId,
+    this.bookId,
+    this.chapterId,
+    this.questionTypeId,
+    this.userId,
+    this.updatedAt,
+    this.createdAt,
+    this.id,
+  });
+
+  var challengeId;
+  var subjectId;
+  var bookId;
+ var chapterId;
+  var questionTypeId;
+  var userId;
+  var updatedAt;
+  var createdAt;
+  var id;
+
+  factory Requests.fromJson(Map<String, dynamic> json) => Requests(
+    challengeId: json["challenge_id"],
+    subjectId: json["subject_id"],
+    bookId: json["book_id"],
+    chapterId: json["chapter_id"],
+    questionTypeId: json["question_type_id"],
+    userId: json["user_id"],
+    updatedAt: json["updated_at"],
+    createdAt: json["created_at"],
+    id: json["id"],
+  );
+
+  Map<String, dynamic> toJson() => {
+    "challenge_id": challengeId,
+    "subject_id": subjectId,
+    "book_id": bookId,
+    "chapter_id": chapterId,
+    "question_type_id": questionTypeId,
+    "user_id": userId,
+    "updated_at": updatedAt,
+    "created_at": createdAt,
+    "id": id,
+  };
+}
+
+
+Challengerlist challengerlistFromJson(String str) => Challengerlist.fromJson(json.decode(str));
+String challengerlistToJson(Challengerlist data) => json.encode(data.toJson());
+
+class Challengerlist {
+  Challengerlist({
+    required this.data6,
+    required this.message,
+    required this.status,
+  });
+
+  Data6 data6;
+  String message;
+  int status;
+
+  factory Challengerlist.fromJson(Map<String, dynamic> json) => Challengerlist(
+    data6: Data6.fromJson(json["data"]),
+    message: json["message"],
+    status: json["status"],
+  );
+
+  Map<String, dynamic> toJson() => {
+    "data": data6.toJson(),
+    "message": message,
+    "status": status,
+  };
+}
+class Data6 {
+  Data6({
+    required this.alerts,
+  });
+
+  List<Alert> alerts;
+
+  factory Data6.fromJson(Map<String, dynamic> json) => Data6(
+    alerts: List<Alert>.from(json["alerts"].map((x) => Alert.fromJson(x))),
+  );
+
+  Map<String, dynamic> toJson() => {
+    "alerts": List<dynamic>.from(alerts.map((x) => x.toJson())),
+  };
+}
+class Alert {
+  Alert({
+    this.challengeId,
+    this.name,
+    this.img,
+    this.subjectId,
+    this.subjectName,
+    this.bookId,
+    this.book,
+    this.chapterId,
+    this.chapter,
+    this.questionTypeId,
+    this.questionType,
+  });
+
+  var challengeId;
+  var name;
+  var img;
+ var subjectId;
+  var subjectName;
+  var bookId;
+  var book;
+  var chapterId;
+  var chapter;
+  var questionTypeId;
+  var questionType;
+
+  factory Alert.fromJson(Map<String, dynamic> json) => Alert(
+    challengeId: json["challenge_id"],
+    name: json["name"],
+    img: json["img"],
+    subjectId: json["subject_id"],
+    subjectName: json["subject_name"],
+    bookId: json["book_id"],
+    book: json["book"],
+    chapterId: json["chapter_id"],
+    chapter: json["chapter"],
+    questionTypeId: json["question_type_id"],
+    questionType: json["question_type"],
+  );
+
+  Map<String, dynamic> toJson() => {
+    "challenge_id": challengeId,
+    "name": name,
+    "img": img,
+    "subject_id": subjectId,
+    "subject_name": subjectName,
+    "book_id": bookId,
+    "book": book,
+    "chapter_id": chapterId,
+    "chapter": chapter,
+    "question_type_id": questionTypeId,
+    "question_type": questionType,
+  };
+}
+Future<Challengerlist> getChalList() async {
+
+  final String apiUrl = "${BASE}api/student/challenge/play_later/list";
+  final response = await http.get(Uri.parse(apiUrl),headers: <String, String>{
+    "Authorization": "Bearer $token",
+    "Content-Type" : "application/json"
+  });
+
+  if (response.statusCode == 200) {
+    debugPrint("hello");
+    final String responseString = response.body;
+    return challengerlistFromJson(responseString);
+  }
+  else {
+    throw Exception('Failed to load album');
+  }
+}
+
 const AndroidNotificationChannel channel = AndroidNotificationChannel(
   //'high_importance_channel', // id
     'High Importance Notifications', // title
-    'This channel is used for important notifications.', // description
+    'This channel is used for important notifications.',
+    // description
     importance: Importance.high,
     playSound: true);
 
 final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
 FlutterLocalNotificationsPlugin();
 
+
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   await Firebase.initializeApp();
+  FirebaseMessaging.instance.setForegroundNotificationPresentationOptions(alert: true,badge: true,sound: true);
   print('A bg message just showed up :  ${message.messageId}');
 }
 
 Future<K12Card> getMentorApi(String cls, String sub) async {
   final String apiUrl =
-      "http://ec2-13-234-116-155.ap-south-1.compute.amazonaws.com/api/getk12";
+      "${BASE}api/getk12";
   final response = await http.post(Uri.parse(apiUrl), headers: <String, String>{
     "Authorization": "Bearer $token",
   }, body: {"class_id": cls, "subject_id": sub});
@@ -57,6 +268,26 @@ Future<K12Card> getMentorApi(String cls, String sub) async {
     final String responseString = response.body;
     debugPrint(response.body);
     return k12CardFromJson(responseString);
+  } else {
+    throw Exception('Failed to load album');
+  }
+}
+
+Future<PlayLater> PlayLaterApi(String cls) async {
+  final String apiUrl =
+      "${BASE}api/student/challenge/play_later";
+  final response = await http.post(Uri.parse(apiUrl), headers: <String, String>{
+    "Authorization": "Bearer $token",
+  }, body:
+  {
+    "challenge_id" : cls
+  });
+
+  if (response.statusCode == 200) {
+    play=200;
+    final String responseString = response.body;
+    debugPrint(response.body);
+    return playLaterFromJson(responseString);
   } else {
     throw Exception('Failed to load album');
   }
@@ -162,7 +393,7 @@ class Data4 {
 
 Future<Studentdp> getProfileApi() async {
   final String apiUrl =
-      "http://ec2-13-234-116-155.ap-south-1.compute.amazonaws.com/api/profile";
+      "${BASE}api/profile";
   final response = await http.get(Uri.parse(apiUrl), headers: <String, String>{
     "Authorization": "Bearer $token",
   });
@@ -180,8 +411,8 @@ Future<Studentdp> getProfileApi() async {
 Future createStuDp(Map mentorData, File image) async {
   int responseCode;
   Map<String, String> headers = {"Authorization": "Bearer $token"};
-  const String apiUrl =
-      "http://ec2-13-234-116-155.ap-south-1.compute.amazonaws.com/api/profile";
+  String apiUrl =
+      "${BASE}api/profile";
   var uri = Uri.parse(apiUrl);
 
   var request = http.MultipartRequest("POST", uri);
@@ -429,7 +660,7 @@ class Subject2 {
 }
 Future<StuDashboard> createDash(String id) async {
   final String apiUrl =
-      "http://ec2-13-234-116-155.ap-south-1.compute.amazonaws.com/api/mentee/dashboard";
+      "${BASE}api/mentee/dashboard";
 
   final response = await http.post(Uri.parse(apiUrl),
       headers: <String, String> {
@@ -540,7 +771,7 @@ class K12_c {
 }
 Future<K12Card> createK12card(String id) async {
   final String apiUrl =
-      "http://ec2-13-234-116-155.ap-south-1.compute.amazonaws.com/api/getk12";
+      "${BASE}api/getk12";
 
   final response = await http.post(Uri.parse(apiUrl),
       body: {
@@ -557,7 +788,7 @@ Future<K12Card> createK12card(String id) async {
 }
 Future<LandingApi> getLanding() async {
 
-  final String apiUrl = "http://ec2-13-234-116-155.ap-south-1.compute.amazonaws.com/api/dashboard";
+  final String apiUrl = "${BASE}api/dashboard";
   final response = await http.get(Uri.parse(apiUrl));
 
   if (response.statusCode == 200) {
@@ -923,7 +1154,9 @@ class _landingPageState extends State<landingPage> {
   @override
   void initState()  {
     super.initState();
+    FirebaseMessaging.instance.setForegroundNotificationPresentationOptions(alert: true,badge: true,sound: true);
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+      FirebaseMessaging.instance.setForegroundNotificationPresentationOptions(alert: true,badge: true,sound: true);
       RemoteNotification? notification = message.notification;
       AndroidNotification? android = message.notification?.android;
       if (notification != null && android != null) {
@@ -942,8 +1175,9 @@ class _landingPageState extends State<landingPage> {
             ));
       }
     });
-
     FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
+
+      FirebaseMessaging.instance.setForegroundNotificationPresentationOptions(alert: true,badge: true,sound: true);
       print('A new onMessageOpenedApp event was published!');
       RemoteNotification? notification = message.notification;
       AndroidNotification? android = message.notification?.android;
@@ -1009,10 +1243,19 @@ class _landingPageState extends State<landingPage> {
                                 fontFamily: 'Candara',
                               ),
                             ),
-                            onPressed: () {
+                            onPressed: () async {
+
+                                PlayLater _play = await PlayLaterApi(notification.body.toString().split("--")[1]);
+                              PlayLater plays;
+                              setState(() {
+                                plays=_play;
+                              });
+                              if(play==200){
                               Navigator.pop(context);
+                              play==0;
                               Navigator.pushReplacement(
                                   context, MaterialPageRoute(builder: (context) => landing()));
+                              }
                             },
                           ),
                           SizedBox(width: 10),
@@ -1029,9 +1272,10 @@ class _landingPageState extends State<landingPage> {
                             onPressed: () {
                               var chapd=notification.body.toString().split("--")[1].split("-")[2].toString();
                               var qtd=notification.body.toString().split("--")[1].split("-")[3].toString();
+                              var challd=notification.body.toString().split("--")[1];
                               Navigator.pop(context);
                               Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) =>
-                                  quiz_challenge(chapd,qtd,"Aryan","http://ec2-13-234-116-155.ap-south-1.compute.amazonaws.com/uploads/Student-1650013240.png")));
+                                  quiz_challenge(chapd,qtd,challd,"Aryan","http://ec2-13-234-116-155.ap-south-1.compute.amazonaws.com/uploads/Student-1650013240.png")));
 
                             },
                           ),
@@ -1046,6 +1290,49 @@ class _landingPageState extends State<landingPage> {
       }
     });
 
+  }
+
+  void sendNotification({String? title, String? body}) async {
+    FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+    FlutterLocalNotificationsPlugin();
+
+    ////Set the settings for various platform
+    // initialise the plugin. app_icon needs to be a added as a drawable resource to the Android head project
+    const AndroidInitializationSettings initializationSettingsAndroid =
+    AndroidInitializationSettings('@mipmap/ic_launcher');
+    const IOSInitializationSettings initializationSettingsIOS =
+    IOSInitializationSettings(
+      requestAlertPermission: true,
+      requestBadgePermission: true,
+      requestSoundPermission: true,
+    );
+    const LinuxInitializationSettings initializationSettingsLinux =
+    LinuxInitializationSettings(
+      defaultActionName: 'hello',
+    );
+    const InitializationSettings initializationSettings = InitializationSettings(
+        android: initializationSettingsAndroid,
+        iOS: initializationSettingsIOS,
+        linux: initializationSettingsLinux);
+    await flutterLocalNotificationsPlugin.initialize(
+      initializationSettings,
+    );
+
+    ///
+    const AndroidNotificationChannel channel = AndroidNotificationChannel(
+        'high_channel', 'High Importance Notification',
+        description: "This channel is for important notification",
+        importance: Importance.max);
+
+    flutterLocalNotificationsPlugin.show(
+      0,
+      title,
+      body,
+      NotificationDetails(
+        android: AndroidNotificationDetails(channel.id, channel.name,
+            channelDescription: channel.description),
+      ),
+    );
   }
 
   void showNotification() {
@@ -1357,6 +1644,26 @@ class _landingPageState extends State<landingPage> {
                 child: SingleChildScrollView(
                     child: Column(
                       children: [
+                        FutureBuilder(
+                            future: getProfileApi(),
+                            builder: (context, AsyncSnapshot<Studentdp> snapshot8) {
+                              if(snapshot8.hasData){
+                              userName=snapshot8.data!.data4.name.toString();
+                              userImg=snapshot8.data!.data4.img.toString();
+                              schools=snapshot8.data!.data4.school.toString();
+                              var im=0;
+                              if(snapshot8.data!.data4.img=="http://ec2-13-234-116-155.ap-south-1.compute.amazonaws.com/uploads/no-image.jpeg")
+                                im=0;
+                              else
+                                im=1;
+                              return Container(
+                              );}
+                              else
+                                return Center(child: CircularProgressIndicator());
+
+                            }
+
+                        ),
                         Container(
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.only(
@@ -2398,147 +2705,116 @@ class _landingPageState extends State<landingPage> {
               ],
             );
           else
-            return Scaffold(
-              body: Container(
-                padding: EdgeInsets.all(15),
-                child: SingleChildScrollView(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: <Widget>[
-                      GestureDetector(
-                        onTap:(){
-                          Navigator.push(context, MaterialPageRoute(builder: (context) =>
-                              quiz_challenge("183","1","Aryan","http://ec2-13-234-116-155.ap-south-1.compute.amazonaws.com/uploads/Student-1650013240.png")));
-                        },
-                        child: Card(
-                          elevation: 5,
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.all(Radius.circular(10))),
-                          child: Container(
-                            padding: EdgeInsets.all(8),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.start,
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    Center(
-                                      child: CircleAvatar(
-                                        backgroundImage: NetworkImage("http://ec2-13-234-116-155.ap-south-1.compute.amazonaws.com/uploads/Student-1650013240.png"),
-                                        radius: 35,
-                                      ),
-                                    ),
-                                    SizedBox(width: 20,),
+            return FutureBuilder(
+                future: getChalList(),
+                builder: (context,AsyncSnapshot<Challengerlist> snapshot3 ){
+                  debugPrint(snapshot3.toString());
+                  if(snapshot3.hasData)
+                    return Scaffold(
+                      body: Container(
+                        padding: EdgeInsets.all(15),
+                        child: SingleChildScrollView(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: <Widget>[
+                              for (var i=0;i<snapshot3.data!.data6.alerts.length;i++)
+                                GestureDetector(
+                                onTap:(){
+                                  Navigator.push(context, MaterialPageRoute(builder: (context) =>
+                                      quiz_challenge(snapshot3.data!.data6.alerts[i].chapterId.toString(),
+                                          snapshot3.data!.data6.alerts[i].questionTypeId.toString(),
+                                      snapshot3.data!.data6.alerts[i].challengeId.toString(),
+                                      snapshot3.data!.data6.alerts[i].name.toString(),
 
-                                  ],
-                                ),
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      "Aryan Bhatnagar",
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        fontFamily: 'Candara',
-                                        fontSize: 15,
-                                      ),
-                                    ),
-                                    Text(
-                                        'La Martiniere College',
-                                        style: TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                          fontFamily: 'Candara',
-                                          color: Colors.grey,
-                                          fontSize: 10,
+                                      snapshot3.data!.data6.alerts[i].img.toString())));
+                                },
+                                child: Card(
+                                  elevation: 5,
+                                  shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.all(Radius.circular(10))),
+                                  child: Container(
+                                    padding: EdgeInsets.all(8),
+                                    child: Row(
+                                      mainAxisAlignment: MainAxisAlignment.start,
+                                      crossAxisAlignment: CrossAxisAlignment.center,
+                                      children: [
+                                        Row(
+                                          mainAxisAlignment: MainAxisAlignment.start,
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            Center(
+                                              child: CircleAvatar(
+                                                backgroundImage: NetworkImage("${snapshot3.data!.data6.alerts[i].img.toString()}"),
+                                                radius: 35,
+                                              ),
+                                            ),
+                                            SizedBox(width: 20,),
+
+                                          ],
                                         ),
-                                        maxLines: 5,
-                                        overflow: TextOverflow.ellipsis),
+                                        Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              "${snapshot3.data!.data6.alerts[i].name.toString()}",
+                                              style: TextStyle(
+                                                fontWeight: FontWeight.bold,
+                                                fontFamily: 'Candara',
+                                                fontSize: 15,
+                                              ),
+                                            ),
+                                            Text(
+                                                "${snapshot3.data!.data6.alerts[i].subjectName.toString()}",
+                                                style: TextStyle(
+                                                  fontWeight: FontWeight.bold,
+                                                  fontFamily: 'Candara',
+                                                  color: Colors.grey,
+                                                  fontSize: 10,
+                                                ),
+                                                maxLines: 5,
+                                                overflow: TextOverflow.ellipsis),
 
-                                    SizedBox(
-                                      height: 10,
+                                            SizedBox(
+                                              height: 10,
+                                            ),
+                                            Text("CHALLENGED YOU FOR A QUIZ",style: TextStyle(fontFamily: "Candara",fontSize: 10,color: Colors.red),overflow: TextOverflow.ellipsis,maxLines: 2),
+                                            Text("Subject : ${snapshot3.data!.data6.alerts[i].subjectName}",style: TextStyle(fontFamily: "Candara",fontSize: 11,),overflow: TextOverflow.ellipsis,maxLines: 2),
+                                            Text("Chapter : ${snapshot3.data!.data6.alerts[i].chapter}",style: TextStyle(fontFamily: "Candara",fontSize: 11,),overflow: TextOverflow.ellipsis,maxLines: 2,),
+                                            Text("Type :  ${snapshot3.data!.data6.alerts[i].questionType}",style: TextStyle(fontFamily: "Candara",fontSize: 11,),overflow: TextOverflow.ellipsis,maxLines: 2,),
+                                          ],
+                                        ),
+                                      ],
                                     ),
-                                    Text("CHALLENGED YOU FOR A QUIZ",style: TextStyle(fontFamily: "Candara",fontSize: 10,color: Colors.red),overflow: TextOverflow.ellipsis,maxLines: 2),
-                                    Text("Subject : English",style: TextStyle(fontFamily: "Candara",fontSize: 11,),overflow: TextOverflow.ellipsis,maxLines: 2),
-                                    Text("Chapter : Who Did Patrick's Homework?",style: TextStyle(fontFamily: "Candara",fontSize: 11,),overflow: TextOverflow.ellipsis,maxLines: 2,),
-                                    Text("Type :  Fill in the Blanks",style: TextStyle(fontFamily: "Candara",fontSize: 11,),overflow: TextOverflow.ellipsis,maxLines: 2,),
-                                  ],
+                                  ),
                                 ),
-                              ],
-                            ),
+                              ),
+
+                            ],
                           ),
                         ),
-                      ),
-                      GestureDetector(
-                        onTap:(){
-                          Navigator.push(context, MaterialPageRoute(builder: (context) =>
-                              quiz_challenge("183","1","Aryan","http://ec2-13-234-116-155.ap-south-1.compute.amazonaws.com/uploads/Student-1650013240.png")));
-                        },
-                        child: Card(
-                          elevation: 5,
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.all(Radius.circular(10))),
-                          child: Container(
-                            padding: EdgeInsets.all(8),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.start,
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    Center(
-                                      child: CircleAvatar(
-                                        backgroundImage: NetworkImage("http://ec2-13-234-116-155.ap-south-1.compute.amazonaws.com/uploads/Student-1650013240.png"),
-                                        radius: 35,
-                                      ),
-                                    ),
-                                    SizedBox(width: 20,),
-
-                                  ],
-                                ),
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      "Aryan Bhatnagar",
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        fontFamily: 'Candara',
-                                        fontSize: 15,
-                                      ),
-                                    ),
-                                    Text(
-                                        'La Martiniere College',
-                                        style: TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                          fontFamily: 'Candara',
-                                          color: Colors.grey,
-                                          fontSize: 10,
-                                        ),
-                                        maxLines: 5,
-                                        overflow: TextOverflow.ellipsis),
-
-                                    SizedBox(
-                                      height: 10,
-                                    ),
-                                    Text("CHALLENGED YOU FOR A QUIZ",style: TextStyle(fontFamily: "Candara",fontSize: 10,color: Colors.red),overflow: TextOverflow.ellipsis,maxLines: 2),
-                                    Text("Subject : English",style: TextStyle(fontFamily: "Candara",fontSize: 11,),overflow: TextOverflow.ellipsis,maxLines: 2),
-                                    Text("Chapter : Who Did Patrick's Homework?",style: TextStyle(fontFamily: "Candara",fontSize: 11,),overflow: TextOverflow.ellipsis,maxLines: 2,),
-                                    Text("Type :  Fill in the Blanks",style: TextStyle(fontFamily: "Candara",fontSize: 11,),overflow: TextOverflow.ellipsis,maxLines: 2,),
-                                  ],
-                                ),
-                              ],
-                            ),
+                      ));
+                  else
+                    return Column(
+                      children: [
+                        SizedBox(height: 40),
+                        Container(
+                          height: 250,
+                          width: 250,
+                          decoration: BoxDecoration(
+                            image: DecorationImage(image: AssetImage("images/notificationno.png"),fit: BoxFit.fill),
                           ),
                         ),
-                      ),
-                    ],
-                  ),
-                ),
-              ));
+                        SizedBox(height: 20,),
+                        Center(child: Text("No new notification!!", style: TextStyle(
+                            fontSize: 20,
+                            fontFamily: "Candara",
+                            color: Colors.teal),),),
+                        SizedBox(height: 15,),
+                      ],
+                    );
+                }
+
+            );
         },
       ),
       SingleChildScrollView(
@@ -2600,26 +2876,7 @@ class _landingPageState extends State<landingPage> {
             //centerTitle: true,
             actions: <IconButton>[
               IconButton(
-                /*onPressed: () async {
-              if(token=="")
-              Navigator.push(
-                  context, MaterialPageRoute(builder: (context) => Login()));
-              else if(token!="" && classId!=""){
-                print(userName);
-                Navigator.push(
-                    context, MaterialPageRoute(builder: (context) => Dashboard(classId)));
-              }
-              else{
-                final Future<ConfirmAction?> action =
-                    await _asyncConfirmDialog(
-                    context,
-                    'Mentor Name',
-                    'Mentor Bio',
-                    'Communication',
-                    x,
-                    'None');
-              }
-            }*/
+
                 icon: Icon(Icons.notifications, color: Colors.teal, size: 30),
                 onPressed: (){},
               )
@@ -2647,6 +2904,8 @@ class _landingPageState extends State<landingPage> {
                         future: getProfileApi(),
                         builder: (context, AsyncSnapshot<Studentdp> snapshot) {
                           userName=snapshot.data!.data4.name.toString();
+                          userImg=snapshot.data!.data4.img.toString();
+                          schools=snapshot.data!.data4.school.toString();
                           var im=0;
                           if(snapshot.data!.data4.img=="http://ec2-13-234-116-155.ap-south-1.compute.amazonaws.com/uploads/no-image.jpeg")
                             im=0;

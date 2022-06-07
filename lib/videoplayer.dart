@@ -37,7 +37,7 @@ class Videolike {
 }
 Future<Videolike> createVideovisit(String id) async {
   final String apiUrl =
-      "http://ec2-13-234-116-155.ap-south-1.compute.amazonaws.com/api/book_video/like";
+      "${BASE}api/book_video/like";
 
   final response = await http.post(Uri.parse(apiUrl),headers: <String, String> {
     "Authorization": "Bearer $token",
@@ -56,7 +56,7 @@ Future<Videolike> createVideovisit(String id) async {
 }
 Future<Videolike> createVideolike(String id) async {
   final String apiUrl =
-      "http://ec2-13-234-116-155.ap-south-1.compute.amazonaws.com/api/book_video/visitor";
+      "${BASE}api/book_video/visitor";
 
   final response = await http.post(Uri.parse(apiUrl),headers: <String, String> {
     "Authorization": "Bearer $token",

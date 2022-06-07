@@ -97,7 +97,7 @@ class SignUpPage extends StatefulWidget {
 
 
 Future<User1> createUser(String name, String phone, String email, String password) async{
-  final String apiUrl = "http://ec2-13-234-116-155.ap-south-1.compute.amazonaws.com/api/register";
+  final String apiUrl = "${BASE}api/register";
 
   final response = await http.post(Uri.parse(apiUrl), body: {
     "name": name,
