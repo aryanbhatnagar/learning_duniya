@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:group_button/group_button.dart';
-import 'package:learning_duniya/landing.dart';
+import 'package:learning_duniya/winnerpage.dart';
 import 'package:video_player/video_player.dart';
 
 import 'globals.dart';
@@ -1035,6 +1035,7 @@ class _quiz_challengeState extends State<quiz_challenge> {
     SendData sendData = await createData(start_time,end_time,allQuestionData,R);
     setState(() {
       _sendData = sendData;
+      challID=sendData.data.chapterId.toString();
     });
 
     if(ComCode == 200) {
@@ -1086,7 +1087,8 @@ Future<Future<ConfirmActionQuiz?>> _asyncConfirmDialog(
               timeData.clear();
               Navigator.of(context).pop(ConfirmActionQuiz.Accept);
               Navigator.pop(context);
-              Navigator.push(context,MaterialPageRoute(builder: (context) => landing()),);
+              Navigator.push(context, MaterialPageRoute(builder: (context) => winnerClass(challID.toString())));
+
             },
           )
         ],

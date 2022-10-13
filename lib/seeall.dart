@@ -569,7 +569,7 @@ class _seeallpageState extends State<seeallpage> {
               if(snapshot.hasData){
                 return SingleChildScrollView(
                   child: Container(
-                      padding: EdgeInsets.all(20),
+                      padding: EdgeInsets.all(10),
                       color: Colors.grey[200],
                       child: Column(
                         children: [
@@ -842,7 +842,7 @@ class _seeallpageState extends State<seeallpage> {
               if(snapshot.hasData){
 
                 return Container(
-                    padding: EdgeInsets.all(20),
+                    padding: EdgeInsets.all(10),
                     color: Colors.grey[200],
                     child: Column(
                       children: [

@@ -2,11 +2,30 @@ import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:learning_duniya/globals.dart';
+import 'package:learning_duniya/landing.dart';
 import 'package:learning_duniya/quiz_chall.dart';
+import 'package:learning_duniya/winnerpage.dart';
 
 SendInvite sendInviteFromJson(String str) =>
     SendInvite.fromJson(json.decode(str));
 
+Future<Challengerlist> getChalList2() async {
+
+  final String apiUrl = "${BASE}api/challenge/list";
+  final response = await http.get(Uri.parse(apiUrl),headers: <String, String>{
+    "Authorization": "Bearer $token",
+    "Content-Type" : "application/json"
+  });
+
+  if (response.statusCode == 200) {
+    debugPrint("hello");
+    final String responseString = response.body;
+    return challengerlistFromJson(responseString);
+  }
+  else {
+    throw Exception('Failed to load album');
+  }
+}
 
 String sendInviteToJson(SendInvite data) => json.encode(data.toJson());
 late SendInvite? _inv =null;
@@ -38,16 +57,20 @@ class SendInvite {
 class Data6 {
   Data6({
     this.requests,
+    this.challengeId,
   });
 
   dynamic requests;
+  var challengeId;
 
   factory Data6.fromJson(Map<String, dynamic> json) => Data6(
         requests: json["requests"],
+    challengeId: json["challenge_id"]
       );
 
   Map<String, dynamic> toJson() => {
         "requests": requests,
+    "challenge_id" :challengeId
       };
 }
 
@@ -102,7 +125,6 @@ class Livestudents {
         "status": status,
       };
 }
-
 class Data1 {
   Data1({
     required this.student,
@@ -124,7 +146,6 @@ class Data1 {
         "subjects": List<dynamic>.from(subjects.map((x) => x.toJson())),
       };
 }
-
 class Student {
   Student({
     this.id,
@@ -204,7 +225,6 @@ class Student {
         "updated_at": updatedAt,
       };
 }
-
 class Subject {
   Subject({
     this.id,
@@ -294,7 +314,6 @@ class K12Card {
         "message": message,
       };
 }
-
 class Data2 {
   Data2({
     required this.k12,
@@ -310,7 +329,6 @@ class Data2 {
         "k12": List<dynamic>.from(k12.map((x) => x.toJson())),
       };
 }
-
 class K12_c {
   K12_c(
       {required this.id,
@@ -379,7 +397,6 @@ class K12Api {
         "message": message,
       };
 }
-
 class Data {
   Data({
     required this.k12,
@@ -400,7 +417,6 @@ class Data {
         "k12_details": List<dynamic>.from(k12Details.map((x) => x.toJson())),
       };
 }
-
 class K12 {
   K12({
     required this.img,
@@ -471,7 +487,6 @@ class K12 {
         "likes": likes
       };
 }
-
 class K12Detail {
   K12Detail({
     required this.id,
@@ -545,7 +560,6 @@ class K12Chapter {
         "message": message,
       };
 }
-
 class Data3 {
   Data3({
     required this.chapterDetails,
@@ -571,7 +585,6 @@ class Data3 {
             List<dynamic>.from(questionTypes.map((x) => x.toJson())),
       };
 }
-
 class ChapterDetails {
   ChapterDetails({
     required this.id,
@@ -695,7 +708,6 @@ class ChapterDetails {
         "updated_at": updatedAt,
       };
 }
-
 class QuestionType {
   QuestionType({
     required this.id,
@@ -719,7 +731,6 @@ class QuestionType {
         "question_count": questionCount,
       };
 }
-
 class Video {
   Video({
     required this.id,
@@ -801,650 +812,818 @@ class _challenge_pageState extends State<challenge_page> {
     else {
       idclass = (2 + int.parse(classId)).toString();
     }
-    return FutureBuilder(
-        future: createLiveStudents(idclass),
-        builder: (context, AsyncSnapshot<Livestudents> snapshot) {
-          if (snapshot.hasData) {
-            if (SubjectList.isEmpty)
-              for (var j = 0; j < snapshot.data!.data1.subjects.length; j++)
-                SubjectList.add(
-                    snapshot.data!.data1.subjects[j].subjectName.toString());
-            return Scaffold(
-              body: SingleChildScrollView(
-                child: Container(
-                  child: Column(
-                    children: [
-                      Container(
-                        margin: EdgeInsets.all(20),
-                        padding: EdgeInsets.all(20),
-                        decoration: BoxDecoration(
-                            border: Border.all(color: Colors.teal),
-                            borderRadius: BorderRadius.circular(5)),
-                        child: Column(
-                          children: [
-                            Center(
-                              child: Text(
-                                'Quiz Challenge',
-                                style:
-                                    TextStyle(color: Colors.grey, fontSize: 20),
-                              ),
-                            ),
-                            SizedBox(
-                              height: 30,
-                            ),
-                            FormField<String>(
-                              builder: (FormFieldState<String> state) {
-                                String _currentSelectedValue = '';
-                                return Container(
-                                  height: 55,
-                                  //padding: EdgeInsets.only(left: 10,right: 10),
-                                  child: InputDecorator(
-                                    decoration: InputDecoration(
-                                        //labelText: 'Subject',
-                                        prefixIcon: Icon(Icons.subject,
-                                            color: Colors.teal),
-                                        labelStyle:
-                                            TextStyle(fontFamily: "Candara"),
-                                        errorStyle: TextStyle(
-                                            fontFamily: "Candara",
-                                            color: Colors.redAccent,
-                                            fontSize: 16.0),
-                                        //hintText: 'Please select expense',
-                                        enabledBorder: OutlineInputBorder(
-                                            borderSide: const BorderSide(
-                                                color: Colors.grey, width: 2.0),
-                                            borderRadius:
-                                                BorderRadius.circular(5)),
-                                        focusedBorder: OutlineInputBorder(
-                                            borderSide: const BorderSide(
-                                                color: Colors.teal, width: 2.0),
-                                            borderRadius:
-                                                BorderRadius.circular(5))),
-                                    //border: OutlineInputBorder(borderRadius: BorderRadius.circular(5.0))),
-                                    isEmpty: _currentSelectedValue == '',
-                                    child: DropdownButtonHideUnderline(
-                                        child: DropdownButton(
-                                      menuMaxHeight: 200,
-                                      hint: _dropDownValue == ""
-                                          ? Text("Subject")
-                                          : Text(
-                                              _dropDownValue,
-                                              style: TextStyle(
-                                                  fontFamily: "Candara",
-                                                  color: Colors.black,
-                                                  fontSize: 14),
-                                            ),
-                                      isExpanded: false,
-                                      iconSize: 30.0,
-                                      style: TextStyle(color: Colors.black),
-                                      items: SubjectList.map(
-                                        (val) {
-                                          return DropdownMenuItem<String>(
-                                            value: val,
-                                            child: Text(val),
-                                          );
-                                        },
-                                      ).toList(),
-                                      onChanged: (String? val) {
-                                        for (var k = 0;
-                                            k <
-                                                snapshot.data!.data1.subjects
-                                                    .length;
-                                            k++)
-                                          if (snapshot.data!.data1.subjects[k]
-                                                  .subjectName ==
-                                              val)
-                                            idSub = snapshot
-                                                .data!.data1.subjects[k].id
-                                                .toString();
-
-                                        setState(() {
-                                          _dropDownValue = val!;
-                                          _dropDownValue1 = "";
-                                          _dropDownValue2 = "";
-                                          _dropDownValue3 = "";
-                                        });
-                                      },
-                                    )),
-                                  ),
-                                );
-                              },
-                            ),
-                            SizedBox(
-                              height: 8,
-                              child: Container(),
-                            ),
-                            if (_dropDownValue != "")
-                              FutureBuilder(
-                                  future: getLiveSubjects(classId, idSub),
-                                  builder: (context,
-                                      AsyncSnapshot<K12Card> snapshot1) {
-                                    if (snapshot1.hasData) {
-                                      List<String> Booklist = [];
-                                      for (var k = 0;
-                                          k < snapshot1.data!.data2.k12.length;
-                                          k++)
-                                        Booklist.add(snapshot1
-                                            .data!.data2.k12[k].courseName
-                                            .toString());
-                                      return FormField<String>(
-                                        builder:
-                                            (FormFieldState<String> state) {
-                                          String _currentSelectedValue = '';
-                                          return Container(
-                                            height: 55,
-                                            //padding: EdgeInsets.only(left: 10,right: 10),
-                                            child: InputDecorator(
-                                              decoration: InputDecoration(
-                                                  //labelText: 'CLASS',
-                                                  prefixIcon: Icon(
-                                                      Icons.menu_book_sharp,
-                                                      color: Colors.teal),
-                                                  labelStyle: TextStyle(
-                                                      fontFamily: "Candara",
-                                                      fontSize: 16),
-                                                  errorStyle: TextStyle(
-                                                      fontFamily: "Candara",
-                                                      color: Colors.redAccent,
-                                                      fontSize: 16.0),
-                                                  //hintText: 'Please select expense',
-                                                  enabledBorder:
-                                                      OutlineInputBorder(
-                                                          borderSide:
-                                                              const BorderSide(
-                                                                  color: Colors
-                                                                      .grey,
-                                                                  width: 2.0),
-                                                          borderRadius:
-                                                              BorderRadius
-                                                                  .circular(5)),
-                                                  focusedBorder:
-                                                      OutlineInputBorder(
-                                                          borderSide:
-                                                              const BorderSide(
-                                                                  color: Colors
-                                                                      .teal,
-                                                                  width: 2.0),
-                                                          borderRadius:
-                                                              BorderRadius
-                                                                  .circular(
-                                                                      5))),
-                                              //border: OutlineInputBorder(borderRadius: BorderRadius.circular(5.0))),
-                                              isEmpty:
-                                                  _currentSelectedValue == '',
-                                              child:
-                                                  DropdownButtonHideUnderline(
-                                                      child: DropdownButton(
-                                                menuMaxHeight: 200,
-                                                hint: _dropDownValue1 == ""
-                                                    ? Text("Book")
-                                                    : Text(
-                                                        _dropDownValue1,
-                                                        style: TextStyle(
-                                                            fontFamily:
-                                                                "Candara",
-                                                            color: Colors.black,
-                                                            fontSize: 14),
-                                                        maxLines: 1,
-                                                        overflow: TextOverflow
-                                                            .ellipsis,
-                                                      ),
-                                                isExpanded: false,
-                                                iconSize: 30,
-                                                style: TextStyle(
-                                                    color: Colors.black),
-                                                items: Booklist.map(
-                                                  (val) {
-                                                    return DropdownMenuItem<
-                                                        String>(
-                                                      value: val,
-                                                      child: Text(val),
-                                                    );
-                                                  },
-                                                ).toList(),
-                                                onChanged: (String? val) {
-                                                  for (var k = 0;
-                                                      k <
-                                                          snapshot1.data!.data2
-                                                              .k12.length;
-                                                      k++)
-                                                    if (snapshot1
-                                                            .data!
-                                                            .data2
-                                                            .k12[k]
-                                                            .courseName ==
-                                                        val)
-                                                      idbook = snapshot1
-                                                          .data!.data2.k12[k].id
-                                                          .toString();
-                                                  debugPrint(idbook);
-                                                  setState(() {
-                                                    _dropDownValue1 = val!;
-                                                    _dropDownValue2 = "";
-                                                    _dropDownValue3 = "";
-                                                  });
-                                                },
-                                              )),
-                                            ),
-                                          );
-                                        },
-                                      );
-                                    } else
-                                      return Text("no");
-                                  }),
-                            SizedBox(
-                              height: 8,
-                              child: Container(),
-                            ),
-                            if (_dropDownValue1 != "")
-                              FutureBuilder(
-                                  future: createK12(idbook),
-                                  builder: (context,
-                                      AsyncSnapshot<K12Api> snapshot2) {
-                                    if (snapshot2.hasData) {
-                                      List<String> ChapList = [];
-                                      for (var k = 0;
-                                          k <
-                                              snapshot2
-                                                  .data!.data.k12Details.length;
-                                          k++)
-                                        ChapList.add(snapshot2.data!.data
-                                            .k12Details[k].chapterName
-                                            .toString());
-                                      return FormField<String>(
-                                        builder:
-                                            (FormFieldState<String> state) {
-                                          String _currentSelectedValue = '';
-                                          return Container(
-                                            height: 55,
-                                            //padding: EdgeInsets.only(left: 10),
-                                            child: InputDecorator(
-                                              decoration: InputDecoration(
-                                                  //labelText: 'CLASS',
-                                                  prefixIcon: Icon(
-                                                    Icons.book_rounded,
-                                                    color: Colors.teal,
-                                                    size: 20,
-                                                  ),
-                                                  labelStyle: TextStyle(
-                                                      fontFamily: "Candara"),
-                                                  errorStyle: TextStyle(
-                                                      fontFamily: "Candara",
-                                                      color: Colors.redAccent,
-                                                      fontSize: 16.0),
-                                                  //hintText: 'Please select expense',
-                                                  enabledBorder:
-                                                      OutlineInputBorder(
-                                                          borderSide:
-                                                              const BorderSide(
-                                                                  color: Colors
-                                                                      .grey,
-                                                                  width: 2.0),
-                                                          borderRadius:
-                                                              BorderRadius
-                                                                  .circular(5)),
-                                                  focusedBorder:
-                                                      OutlineInputBorder(
-                                                          borderSide:
-                                                              const BorderSide(
-                                                                  color: Colors
-                                                                      .teal,
-                                                                  width: 2.0),
-                                                          borderRadius:
-                                                              BorderRadius
-                                                                  .circular(
-                                                                      5))),
-                                              //border: OutlineInputBorder(borderRadius: BorderRadius.circular(5.0))),
-                                              isEmpty:
-                                                  _currentSelectedValue == '',
-                                              child:
-                                                  DropdownButtonHideUnderline(
-                                                      child: DropdownButton(
-                                                menuMaxHeight: 200,
-                                                hint: _dropDownValue2 == ""
-                                                    ? Text("Chapter")
-                                                    : Text(
-                                                        _dropDownValue2,
-                                                        style: TextStyle(
-                                                            fontFamily:
-                                                                "Candara",
-                                                            color: Colors.black,
-                                                            fontSize: 14),
-                                                        maxLines: 2,
-                                                        overflow: TextOverflow
-                                                            .ellipsis,
-                                                      ),
-                                                isExpanded: true,
-                                                iconSize: 30.0,
-                                                style: TextStyle(
-                                                    color: Colors.black),
-                                                items: ChapList.map(
-                                                  (val) {
-                                                    return DropdownMenuItem<
-                                                        String>(
-                                                      value: val,
-                                                      child: Text(val),
-                                                    );
-                                                  },
-                                                ).toList(),
-                                                onChanged: (String? val) {
-                                                  for (var k = 0;
-                                                      k <
-                                                          snapshot2
-                                                              .data!
-                                                              .data
-                                                              .k12Details
-                                                              .length;
-                                                      k++)
-                                                    if (snapshot2
-                                                            .data!
-                                                            .data
-                                                            .k12Details[k]
-                                                            .chapterName ==
-                                                        val)
-                                                      idchap = snapshot2.data!
-                                                          .data.k12Details[k].id
-                                                          .toString();
-                                                  setState(() {
-                                                    _dropDownValue2 = val!;
-                                                    _dropDownValue3 = "";
-                                                  });
-                                                },
-                                              )),
-                                            ),
-                                          );
-                                        },
-                                      );
-                                    } else
-                                      return Center(
-                                        child: CircularProgressIndicator(),
-                                      );
-                                  }),
-                            SizedBox(
-                              height: 8,
-                              child: Container(),
-                            ),
-                            if (_dropDownValue2 != "")
-                              FutureBuilder(
-                                  future: createqt(idchap),
-                                  builder: (context,
-                                      AsyncSnapshot<K12Chapter> snapshot3) {
-                                    if (snapshot3.hasData) {
-                                      List<String> qtList = [];
-                                      for (var k = 0;
-                                          k <
-                                              snapshot3.data!.data3
-                                                  .questionTypes.length;
-                                          k++)
-                                        qtList.add(snapshot3.data!.data3
-                                            .questionTypes[k].catName
-                                            .toString());
-                                      return FormField<String>(
-                                        builder:
-                                            (FormFieldState<String> state) {
-                                          String _currentSelectedValue = '';
-                                          return Container(
-                                            height: 55,
-                                            //padding: EdgeInsets.only(left: 10),
-                                            child: InputDecorator(
-                                              decoration: InputDecoration(
-                                                  //labelText: 'CLASS',
-                                                  prefixIcon: Icon(
-                                                    Icons.list_alt,
-                                                    color: Colors.teal,
-                                                    size: 20,
-                                                  ),
-                                                  labelStyle: TextStyle(
-                                                      fontFamily: "Candara"),
-                                                  errorStyle: TextStyle(
-                                                      fontFamily: "Candara",
-                                                      color: Colors.redAccent,
-                                                      fontSize: 16.0),
-                                                  //hintText: 'Please select expense',
-                                                  enabledBorder:
-                                                      OutlineInputBorder(
-                                                          borderSide:
-                                                              const BorderSide(
-                                                                  color: Colors
-                                                                      .grey,
-                                                                  width: 2.0),
-                                                          borderRadius:
-                                                              BorderRadius
-                                                                  .circular(5)),
-                                                  focusedBorder:
-                                                      OutlineInputBorder(
-                                                          borderSide:
-                                                              const BorderSide(
-                                                                  color: Colors
-                                                                      .teal,
-                                                                  width: 2.0),
-                                                          borderRadius:
-                                                              BorderRadius
-                                                                  .circular(
-                                                                      5))),
-                                              //border: OutlineInputBorder(borderRadius: BorderRadius.circular(5.0))),
-                                              isEmpty:
-                                                  _currentSelectedValue == '',
-                                              child:
-                                                  DropdownButtonHideUnderline(
-                                                      child: DropdownButton(
-                                                menuMaxHeight: 200,
-                                                hint: _dropDownValue3 == ""
-                                                    ? Text("QuestionType")
-                                                    : Text(
-                                                        _dropDownValue3,
-                                                        style: TextStyle(
-                                                            fontFamily:
-                                                                "Candara",
-                                                            color: Colors.black,
-                                                            fontSize: 14),
-                                                        maxLines: 2,
-                                                        overflow: TextOverflow
-                                                            .ellipsis,
-                                                      ),
-                                                isExpanded: true,
-                                                iconSize: 30.0,
-                                                style: TextStyle(
-                                                    color: Colors.black),
-                                                items: qtList.map(
-                                                  (val) {
-                                                    return DropdownMenuItem<
-                                                        String>(
-                                                      value: val,
-                                                      child: Text(val),
-                                                    );
-                                                  },
-                                                ).toList(),
-                                                onChanged: (String? val) {
-                                                  for (var k = 0;
-                                                      k <
-                                                          snapshot3
-                                                              .data!
-                                                              .data3
-                                                              .questionTypes
-                                                              .length;
-                                                      k++)
-                                                    if (snapshot3
-                                                            .data!
-                                                            .data3
-                                                            .questionTypes[k]
-                                                            .catName
-                                                            .toString() ==
-                                                        val)
-                                                      idqt = snapshot3
-                                                          .data!
-                                                          .data3
-                                                          .questionTypes[k]
-                                                          .id
-                                                          .toString();
-                                                  setState(() {
-                                                    _dropDownValue3 = val!;
-                                                  });
-                                                },
-                                              )),
-                                            ),
-                                          );
-                                        },
-                                      );
-                                    } else
-                                      return Center(
-                                        child: CircularProgressIndicator(),
-                                      );
-                                  }),
-                            SizedBox(
-                              height: 10,
-                            ),
-                            Container(
-                              width: MediaQuery.of(context).size.width - 20,
-                              child: Text(
-                                'Random students of your grade',
-                                style: TextStyle(color: Colors.grey),
-                              ),
-                            ),
-                            SizedBox(
-                              height: 20,
-                            ),
-                            for (var i = 0;
-                                i < snapshot.data!.data1.student.length;
-                                i++)
-                              Container(
-                                //margin: EdgeInsets.all(10),
-                                padding: EdgeInsets.all(5),
-                                child: Column(
-                                  children: [
-                                    Padding(
-                                      padding:
-                                          const EdgeInsets.only(bottom: 10),
-                                      child: Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.end,
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.end,
-                                        children: [
-                                          Expanded(
-                                              flex: 2,
-                                              child: Container(
-                                                child: CircleAvatar(
-                                                    backgroundColor:
-                                                        Colors.amber,
-                                                    backgroundImage: NetworkImage(
-                                                        "http://ec2-13-234-116-155.ap-south-1.compute.amazonaws.com/uploads/${snapshot.data!.data1.student[i].img.toString()}")),
-                                              )),
-                                          SizedBox(
-                                            width: 10,
-                                          ),
-                                          Expanded(
-                                            flex: 7,
-                                            child: Column(
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
-                                              children: [
-                                                Text(
-                                                  "${snapshot.data!.data1.student[i].name.toString()}",
-                                                  style: TextStyle(
-                                                      color: Color.fromARGB(
-                                                          255, 42, 56, 134),
-                                                      fontWeight:
-                                                          FontWeight.bold),
-                                                ),
-                                                Text(
-                                                  "${snapshot.data!.data1.student[i].school.toString()}",
-                                                  style: TextStyle(
-                                                      color: Colors.grey,
-                                                      fontSize: 12),
-                                                )
-                                              ],
-                                            ),
-                                          ),
-                                          if (_dropDownValue != "" &&
-                                              _dropDownValue1 != "" &&
-                                              _dropDownValue2 != "" &&
-                                              _dropDownValue3 != "")
-                                            Expanded(
-                                              flex: 3,
-                                              child: SizedBox(
-                                                height: 30,
-                                                width: 40,
-                                                child: ElevatedButton(
-                                                  style: ButtonStyle(
-                                                      backgroundColor:
-                                                          MaterialStateProperty
-                                                              .all<Color>(
-                                                                  Colors.teal)),
-                                                  child: Text('Play',
-                                                      style: TextStyle(
-                                                          fontSize: 12)),
-                                                  onPressed: () async {
-                                                    SendInvite inv =
-                                                        await createInvite(snapshot.data!.data1.student[i].id.toString(),idSub.toString(),idbook.toString(),idchap.toString(),idqt.toString());
-
-                                                    setState(() {
-                                                      _inv = inv;
-                                                    });
-
-                                                    if (invitecode == 200) {
-                                                      Navigator.push(
-                                                          context,
-                                                          MaterialPageRoute(
-                                                              builder: (context) =>
-                                                                  quiz_challenge(idchap, idqt," 0",
-                                                                      snapshot.data!.data1.student[i]
-                                                                          .name
-                                                                          .toString(),
-
-
-                                                                      "http://ec2-13-234-116-155.ap-south-1.compute.amazonaws.com/uploads/${snapshot.data!.data1.student[i].img.toString()}")));
-                                                    }
-
-                                                  },
-                                                ),
-                                              ),
-                                            )
-                                          else
-                                            Expanded(
-                                              flex: 3,
-                                              child: SizedBox(
-                                                height: 30,
-                                                width: 40,
-                                                child: ElevatedButton(
-                                                  style: ButtonStyle(
-                                                      backgroundColor:
-                                                          MaterialStateProperty
-                                                              .all<Color>(
-                                                                  Colors.grey)),
-                                                  child: Text('Play',
-                                                      style: TextStyle(
-                                                          fontSize: 12)),
-                                                  onPressed: () {},
-                                                ),
-                                              ),
-                                            )
-                                        ],
-                                      ),
-                                    ),
-                                    SizedBox(
-                                      height: 1,
-                                      child: Container(
-                                        margin: EdgeInsets.only(
-                                            left: 20, right: 20),
-                                        color: Colors.grey,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                          ],
-                        ),
-                      ),
-                    ],
+    return DefaultTabController(
+      length: 2,
+      child: Padding(
+        padding: const EdgeInsets.only(left: 8, right: 8),
+        child: new Scaffold(
+          appBar: new AppBar(
+            backgroundColor: Colors.white,
+            //shadowColor: Colors.black,
+            flexibleSpace: new Column(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                new TabBar(
+                  indicator:
+                  BoxDecoration(color: Colors.teal),
+                  unselectedLabelColor: Colors.grey,
+                  labelStyle: TextStyle(
+                    fontFamily: 'Candara',
                   ),
+                  tabs: [
+                    new Tab(
+                      text: "Challenge Others",
+                    ),
+                    new Tab(
+                      text: "Completed",
+                    )
+                  ],
                 ),
-              ),
-            );
-          } else
-            return Center(
-              child: CircularProgressIndicator(),
-            );
-        });
+              ],
+            ),
+            actions: [
+              //Builder(builder: (context){final index = DefaultTabController.of(context).index;})
+            ],
+          ),
+          body: TabBarView(
+            physics: NeverScrollableScrollPhysics(),
+            children: [
+              FutureBuilder(
+                  future: createLiveStudents(idclass),
+                  builder: (context, AsyncSnapshot<Livestudents> snapshot) {
+                    if (snapshot.hasData) {
+                      if (SubjectList.isEmpty)
+                        for (var j = 0; j < snapshot.data!.data1.subjects.length; j++)
+                          SubjectList.add(
+                              snapshot.data!.data1.subjects[j].subjectName.toString());
+                      return Scaffold(
+                        body: SingleChildScrollView(
+                          child: Container(
+                            child: Column(
+                              children: [
+                                Container(
+                                  margin: EdgeInsets.all(20),
+                                  padding: EdgeInsets.all(20),
+                                  decoration: BoxDecoration(
+                                      border: Border.all(color: Colors.teal),
+                                      borderRadius: BorderRadius.circular(5)),
+                                  child: Column(
+                                    children: [
+                                      Center(
+                                        child: Text(
+                                          'Quiz Challenge',
+                                          style:
+                                          TextStyle(color: Colors.grey, fontSize: 20),
+                                        ),
+                                      ),
+                                      SizedBox(
+                                        height: 30,
+                                      ),
+                                      FormField<String>(
+                                        builder: (FormFieldState<String> state) {
+                                          String _currentSelectedValue = '';
+                                          return Container(
+                                            height: 60,
+//padding: EdgeInsets.only(left: 10,right: 10),
+                                            child: InputDecorator(
+                                              decoration: InputDecoration(
+//labelText: 'Subject'
+                                              contentPadding: EdgeInsets.symmetric(vertical: 18, horizontal: 15),
+                                                  prefixIcon: Icon(Icons.subject,
+                                                      color: Colors.teal),
+                                                  labelStyle:
+                                                  TextStyle(fontFamily: "Candara"),
+                                                  errorStyle: TextStyle(
+                                                      fontFamily: "Candara",
+                                                      color: Colors.redAccent,
+                                                      fontSize: 16.0),
+//hintText: 'Please select expense',
+                                                  enabledBorder: OutlineInputBorder(
+                                                      borderSide: const BorderSide(
+                                                          color: Colors.grey, width: 2.0),
+                                                      borderRadius:
+                                                      BorderRadius.circular(5)),
+                                                  focusedBorder: OutlineInputBorder(
+                                                      borderSide: const BorderSide(
+                                                          color: Colors.teal, width: 2.0),
+                                                      borderRadius:
+                                                      BorderRadius.circular(5))),
+//border: OutlineInputBorder(borderRadius: BorderRadius.circular(5.0))),
+                                              isEmpty: _currentSelectedValue == '',
+                                              child: DropdownButtonHideUnderline(
+
+                                                  child: DropdownButton(
+                                                    isDense: true,
+                                                    menuMaxHeight: 200,
+                                                    hint: _dropDownValue == ""
+                                                        ? Text("Subject")
+                                                        : Text(
+                                                      _dropDownValue,
+                                                      style: TextStyle(
+                                                          fontFamily: "Candara",
+                                                          color: Colors.black,
+                                                          fontSize: 14),
+                                                    ),
+                                                    isExpanded: false,
+                                                    iconSize: 30.0,
+                                                    style: TextStyle(color: Colors.black),
+                                                    items: SubjectList.map(
+                                                          (val) {
+                                                        return DropdownMenuItem<String>(
+                                                          value: val,
+                                                          child: Text(val),
+                                                        );
+                                                      },
+                                                    ).toList(),
+                                                    onChanged: (String? val) {
+                                                      for (var k = 0;
+                                                      k <
+                                                          snapshot.data!.data1.subjects
+                                                              .length;
+                                                      k++)
+                                                        if (snapshot.data!.data1.subjects[k]
+                                                            .subjectName ==
+                                                            val)
+                                                          idSub = snapshot
+                                                              .data!.data1.subjects[k].id
+                                                              .toString();
+
+                                                      setState(() {
+                                                        _dropDownValue = val!;
+                                                        _dropDownValue1 = "";
+                                                        _dropDownValue2 = "";
+                                                        _dropDownValue3 = "";
+                                                      });
+                                                    },
+                                                  )),
+                                            ),
+                                          );
+                                        },
+                                      ),
+                                      SizedBox(
+                                        height: 8,
+                                        child: Container(),
+                                      ),
+                                      if (_dropDownValue != "")
+                                        FutureBuilder(
+                                            future: getLiveSubjects(classId, idSub),
+                                            builder: (context,
+                                                AsyncSnapshot<K12Card> snapshot1) {
+                                              if (snapshot1.hasData) {
+                                                List<String> Booklist = [];
+                                                for (var k = 0;
+                                                k < snapshot1.data!.data2.k12.length;
+                                                k++)
+                                                  Booklist.add(snapshot1
+                                                      .data!.data2.k12[k].courseName
+                                                      .toString());
+                                                return FormField<String>(
+                                                  builder:
+                                                      (FormFieldState<String> state) {
+                                                    String _currentSelectedValue = '';
+                                                    return Container(
+                                                      height: 60,
+//padding: EdgeInsets.only(left: 10,right: 10),
+                                                      child: InputDecorator(
+                                                        decoration: InputDecoration(
+//labelText: 'CLASS',
+                                                            contentPadding: EdgeInsets.symmetric(vertical: 18, horizontal: 15),
+
+                                                            prefixIcon: Icon(
+                                                                Icons.menu_book_sharp,
+                                                                color: Colors.teal),
+                                                            labelStyle: TextStyle(
+                                                                fontFamily: "Candara",
+                                                                fontSize: 16),
+                                                            errorStyle: TextStyle(
+                                                                fontFamily: "Candara",
+                                                                color: Colors.redAccent,
+                                                                fontSize: 16.0),
+//hintText: 'Please select expense',
+                                                            enabledBorder:
+                                                            OutlineInputBorder(
+                                                                borderSide:
+                                                                const BorderSide(
+                                                                    color: Colors
+                                                                        .grey,
+                                                                    width: 2.0),
+                                                                borderRadius:
+                                                                BorderRadius
+                                                                    .circular(5)),
+                                                            focusedBorder:
+                                                            OutlineInputBorder(
+                                                                borderSide:
+                                                                const BorderSide(
+                                                                    color: Colors
+                                                                        .teal,
+                                                                    width: 2.0),
+                                                                borderRadius:
+                                                                BorderRadius
+                                                                    .circular(
+                                                                    5))),
+//border: OutlineInputBorder(borderRadius: BorderRadius.circular(5.0))),
+                                                        isEmpty:
+                                                        _currentSelectedValue == '',
+                                                        child:
+                                                        DropdownButtonHideUnderline(
+                                                            child: DropdownButton(
+                                                              menuMaxHeight: 200,
+                                                              hint: _dropDownValue1 == ""
+                                                                  ? Text("Book")
+                                                                  : Text(
+                                                                _dropDownValue1,
+                                                                style: TextStyle(
+                                                                    fontFamily:
+                                                                    "Candara",
+                                                                    color: Colors.black,
+                                                                    fontSize: 14),
+                                                                maxLines: 1,
+                                                                overflow: TextOverflow
+                                                                    .ellipsis,
+                                                              ),
+                                                              isExpanded: false,
+                                                              iconSize: 30,
+                                                              style: TextStyle(
+                                                                  color: Colors.black),
+                                                              items: Booklist.map(
+                                                                    (val) {
+                                                                  return DropdownMenuItem<
+                                                                      String>(
+                                                                    value: val,
+                                                                    child: Text(val),
+                                                                  );
+                                                                },
+                                                              ).toList(),
+                                                              onChanged: (String? val) {
+                                                                for (var k = 0;
+                                                                k <
+                                                                    snapshot1.data!.data2
+                                                                        .k12.length;
+                                                                k++)
+                                                                  if (snapshot1
+                                                                      .data!
+                                                                      .data2
+                                                                      .k12[k]
+                                                                      .courseName ==
+                                                                      val)
+                                                                    idbook = snapshot1
+                                                                        .data!.data2.k12[k].id
+                                                                        .toString();
+                                                                debugPrint(idbook);
+                                                                setState(() {
+                                                                  _dropDownValue1 = val!;
+                                                                  _dropDownValue2 = "";
+                                                                  _dropDownValue3 = "";
+                                                                });
+                                                              },
+                                                            )),
+                                                      ),
+                                                    );
+                                                  },
+                                                );
+                                              } else
+                                                return Text("no");
+                                            }),
+                                      SizedBox(
+                                        height: 8,
+                                        child: Container(),
+                                      ),
+                                      if (_dropDownValue1 != "")
+                                        FutureBuilder(
+                                            future: createK12(idbook),
+                                            builder: (context,
+                                                AsyncSnapshot<K12Api> snapshot2) {
+                                              if (snapshot2.hasData) {
+                                                List<String> ChapList = [];
+                                                for (var k = 0;
+                                                k <
+                                                    snapshot2
+                                                        .data!.data.k12Details.length;
+                                                k++)
+                                                  ChapList.add(snapshot2.data!.data
+                                                      .k12Details[k].chapterName
+                                                      .toString());
+                                                return FormField<String>(
+                                                  builder:
+                                                      (FormFieldState<String> state) {
+                                                    String _currentSelectedValue = '';
+                                                    return Container(
+                                                      height: 60,
+//padding: EdgeInsets.only(left: 10),
+                                                      child: InputDecorator(
+                                                        decoration: InputDecoration(
+//labelText: 'CLASS',
+                                                            contentPadding: EdgeInsets.symmetric(vertical: 5, horizontal: 15),
+
+                                                            prefixIcon: Icon(
+                                                              Icons.book_rounded,
+                                                              color: Colors.teal,
+                                                              size: 20,
+                                                            ),
+                                                            labelStyle: TextStyle(
+                                                                fontFamily: "Candara"),
+                                                            errorStyle: TextStyle(
+                                                                fontFamily: "Candara",
+                                                                color: Colors.redAccent,
+                                                                fontSize: 16.0),
+//hintText: 'Please select expense',
+                                                            enabledBorder:
+                                                            OutlineInputBorder(
+                                                                borderSide:
+                                                                const BorderSide(
+                                                                    color: Colors
+                                                                        .grey,
+                                                                    width: 2.0),
+                                                                borderRadius:
+                                                                BorderRadius
+                                                                    .circular(5)),
+                                                            focusedBorder:
+                                                            OutlineInputBorder(
+                                                                borderSide:
+                                                                const BorderSide(
+                                                                    color: Colors
+                                                                        .teal,
+                                                                    width: 2.0),
+                                                                borderRadius:
+                                                                BorderRadius
+                                                                    .circular(
+                                                                    5))),
+//border: OutlineInputBorder(borderRadius: BorderRadius.circular(5.0))),
+                                                        isEmpty:
+                                                        _currentSelectedValue == '',
+                                                        child:
+                                                        DropdownButtonHideUnderline(
+                                                            child: DropdownButton(
+                                                              menuMaxHeight: 200,
+                                                              hint: _dropDownValue2 == ""
+                                                                  ? Text("Chapter")
+                                                                  : Text(
+                                                                _dropDownValue2,
+                                                                style: TextStyle(
+                                                                    fontFamily:
+                                                                    "Candara",
+                                                                    color: Colors.black,
+                                                                    fontSize: 13),
+                                                                maxLines: 2,
+                                                                overflow: TextOverflow
+                                                                    .ellipsis,
+                                                              ),
+                                                              isExpanded: true,
+                                                              iconSize: 30.0,
+                                                              style: TextStyle(
+                                                                  color: Colors.black),
+                                                              items: ChapList.map(
+                                                                    (val) {
+                                                                  return DropdownMenuItem<
+                                                                      String>(
+                                                                    value: val,
+                                                                    child: Text(val),
+                                                                  );
+                                                                },
+                                                              ).toList(),
+                                                              onChanged: (String? val) {
+                                                                for (var k = 0;
+                                                                k <
+                                                                    snapshot2
+                                                                        .data!
+                                                                        .data
+                                                                        .k12Details
+                                                                        .length;
+                                                                k++)
+                                                                  if (snapshot2
+                                                                      .data!
+                                                                      .data
+                                                                      .k12Details[k]
+                                                                      .chapterName ==
+                                                                      val)
+                                                                    idchap = snapshot2.data!
+                                                                        .data.k12Details[k].id
+                                                                        .toString();
+                                                                setState(() {
+                                                                  _dropDownValue2 = val!;
+                                                                  _dropDownValue3 = "";
+                                                                });
+                                                              },
+                                                            )),
+                                                      ),
+                                                    );
+                                                  },
+                                                );
+                                              } else
+                                                return Center(
+                                                  child: CircularProgressIndicator(),
+                                                );
+                                            }),
+                                      SizedBox(
+                                        height: 8,
+                                        child: Container(),
+                                      ),
+                                      if (_dropDownValue2 != "")
+                                        FutureBuilder(
+                                            future: createqt(idchap),
+                                            builder: (context,
+                                                AsyncSnapshot<K12Chapter> snapshot3) {
+                                              if (snapshot3.hasData) {
+                                                List<String> qtList = [];
+                                                for (var k = 0;
+                                                k <
+                                                    snapshot3.data!.data3
+                                                        .questionTypes.length;
+                                                k++)
+                                                  qtList.add(snapshot3.data!.data3
+                                                      .questionTypes[k].catName
+                                                      .toString());
+                                                return FormField<String>(
+                                                  builder:
+                                                      (FormFieldState<String> state) {
+                                                    String _currentSelectedValue = '';
+                                                    return Container(
+                                                      height: 60,
+//padding: EdgeInsets.only(left: 10),
+                                                      child: InputDecorator(
+                                                        decoration: InputDecoration(
+//labelText: 'CLASS',
+                                                            contentPadding: EdgeInsets.symmetric(vertical: 15, horizontal: 15),
+
+                                                            prefixIcon: Icon(
+                                                              Icons.list_alt,
+                                                              color: Colors.teal,
+                                                              size: 20,
+                                                            ),
+                                                            labelStyle: TextStyle(
+                                                                fontFamily: "Candara"),
+                                                            errorStyle: TextStyle(
+                                                                fontFamily: "Candara",
+                                                                color: Colors.redAccent,
+                                                                fontSize: 16.0),
+//hintText: 'Please select expense',
+                                                            enabledBorder:
+                                                            OutlineInputBorder(
+                                                                borderSide:
+                                                                const BorderSide(
+                                                                    color: Colors
+                                                                        .grey,
+                                                                    width: 2.0),
+                                                                borderRadius:
+                                                                BorderRadius
+                                                                    .circular(5)),
+                                                            focusedBorder:
+                                                            OutlineInputBorder(
+                                                                borderSide:
+                                                                const BorderSide(
+                                                                    color: Colors
+                                                                        .teal,
+                                                                    width: 2.0),
+                                                                borderRadius:
+                                                                BorderRadius
+                                                                    .circular(
+                                                                    5))),
+//border: OutlineInputBorder(borderRadius: BorderRadius.circular(5.0))),
+                                                        isEmpty:
+                                                        _currentSelectedValue == '',
+                                                        child:
+                                                        DropdownButtonHideUnderline(
+                                                            child: DropdownButton(
+                                                              menuMaxHeight: 200,
+                                                              hint: _dropDownValue3 == ""
+                                                                  ? Text("QuestionType")
+                                                                  : Text(
+                                                                _dropDownValue3,
+                                                                style: TextStyle(
+                                                                    fontFamily:
+                                                                    "Candara",
+                                                                    color: Colors.black,
+                                                                    fontSize: 14),
+                                                                maxLines: 2,
+                                                                overflow: TextOverflow
+                                                                    .ellipsis,
+                                                              ),
+                                                              isExpanded: true,
+                                                              iconSize: 30.0,
+                                                              style: TextStyle(
+                                                                  color: Colors.black),
+                                                              items: qtList.map(
+                                                                    (val) {
+                                                                  return DropdownMenuItem<
+                                                                      String>(
+                                                                    value: val,
+                                                                    child: Text(val),
+                                                                  );
+                                                                },
+                                                              ).toList(),
+                                                              onChanged: (String? val) {
+                                                                for (var k = 0;
+                                                                k <
+                                                                    snapshot3
+                                                                        .data!
+                                                                        .data3
+                                                                        .questionTypes
+                                                                        .length;
+                                                                k++)
+                                                                  if (snapshot3
+                                                                      .data!
+                                                                      .data3
+                                                                      .questionTypes[k]
+                                                                      .catName
+                                                                      .toString() ==
+                                                                      val)
+                                                                    idqt = snapshot3
+                                                                        .data!
+                                                                        .data3
+                                                                        .questionTypes[k]
+                                                                        .id
+                                                                        .toString();
+                                                                setState(() {
+                                                                  _dropDownValue3 = val!;
+                                                                });
+                                                              },
+                                                            )),
+                                                      ),
+                                                    );
+                                                  },
+                                                );
+                                              } else
+                                                return Center(
+                                                  child: CircularProgressIndicator(),
+                                                );
+                                            }),
+                                      SizedBox(
+                                        height: 10,
+                                      ),
+                                      Container(
+                                        width: MediaQuery.of(context).size.width - 20,
+                                        child: Text(
+                                          'Random students of your grade',
+                                          style: TextStyle(color: Colors.grey),
+                                        ),
+                                      ),
+                                      SizedBox(
+                                        height: 20,
+                                      ),
+                                      for (var i = 0;
+                                      i < snapshot.data!.data1.student.length;
+                                      i++)
+                                        Container(
+//margin: EdgeInsets.all(10),
+                                          padding: EdgeInsets.all(5),
+                                          child: Column(
+                                            children: [
+                                              Padding(
+                                                padding:
+                                                const EdgeInsets.only(bottom: 10),
+                                                child: Row(
+                                                  mainAxisAlignment:
+                                                  MainAxisAlignment.end,
+                                                  crossAxisAlignment:
+                                                  CrossAxisAlignment.end,
+                                                  children: [
+                                                    Expanded(
+                                                        flex: 2,
+                                                        child: Container(
+                                                          child: CircleAvatar(
+                                                              backgroundColor:
+                                                              Colors.amber,
+                                                              backgroundImage: NetworkImage(
+                                                                  "http://ec2-13-234-116-155.ap-south-1.compute.amazonaws.com/uploads/${snapshot.data!.data1.student[i].img.toString()}")),
+                                                        )),
+                                                    SizedBox(
+                                                      width: 10,
+                                                    ),
+                                                    Expanded(
+                                                      flex: 7,
+                                                      child: Column(
+                                                        crossAxisAlignment:
+                                                        CrossAxisAlignment.start,
+                                                        children: [
+                                                          Text(
+                                                            "${snapshot.data!.data1.student[i].name.toString()}",
+                                                            style: TextStyle(
+                                                                color: Color.fromARGB(
+                                                                    255, 42, 56, 134),
+                                                                fontWeight:
+                                                                FontWeight.bold),
+                                                          ),
+                                                          Text(
+                                                            "${snapshot.data!.data1.student[i].school.toString()}",
+                                                            style: TextStyle(
+                                                                color: Colors.grey,
+                                                                fontSize: 12),
+                                                          )
+                                                        ],
+                                                      ),
+                                                    ),
+                                                    if (_dropDownValue != "" &&
+                                                        _dropDownValue1 != "" &&
+                                                        _dropDownValue2 != "" &&
+                                                        _dropDownValue3 != "")
+                                                      Expanded(
+                                                        flex: 3,
+                                                        child: SizedBox(
+                                                          height: 30,
+                                                          width: 40,
+                                                          child: ElevatedButton(
+                                                            style: ButtonStyle(
+                                                                backgroundColor:
+                                                                MaterialStateProperty
+                                                                    .all<Color>(
+                                                                    Colors.teal)),
+                                                            child: Text('Play',
+                                                                style: TextStyle(
+                                                                    fontSize: 12)),
+                                                            onPressed: () async {
+                                                              SendInvite inv =
+                                                              await createInvite(snapshot.data!.data1.student[i].id.toString(),idSub.toString(),idbook.toString(),idchap.toString(),idqt.toString());
+
+                                                              setState(() {
+                                                                _inv = inv;
+                                                              });
+
+                                                              if (invitecode == 200) {
+                                                                print(_inv!.data6.challengeId.toString());
+                                                                Navigator.push(
+                                                                    context,
+                                                                    MaterialPageRoute(
+                                                                        builder: (context) =>
+                                                                            quiz_challenge(idchap, idqt,_inv!.data6.challengeId.toString(),
+                                                                                snapshot.data!.data1.student[i]
+                                                                                    .name
+                                                                                    .toString(),
+
+
+                                                                                "http://ec2-13-234-116-155.ap-south-1.compute.amazonaws.com/uploads/${snapshot.data!.data1.student[i].img.toString()}")));
+                                                              }
+
+                                                            },
+                                                          ),
+                                                        ),
+                                                      )
+                                                    else
+                                                      Expanded(
+                                                        flex: 3,
+                                                        child: SizedBox(
+                                                          height: 30,
+                                                          width: 40,
+                                                          child: ElevatedButton(
+                                                            style: ButtonStyle(
+                                                                backgroundColor:
+                                                                MaterialStateProperty
+                                                                    .all<Color>(
+                                                                    Colors.grey)),
+                                                            child: Text('Play',
+                                                                style: TextStyle(
+                                                                    fontSize: 12)),
+                                                            onPressed: () {},
+                                                          ),
+                                                        ),
+                                                      )
+                                                  ],
+                                                ),
+                                              ),
+                                              SizedBox(
+                                                height: 1,
+                                                child: Container(
+                                                  margin: EdgeInsets.only(
+                                                      left: 20, right: 20),
+                                                  color: Colors.grey,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      );
+                    } else
+                      return Center(
+                        child: CircularProgressIndicator(),
+                      );
+                  }),
+              FutureBuilder(
+                        future: getChalList2(),
+                        builder: (context,AsyncSnapshot<Challengerlist> snapshot3 ){
+                          debugPrint(snapshot3.toString());
+                          if(snapshot3.hasData)
+                            return Scaffold(
+                                body: Container(
+                                  padding: EdgeInsets.all(2),
+                                  child: SingleChildScrollView(
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: <Widget>[
+                                        for (var i=0;i<snapshot3.data!.data6.alerts.length;i++)
+                                          GestureDetector(
+                                            onTap:(){
+                                              Navigator.push(context, MaterialPageRoute(builder: (context) => winnerClass(snapshot3.data!.data6.alerts[i].challengeId.toString())));
+                                            },
+                                            child: Card(
+                                              elevation: 5,
+                                              shape: RoundedRectangleBorder(
+                                                  borderRadius: BorderRadius.all(Radius.circular(10))),
+                                              child: Container(
+                                                padding: EdgeInsets.all(8),
+                                                child: Row(
+                                                  mainAxisAlignment: MainAxisAlignment.start,
+                                                  //crossAxisAlignment: CrossAxisAlignment.center,
+                                                  children: [
+                                                    Row(
+                                                      mainAxisAlignment: MainAxisAlignment.start,
+                                                      //mainAxisSize: MainAxisSize.min,
+                                                      children: [
+                                                        Center(
+                                                          child: CircleAvatar(
+                                                            backgroundImage: NetworkImage("${snapshot3.data!.data6.alerts[i].img.toString()}"),
+                                                            radius: 35,
+                                                          ),
+                                                        ),
+                                                        SizedBox(width: 20,),
+
+                                                      ],
+                                                    ),
+                                                    Column(
+                                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                                      children: [
+                                                        Text(
+                                                          "${snapshot3.data!.data6.alerts[i].name.toString()}",
+                                                          style: TextStyle(
+                                                            fontWeight: FontWeight.bold,
+                                                            fontFamily: 'Candara',
+                                                            fontSize: 15,
+                                                          ),
+                                                        ),
+                                                        Row(
+                                                          children: [
+                                                            Text("${snapshot3.data!.data6.alerts[i].date}",style: TextStyle(fontFamily: "Candara",fontSize: 11,color: Colors.grey),overflow: TextOverflow.ellipsis,maxLines: 2),
+                                                            Text("  ${snapshot3.data!.data6.alerts[i].time}",style: TextStyle(fontFamily: "Candara",fontSize: 11,color: Colors.grey),overflow: TextOverflow.ellipsis,maxLines: 2),
+                                                          ],
+                                                        ),
+                                                        /*Text(
+                                                            "${snapshot3.data!.data6.alerts[i].subjectName.toString()}",
+                                                            style: TextStyle(
+                                                              fontWeight: FontWeight.bold,
+                                                              fontFamily: 'Candara',
+                                                              color: Colors.grey,
+                                                              fontSize: 10,
+                                                            ),
+                                                            maxLines: 5,
+                                                            overflow: TextOverflow.ellipsis),*/
+
+                                                        SizedBox(
+                                                          height: 10,
+                                                        ),
+                                                        Text("CHALLENGED YOU FOR A QUIZ",style: TextStyle(fontFamily: "Candara",fontSize: 10,color: Colors.red),overflow: TextOverflow.ellipsis,maxLines: 2),
+                                                        Text("Subject : ${snapshot3.data!.data6.alerts[i].subjectName}",style: TextStyle(fontFamily: "Candara",fontSize: 11,),overflow: TextOverflow.ellipsis,maxLines: 2),
+                                                        Container(width:170,child: Text("${snapshot3.data!.data6.alerts[i].chapter}",style: TextStyle(fontFamily: "Candara",fontSize: 11,),overflow: TextOverflow.ellipsis,maxLines: 2,)),
+                                                        Text("Type :  ${snapshot3.data!.data6.alerts[i].questionType}",style: TextStyle(fontFamily: "Candara",fontSize: 11,),overflow: TextOverflow.ellipsis,maxLines: 2,),
+                                                        Row(
+                                                          mainAxisAlignment: MainAxisAlignment.end,
+                                                          children: [
+
+                                                          ],)
+                                                      ],
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+
+                                      ],
+                                    ),
+                                  ),
+                                ));
+                          else
+                            return Column(
+                              children: [
+                                SizedBox(height: 40),
+                                Container(
+                                  height: 250,
+                                  width: 250,
+                                  decoration: BoxDecoration(
+                                    image: DecorationImage(image: AssetImage("images/notificationno.png"),fit: BoxFit.fill),
+                                  ),
+                                ),
+                                SizedBox(height: 20,),
+                                Center(child: Text("No new notification!!", style: TextStyle(
+                                    fontSize: 20,
+                                    fontFamily: "Candara",
+                                    color: Colors.teal),),),
+                                SizedBox(height: 15,),
+                              ],
+                            );
+                        }
+
+                    ),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 }
+
+

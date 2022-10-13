@@ -1719,33 +1719,126 @@ class _profileState extends State<profile> {
                     if (snapshot.hasData) {
                       if (snapshot.data!.data1.mentees1.length != 0)
                         return SingleChildScrollView(
-                          child: GridView.count(
-                            shrinkWrap: true,
-                            primary: false,
-                            padding: const EdgeInsets.all(20),
-                            crossAxisSpacing: 10,
-                            mainAxisSpacing: 10,
-                            crossAxisCount: 2,
-                            children: <Widget>[
+                          child: Column(
+                            children: [
+                              /*GridView.count(
+                                shrinkWrap: true,
+                                primary: false,
+                                padding: const EdgeInsets.all(20),
+                                crossAxisSpacing: 10,
+                                mainAxisSpacing: 10,
+                                crossAxisCount: 2,
+                                children: <Widget>[
+                                  if(searchText.text == '')
+                                    for(var i = 0; i< snapshot.data!.data1.mentees1.length; i++)
+                                      GestureDetector(
+                                        onTap: () {
+                                          /*Navigator.push(context, MaterialPageRoute(
+                                  builder: (context) => k12_det(snapshot.data!.data2.subjects2[i].id.toString(),"images/english.png")));*/
+                                        },
+                                        child: Container(
+                                          //color: Colors.deepPurple,
+                                          child: Column(
+                                            mainAxisAlignment: MainAxisAlignment.center,
+                                            crossAxisAlignment:
+                                            CrossAxisAlignment.center,
+                                            children: [
+                                              CircleAvatar(
+                                                  radius: 40,
+                                                  backgroundImage: NetworkImage(
+                                                      '${snapshot.data!.data1.mentees1[i].img.toString()}')),
+                                              SizedBox(height: 10),
+                                              Text(
+                                                "${snapshot.data!.data1.mentees1[i].name.toString()}",
+                                                style: TextStyle(
+                                                    color: Colors.black,
+                                                    fontSize: 15,
+                                                    fontFamily: "Candara",
+                                                    fontWeight: FontWeight.bold),
+                                              ),
+                                              Text(
+                                                "${snapshot.data!.data1.mentees1[i].email.toString()}",
+                                                style: TextStyle(
+                                                    color: Colors.grey,
+                                                    fontSize: 10,
+                                                    fontFamily: "Candara",
+                                                    fontWeight: FontWeight.bold),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      )
+
+
+                                  else
+                                    for (var i = 0; i < snapshot.data!.data1.mentees1.length; i++)
+                                      if(snapshot.data!.data1.mentees1[i].name.toString().toLowerCase().contains(searchText.text.toLowerCase()))
+                                        GestureDetector(
+                                          onTap: () {
+                                            /*Navigator.push(context, MaterialPageRoute(
+                                  builder: (context) => k12_det(snapshot.data!.data2.subjects2[i].id.toString(),"images/english.png")));*/
+                                          },
+                                          child: Container(
+                                            //color: Colors.deepPurple,
+                                            child: Column(
+                                              mainAxisAlignment: MainAxisAlignment.center,
+                                              crossAxisAlignment:
+                                              CrossAxisAlignment.center,
+                                              children: [
+                                                CircleAvatar(
+                                                    radius: 50,
+                                                    backgroundImage: NetworkImage(
+                                                        '${snapshot.data!.data1.mentees1[i].img.toString()}')),
+                                                SizedBox(height: 10),
+                                                Text(
+                                                  "${snapshot.data!.data1.mentees1[i].name.toString()}",
+                                                  style: TextStyle(
+                                                      color: Colors.black,
+                                                      fontSize: 15,
+                                                      fontFamily: "Candara",
+                                                      fontWeight: FontWeight.bold),
+                                                ),
+                                                Text(
+                                                  "${snapshot.data!.data1.mentees1[i].email.toString()}",
+                                                  style: TextStyle(
+                                                      color: Colors.grey,
+                                                      fontSize: 10,
+                                                      fontFamily: "Candara",
+                                                      fontWeight: FontWeight.bold),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ),
+
+                                ],
+                              ),*/
+
                               if(searchText.text == '')
                                 for(var i = 0; i< snapshot.data!.data1.mentees1.length; i++)
-                                  GestureDetector(
-                                    onTap: () {
-                                      /*Navigator.push(context, MaterialPageRoute(
-                              builder: (context) => k12_det(snapshot.data!.data2.subjects2[i].id.toString(),"images/english.png")));*/
-                                    },
-                                    child: Container(
-                                      //color: Colors.deepPurple,
+                                  Padding(
+                                    padding: const EdgeInsets.all(10.0),
+                                    child: Row(
+                                crossAxisAlignment:
+                                CrossAxisAlignment.start,
+                                children: [
+                                    Center(
+                                      child: CircleAvatar(
+                                        backgroundImage: NetworkImage(
+                                            '${snapshot.data!.data1.mentees1[i].img.toString()}'),
+                                        radius: 30,
+                                      ),
+                                    ),
+                                    SizedBox(
+                                      width: 10,
+                                    ),
+                                    Card(
+                                      elevation: 0,
+                                      color: Colors.transparent,
                                       child: Column(
-                                        mainAxisAlignment: MainAxisAlignment.center,
                                         crossAxisAlignment:
-                                        CrossAxisAlignment.center,
+                                        CrossAxisAlignment.start,
                                         children: [
-                                          CircleAvatar(
-                                              radius: 50,
-                                              backgroundImage: NetworkImage(
-                                                  '${snapshot.data!.data1.mentees1[i].img.toString()}')),
-                                          SizedBox(height: 10),
                                           Text(
                                             "${snapshot.data!.data1.mentees1[i].name.toString()}",
                                             style: TextStyle(
@@ -1762,52 +1855,69 @@ class _profileState extends State<profile> {
                                                 fontFamily: "Candara",
                                                 fontWeight: FontWeight.bold),
                                           ),
+
                                         ],
                                       ),
                                     ),
-                                  )
-                              else
-                                for (var i = 0;
-                                i < snapshot.data!.data1.mentees1.length;
-                                i++)
+                                ],
+                              ),
+                                  ),
+
+                              if(searchText.text!='')
+                                for (var i = 0; i < snapshot.data!.data1.mentees1.length; i++)
                                   if(snapshot.data!.data1.mentees1[i].name.toString().toLowerCase().contains(searchText.text.toLowerCase()))
-                                    GestureDetector(
-                                      onTap: () {
-                                        /*Navigator.push(context, MaterialPageRoute(
-                              builder: (context) => k12_det(snapshot.data!.data2.subjects2[i].id.toString(),"images/english.png")));*/
-                                      },
-                                      child: Container(
-                                        //color: Colors.deepPurple,
-                                        child: Column(
-                                          mainAxisAlignment: MainAxisAlignment.center,
-                                          crossAxisAlignment:
-                                          CrossAxisAlignment.center,
-                                          children: [
-                                            CircleAvatar(
-                                                radius: 50,
-                                                backgroundImage: NetworkImage(
-                                                    '${snapshot.data!.data1.mentees1[i].img.toString()}')),
-                                            SizedBox(height: 10),
-                                            Text(
-                                              "${snapshot.data!.data1.mentees1[i].name.toString()}",
-                                              style: TextStyle(
-                                                  color: Colors.black,
-                                                  fontSize: 15,
-                                                  fontFamily: "Candara",
-                                                  fontWeight: FontWeight.bold),
+                                    Padding(
+                                      padding: const EdgeInsets.all(10.0),
+                                      child: Row(
+                                        crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                        children: [
+                                          Center(
+                                            child: CircleAvatar(
+                                              backgroundImage: NetworkImage(
+                                                  '${snapshot.data!.data1.mentees1[i].img.toString()}'),
+                                              radius: 30,
                                             ),
-                                            Text(
-                                              "${snapshot.data!.data1.mentees1[i].email.toString()}",
-                                              style: TextStyle(
-                                                  color: Colors.grey,
-                                                  fontSize: 10,
-                                                  fontFamily: "Candara",
-                                                  fontWeight: FontWeight.bold),
+                                          ),
+                                          SizedBox(
+                                            width: 10,
+                                          ),
+                                          Card(
+                                            elevation: 0,
+                                            color: Colors.transparent,
+                                            child: Column(
+                                              crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                              children: [
+                                                Text(
+                                                  "${snapshot.data!.data1.mentees1[i].name.toString()}",
+                                                  style: TextStyle(
+                                                      color: Colors.black,
+                                                      fontSize: 15,
+                                                      fontFamily: "Candara",
+                                                      fontWeight: FontWeight.bold),
+                                                ),
+                                                Text(
+                                                  "${snapshot.data!.data1.mentees1[i].email.toString()}",
+                                                  style: TextStyle(
+                                                      color: Colors.grey,
+                                                      fontSize: 10,
+                                                      fontFamily: "Candara",
+                                                      fontWeight: FontWeight.bold),
+                                                ),
+
+                                              ],
                                             ),
-                                          ],
-                                        ),
+                                          ),
+                                        ],
                                       ),
                                     ),
+
+
+
+
+
+
 
                             ],
                           ),
@@ -2028,7 +2138,7 @@ Future<Future<ConfirmAction?>> _asyncConfirmDialog(
                           ),
                         ),
                         //OutlinedButton(onPressed: () {}, child: Text('New Student')),
-                        TextButton(
+                       /* TextButton(
                             onPressed: () {},
                             child: Text(
                               'VIEW PROFILE',
@@ -2037,7 +2147,7 @@ Future<Future<ConfirmAction?>> _asyncConfirmDialog(
                                 color: Color.fromARGB(255, 59, 48, 214),
                                 decoration: TextDecoration.underline,
                               ),
-                            )),
+                            )),*/
                       ],
                     ),
                     /*Divider(
@@ -2219,7 +2329,7 @@ Future<Future<ConfirmAction2?>> _asyncConfirmDialog1(
                           ),
                         ),
                         //OutlinedButton(onPressed: () {}, child: Text('New Student')),
-                        TextButton(
+                        /*TextButton(
                             onPressed: () {},
                             child: Text(
                               'VIEW PROFILE',
@@ -2228,7 +2338,7 @@ Future<Future<ConfirmAction2?>> _asyncConfirmDialog1(
                                 color: Color.fromARGB(255, 59, 48, 214),
                                 decoration: TextDecoration.underline,
                               ),
-                            )),
+                            )),*/
                         SizedBox(
                           height: 10,
                         ),
@@ -2406,7 +2516,7 @@ Future<Future<ConfirmAction3?>> _asyncConfirmDialog2(
                           ),
                         ),
                         //OutlinedButton(onPressed: () {}, child: Text('New Student')),
-                        TextButton(
+                        /*TextButton(
                             onPressed: () {},
                             child: Text(
                               'VIEW PROFILE',
@@ -2415,7 +2525,7 @@ Future<Future<ConfirmAction3?>> _asyncConfirmDialog2(
                                 color: Color.fromARGB(255, 59, 48, 214),
                                 decoration: TextDecoration.underline,
                               ),
-                            )),
+                            )),*/
                         SizedBox(
                           height: 10,
                         ),

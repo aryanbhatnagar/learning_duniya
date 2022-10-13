@@ -6,4 +6,4 @@ String userImg="";
 String schools="";
 String classId="";
 String ROLE="";
-String BASE="http://ec2-13-234-116-155.ap-south-1.compute.amazonaws.com/";
+String BASE="http://ec2-3-108-42-71.ap-south-1.compute.amazonaws.com/";

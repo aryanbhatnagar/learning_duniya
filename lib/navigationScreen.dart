@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 //import 'package:learning_duniya/screen1%20(2).dart';
 //import 'package:learning_duniya/screen2%20(1).dart';
 import 'package:learning_duniya/challenge_page.dart';
-import 'package:learning_duniya/screen4.dart';
+import 'package:learning_duniya/winnerpage.dart';
 import 'package:learning_duniya/screen5.dart';
 import 'screen2.dart';
 import 'screen1 (1).dart';
@@ -36,7 +36,7 @@ class _navigationScreenPageState extends State<navigationScreenPage> {
               Navigator.push(context, MaterialPageRoute(builder: (context) => challenge_page()));
             }, child: Text('Screen 3')),
             ElevatedButton(onPressed: () {
-              Navigator.push(context, MaterialPageRoute(builder: (context) => screen4()));
+              Navigator.push(context, MaterialPageRoute(builder: (context) => winnerClass("5-54-457-1-1-3")));
             }, child: Text('Screen 4')),
             ElevatedButton(onPressed: () {
               Navigator.push(context, MaterialPageRoute(builder: (context) => screen5()));

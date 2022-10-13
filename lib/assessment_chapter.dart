@@ -11,6 +11,8 @@ import 'globals.dart';
 AssesChap assesChapFromJson(String str) => AssesChap.fromJson(json.decode(str));
 String assesChapToJson(AssesChap data) => json.encode(data.toJson());
 
+var bname="";
+
 class AssesChap {
   AssesChap({
     required  this.success,
@@ -250,23 +252,26 @@ Future<AssesChap> createAssessChap(String assid,String chapid ) async {
 
 class ass_chap extends StatefulWidget {
   //const ass_chap({Key? key}) : super(key: key);
-  ass_chap(this.chapid,this.Assid,this.assImg,this.desc);
+  ass_chap(this.chapid,this.Assid,this.assImg,this.desc,this.b_name);
   var Assid;
   var chapid;
   var assImg;
   var desc;
+  var b_name;
   @override
-  _ass_chapState createState() => _ass_chapState(Assid,chapid,assImg,desc);
+  _ass_chapState createState() => _ass_chapState(Assid,chapid,assImg,desc,b_name);
 }
 
 class _ass_chapState extends State<ass_chap> {
-  _ass_chapState(this._Assid,this._chapid,this._assImg,this._desc);
+  _ass_chapState(this._Assid,this._chapid,this._assImg,this._desc,this._b_name);
   var _Assid;
   var _chapid;
   var _assImg;
   var _desc;
+  var _b_name;
   @override
   Widget build(BuildContext context) {
+    bname=_b_name.toString();
     Size size = MediaQuery.of(context).size;
     return Scaffold(
         body: FutureBuilder(
@@ -327,18 +332,12 @@ class _ass_chapState extends State<ass_chap> {
                                 mainAxisAlignment: MainAxisAlignment.start,
                                 children: [
                                   Icon(Icons.book, color: Colors.teal, size: 22),
-                                  Text("book to be asked",
+                                  Text("${bname}",
                                       style: TextStyle(
                                           fontSize: 15,
                                           fontFamily: "Candara",
                                           color: Colors.teal)),
-                                  SizedBox(width: 30),
-                                  Icon(Icons.school, color: Colors.deepOrange, size: 25),
-                                  Text(" ${ass.data.assessment.assessmentClass.toString()}",
-                                      style: TextStyle(
-                                          fontSize: 15,
-                                          fontFamily: "Candara",
-                                          color: Colors.grey))
+
                                   //IconButton(onPressed: (){  }, icon: Icon(Icons.favorite_outline,size: 25),color: Colors.grey,)
                                 ],
                               ),
@@ -398,7 +397,7 @@ class _ass_chapState extends State<ass_chap> {
                                     children: <Widget>[
                                       Row(
                                         children: [
-                                          Icon(Icons.class_,color: Colors.teal,size: 20),
+                                          Icon(Icons.school, color: Colors.deepOrange, size: 22),
                                           Text(" Class",
                                               style: TextStyle(
                                                   fontSize: 16,

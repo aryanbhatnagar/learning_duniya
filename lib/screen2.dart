@@ -251,13 +251,13 @@ class _screen2State extends State<screen2> {
                         ],
                       ),
                       SizedBox(
-                        height: 40,
+                        height: 20,
                       ),
                       Container(
                         width: columnWidth,
                         //height: 100,
                         margin: EdgeInsets.only(left: 5, right: 5),
-                        padding: EdgeInsets.all(10),
+                        padding: EdgeInsets.all(20),
                         decoration: BoxDecoration(
                             border: Border.all(
                                 color: Colors.indigo
@@ -268,11 +268,11 @@ class _screen2State extends State<screen2> {
                           mainAxisAlignment: MainAxisAlignment.start,
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text('Current Suggested Solution', style: TextStyle(color: Colors.teal, fontWeight: FontWeight.bold, fontSize: 10),),
+                            Text('Current Suggested Solution', style: TextStyle(color: Colors.teal, fontWeight: FontWeight.bold, fontSize: 13),),
                             SizedBox(
                               height: 10,
                             ),
-                            Text("${snapshot.data!.data.res.overview.currentSuggestSolution}", style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 10),),
+                            Text("${snapshot.data!.data.res.overview.currentSuggestSolution}", style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 13),),
                           ],
                         ),
                       ),
@@ -284,7 +284,7 @@ class _screen2State extends State<screen2> {
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Text('Subject Details', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.teal, fontSize: 11),),
+                            Text('Subject Details', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.teal, fontSize: 14),),
                             Text("${snapshot.data!.data.res.overview.subjectName}", style: TextStyle(fontWeight: FontWeight.bold),),
                             Row(
                               crossAxisAlignment: CrossAxisAlignment.start,
@@ -405,44 +405,44 @@ class _screen2State extends State<screen2> {
                               children: [
                                 Column(
                                   children: [
-                                    Text('Total', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 11, color: Colors.grey),),
+                                    Text('Total', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12, color: Colors.grey),),
                                     SizedBox(
                                       height: 10,
                                     ),
-                                    Text("${snapshot.data!.data.res.overview.totalTest}", style: TextStyle(fontWeight: FontWeight.bold),),
+                                    Text("${snapshot.data!.data.res.overview.totalTest}", style: TextStyle(fontWeight: FontWeight.bold,fontSize: 12),),
                                   ],
                                 ),
                                 Column(
                                   children: [
-                                    Text('Total Questions', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 11, color: Colors.grey),),
+                                    Text('Total Questions', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12, color: Colors.grey),),
                                     SizedBox(
                                       height: 10,
                                     ),
-                                    Text("${snapshot.data!.data.res.overview.totalQuestion}", style: TextStyle(fontWeight: FontWeight.bold),),
+                                    Text("${snapshot.data!.data.res.overview.totalQuestion}", style: TextStyle(fontWeight: FontWeight.bold,fontSize: 12),),
                                   ],
                                 ),
                                 Column(
                                   children: [
-                                    Text('Correct', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 11, color: Colors.grey),),
+                                    Text('Correct', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12, color: Colors.grey),),
                                     SizedBox(
                                       height: 10,
                                     ),
-                                    Text("${snapshot.data!.data.res.overview.correct}", style: TextStyle(fontWeight: FontWeight.bold, color: Colors.teal),),
+                                    Text("${snapshot.data!.data.res.overview.correct}", style: TextStyle(fontSize: 12,fontWeight: FontWeight.bold, color: Colors.teal),),
                                   ],
                                 ),
                                 Column(
                                   children: [
-                                    Text('Wrong', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 11, color: Colors.grey),),
+                                    Text('Wrong', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12, color: Colors.grey),),
                                     SizedBox(
                                       height: 10,
                                     ),
-                                    Text("${snapshot.data!.data.res.overview.wrong}", style: TextStyle(fontWeight: FontWeight.bold, color: Colors.red),),
+                                    Text("${snapshot.data!.data.res.overview.wrong}", style: TextStyle(fontSize: 12,fontWeight: FontWeight.bold, color: Colors.red),),
                                   ],
                                 ),
                               ],
                             ),
                             SizedBox(height: 10,),
-                            Text('All Subject assessment overflow', style: TextStyle(color: Colors.teal, fontSize: 11, fontWeight: FontWeight.bold),)
+                            Text('All Subject assessment overflow', style: TextStyle(color: Colors.teal, fontSize: 12, fontWeight: FontWeight.bold),)
                           ],
                         ),
                       ),

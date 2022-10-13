@@ -308,10 +308,10 @@ class _screen3State extends State<screen3> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text("Chapter: ${snapshot.data!.data.res.chapters[0].catName}", style: TextStyle(
-                                      color: Colors.teal, fontSize: 10
+                                      color: Colors.teal, fontSize: 14
                                   ),),
                                   Text("Type: ${snapshot.data!.data.res.chapters[0].catName}", style: TextStyle(
-                                      color: Colors.teal, fontSize: 10
+                                      color: Colors.teal, fontSize: 14
                                   ),),
                                 ],
                               ),
@@ -320,7 +320,7 @@ class _screen3State extends State<screen3> {
                               height: 30,
                             ),
                             Text("Ques: ${snapshot.data!.data.res.chapters[0].questions[qcount].que}", style: TextStyle(
-                                color: Colors.teal, fontSize: 10
+                                color: Colors.teal, fontSize: 14
                             ),),
                             SizedBox(
                               height: 20,

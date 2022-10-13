@@ -18,8 +18,13 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/material.dart';
+
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   await Firebase.initializeApp();
+  FirebaseMessaging.instance.setForegroundNotificationPresentationOptions(alert: true,badge: true,sound: true);
   print('A bg message just showed up :  ${message.messageId}');
 }
 
@@ -45,7 +50,7 @@ Future <void> main() async {
   SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
     statusBarColor: Colors.transparent,
   ));
-  SystemChrome.setEnabledSystemUIOverlays([]);
+  SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual, overlays: []);
 
   runApp(MyApp());
 }
@@ -72,12 +77,19 @@ class MyApp1 extends StatefulWidget {
 class _MyApp1State extends State<MyApp1> {
 
   int _counter = 0;
+  FirebaseMessaging _firebaseMessaging = FirebaseMessaging.instance;
 
   @override
   void initState() {
     super.initState();
-
+    getToken();
   }
+
+  void getToken() async {
+    final token = await _firebaseMessaging.getToken();
+    print("dlllllllllllllllll $token");
+  }
+
 
 
   @override

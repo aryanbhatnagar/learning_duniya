@@ -308,24 +308,12 @@ class _needHelpPageState extends State<need_help_page> {
                             textAlign: TextAlign.left,
                           ),
                           Text(
-                            "Would Like To Know",
+                            "Would like To know the following details:",
                             style:
                                 TextStyle(fontSize: 18, fontFamily: "Candara"),
                             textAlign: TextAlign.left,
                           ),
-                          TextButton(
-                              style: TextButton.styleFrom(
-                                  textStyle: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 15,
-                                      decoration: TextDecoration.underline,
-                                      color: Color.fromARGB(255, 153, 0, 255))),
-                              onPressed: () {},
-                              child: Text(
-                                "View Profile",
-                                style: TextStyle(fontFamily: "Candara"),
-                                textAlign: TextAlign.left,
-                              )),
+
                         ],
                       ),
                     ),

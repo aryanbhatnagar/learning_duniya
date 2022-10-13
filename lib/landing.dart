@@ -178,6 +178,8 @@ class Alert {
     this.chapter,
     this.questionTypeId,
     this.questionType,
+    this.date,
+    this.time
   });
 
   var challengeId;
@@ -191,6 +193,8 @@ class Alert {
   var chapter;
   var questionTypeId;
   var questionType;
+  var date;
+  var time;
 
   factory Alert.fromJson(Map<String, dynamic> json) => Alert(
     challengeId: json["challenge_id"],
@@ -204,6 +208,8 @@ class Alert {
     chapter: json["chapter"],
     questionTypeId: json["question_type_id"],
     questionType: json["question_type"],
+    date: json["date"],
+    time: json["time"],
   );
 
   Map<String, dynamic> toJson() => {
@@ -218,6 +224,8 @@ class Alert {
     "chapter": chapter,
     "question_type_id": questionTypeId,
     "question_type": questionType,
+    "date" : date,
+    "time" : time
   };
 }
 Future<Challengerlist> getChalList() async {
@@ -232,6 +240,26 @@ Future<Challengerlist> getChalList() async {
     debugPrint("hello");
     final String responseString = response.body;
     return challengerlistFromJson(responseString);
+  }
+  else {
+    throw Exception('Failed to load album');
+  }
+}
+
+var LOGOUT=0;
+Future<dynamic> getLogout() async {
+
+  final String apiUrl = "${BASE}api/logout";
+  final response = await http.get(Uri.parse(apiUrl),headers: <String, String>{
+    "Authorization": "Bearer $token",
+    "Content-Type" : "application/json"
+  });
+
+  if (response.statusCode == 200) {
+    LOGOUT=200;
+    debugPrint("hello");
+    final String responseString = response.body;
+    return 200;
   }
   else {
     throw Exception('Failed to load album');
@@ -392,6 +420,11 @@ class Data4 {
 
 
 Future<Studentdp> getProfileApi() async {
+  await FirebaseMessaging.instance.setForegroundNotificationPresentationOptions(
+    alert: true,
+    badge: true,
+    sound: true,
+  );
   final String apiUrl =
       "${BASE}api/profile";
   final response = await http.get(Uri.parse(apiUrl), headers: <String, String>{
@@ -1069,6 +1102,35 @@ class landingPage extends StatefulWidget {
 
 class _landingPageState extends State<landingPage> {
 
+  final _firebaseMessaging = FirebaseMessaging.instance.getInitialMessage();
+  void getMessage(BuildContext context) {
+    print("dkfjkdfjkdfjdfdfd :::::::::::::::::::::::::::");
+    FirebaseMessaging.onMessage.listen((RemoteMessage event) {
+      RemoteNotification notification = event.notification!;
+
+      print(":::::::::::::::::::::::::::: $notification");
+
+      // AppleNotification apple = event.notification!.apple!;
+      AndroidNotification androidNotification = event.notification!.android!;
+
+      if (notification != null && androidNotification != null) {
+
+        ///Show local notification
+        sendNotification(title: notification.title!, body: notification.body);
+
+        ///Show Alert dialog
+        showDialog(
+            context: context,
+            builder: (context) {
+              return AlertDialog(
+                title: Text(notification.title!),
+                content: Text(notification.body!),
+              );
+            });
+      }
+    });
+  }
+
   int _selectedIndex = 0;
   String sub="Chemistry";
   List<Widget> add = [];
@@ -1152,14 +1214,18 @@ class _landingPageState extends State<landingPage> {
   int _counter = 0;
 
   @override
-  void initState()  {
+  void initState()   {
     super.initState();
     FirebaseMessaging.instance.setForegroundNotificationPresentationOptions(alert: true,badge: true,sound: true);
+
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+
       FirebaseMessaging.instance.setForegroundNotificationPresentationOptions(alert: true,badge: true,sound: true);
       RemoteNotification? notification = message.notification;
       AndroidNotification? android = message.notification?.android;
       if (notification != null && android != null) {
+        debugPrint(notification.body);
+        BuildContext dialogContext;
         flutterLocalNotificationsPlugin.show(
             notification.hashCode,
             notification.title,
@@ -1173,8 +1239,114 @@ class _landingPageState extends State<landingPage> {
                 icon: 'images/Learning_Duniya_logo.png',
               ),
             ));
+        showDialog(
+            context: context,
+            builder: (BuildContext context) {
+
+              dialogContext=context;
+              return WillPopScope(
+                onWillPop: () async => false,
+                child: AlertDialog(
+                  //title: Text('Challenge'),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(15))),
+                  title: Image.asset(
+                    'images/Learning_Duniya_logo.png',
+                    height: 50,
+                    width: 50,
+                  ),
+                  content: Container(
+                    width: double.infinity,
+                    //height: Wrap(),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Column(
+                          children: [
+                            Text(
+                              "${notification.title.toString()}",
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontFamily: 'Candara',
+                              ),
+                            ),
+                            SizedBox(height: 10),
+                            Text(
+                              "${notification.body.toString().split("--")[0]}",
+                              style: TextStyle(
+                                fontFamily: 'Candara',
+                              ),
+                            ),
+                            SizedBox(height: 20),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                  actions: <Widget>[
+                    Center(
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          SizedBox(width: 10),
+                          ElevatedButton(
+                            style: ButtonStyle(
+                                backgroundColor: MaterialStateProperty.all<Color>(
+                                    Colors.deepOrange)),
+                            child: Text(
+                              'NOT NOW',
+                              style: TextStyle(
+                                fontFamily: 'Candara',
+                              ),
+                            ),
+                            onPressed: () async {
+
+                              PlayLater _play = await PlayLaterApi(notification.body.toString().split("--")[1]);
+                              PlayLater plays;
+                              setState(() {
+                                plays=_play;
+                              });
+                              if(play==200){
+                                Navigator.pop(context);
+                                play==0;
+                               }
+                            },
+                          ),
+                          SizedBox(width: 10),
+                          ElevatedButton(
+                            style: ButtonStyle(
+                                backgroundColor: MaterialStateProperty.all<Color>(
+                                    Colors.teal)),
+                            child: Text(
+                              'PLAY',
+                              style: TextStyle(
+                                fontFamily: 'Candara',
+                              ),
+                            ),
+                            onPressed: () {
+                              var chapd=notification.body.toString().split("--")[1].split("-")[2].toString();
+                              var qtd=notification.body.toString().split("--")[1].split("-")[3].toString();
+                              var challd=notification.body.toString().split("--")[1];
+                              var opponame=notification.body.toString().split("--")[2];
+                              var oppoimg=notification.body.toString().split("--")[3];
+                              Navigator.pop(context);
+                              Navigator.push(context, MaterialPageRoute(builder: (context) =>
+                                  quiz_challenge(chapd,qtd,challd,opponame,"http://ec2-13-234-116-155.ap-south-1.compute.amazonaws.com/uploads/${oppoimg}")));
+
+                            },
+                          ),
+                        ],
+                      ),
+                    ),
+
+                  ],
+                ),
+              );
+            });
+
       }
     });
+
     FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
 
       FirebaseMessaging.instance.setForegroundNotificationPresentationOptions(alert: true,badge: true,sound: true);
@@ -1216,7 +1388,7 @@ class _landingPageState extends State<landingPage> {
                             ),
                             SizedBox(height: 10),
                             Text(
-                              "${notification.body.toString().split("--")[0].toString()}",
+                              "${notification.body.toString().split("--")[0]}",
                               style: TextStyle(
                                 fontFamily: 'Candara',
                               ),
@@ -1253,8 +1425,7 @@ class _landingPageState extends State<landingPage> {
                               if(play==200){
                               Navigator.pop(context);
                               play==0;
-                              Navigator.pushReplacement(
-                                  context, MaterialPageRoute(builder: (context) => landing()));
+
                               }
                             },
                           ),
@@ -1273,9 +1444,11 @@ class _landingPageState extends State<landingPage> {
                               var chapd=notification.body.toString().split("--")[1].split("-")[2].toString();
                               var qtd=notification.body.toString().split("--")[1].split("-")[3].toString();
                               var challd=notification.body.toString().split("--")[1];
+                              var opponame=notification.body.toString().split("--")[2];
+                              var oppoimg=notification.body.toString().split("--")[3];
                               Navigator.pop(context);
-                              Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) =>
-                                  quiz_challenge(chapd,qtd,challd,"Aryan","http://ec2-13-234-116-155.ap-south-1.compute.amazonaws.com/uploads/Student-1650013240.png")));
+                              Navigator.push(context, MaterialPageRoute(builder: (context) =>
+                                  quiz_challenge(chapd,qtd,challd,opponame,"http://ec2-13-234-116-155.ap-south-1.compute.amazonaws.com/uploads/${oppoimg}")));
 
                             },
                           ),
@@ -1372,7 +1545,7 @@ class _landingPageState extends State<landingPage> {
                 for (var i = 0; i < landApi!.data.popularCourses.length; i++)
                   pop_c.add(GestureDetector(
                     onTap: () {
-                      Navigator.push(
+                      Navigator.pushReplacement(
                           context, MaterialPageRoute(
                           builder: (context) => k12_det(landApi!.data.popularCourses[i].id.toString(),landApi!.data.popularCourses[i].img.toString())));
                     },
@@ -1644,7 +1817,8 @@ class _landingPageState extends State<landingPage> {
                 child: SingleChildScrollView(
                     child: Column(
                       children: [
-                        FutureBuilder(
+                        if(token!="")
+                          FutureBuilder(
                             future: getProfileApi(),
                             builder: (context, AsyncSnapshot<Studentdp> snapshot8) {
                               if(snapshot8.hasData){
@@ -1664,6 +1838,7 @@ class _landingPageState extends State<landingPage> {
                             }
 
                         ),
+                        if(snapshot.data!.data.popularCourses.isNotEmpty)
                         Container(
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.only(
@@ -1704,6 +1879,7 @@ class _landingPageState extends State<landingPage> {
 
 
                         ),
+                        if(snapshot.data!.data.assessments.isNotEmpty)
                         Container(
                           padding: EdgeInsets.fromLTRB(15, 15, 15, 15),
                           color: Colors.teal,
@@ -1743,6 +1919,7 @@ class _landingPageState extends State<landingPage> {
                             ],
                           ),
                         ),
+
                         Container(
                           decoration: BoxDecoration(
                               borderRadius: BorderRadius.all(Radius.circular(20)),
@@ -1811,7 +1988,7 @@ class _landingPageState extends State<landingPage> {
                                               for (var i = 0; i <k12_obj!.data1.k12.length; i++)
                                                 GestureDetector(
                                                   onTap: () {
-                                                    Navigator.push(context, MaterialPageRoute(
+                                                    Navigator.pushReplacement(context, MaterialPageRoute(
                                                         builder: (context) => k12_det(k12_obj!.data1.k12[i].id.toString(),"")));
                                                   },
                                                   child: Card(
@@ -1832,7 +2009,7 @@ class _landingPageState extends State<landingPage> {
                                                         Padding(
                                                           padding: const EdgeInsets.fromLTRB(5, 5, 5, 5),
                                                           child: Container(
-                                                            height: 95,
+                                                            //height: 95,
                                                             width: 150,
                                                             child: Column(
                                                               crossAxisAlignment: CrossAxisAlignment.start,
@@ -1888,7 +2065,7 @@ class _landingPageState extends State<landingPage> {
 
                                                                 ],),
 
-                                                                SizedBox(height: 5),
+                                                                SizedBox(height: 10),
                                                               ],
                                                             ),
                                                           ),
@@ -1917,6 +2094,7 @@ class _landingPageState extends State<landingPage> {
                           ),
 
                         ),
+                        if(snapshot.data!.data.competitiveExams.isNotEmpty)
                         Container(
                           decoration: BoxDecoration(borderRadius: BorderRadius.only(
                               topLeft: Radius.circular(20),
@@ -1960,6 +2138,7 @@ class _landingPageState extends State<landingPage> {
 
 
                         ),
+                        if(snapshot.data!.data.mentors.isNotEmpty)
                         Container(
                           padding: EdgeInsets.fromLTRB(15, 15, 15, 15),
                           decoration: BoxDecoration(borderRadius: BorderRadius.only(
@@ -2725,7 +2904,6 @@ class _landingPageState extends State<landingPage> {
                                           snapshot3.data!.data6.alerts[i].questionTypeId.toString(),
                                       snapshot3.data!.data6.alerts[i].challengeId.toString(),
                                       snapshot3.data!.data6.alerts[i].name.toString(),
-
                                       snapshot3.data!.data6.alerts[i].img.toString())));
                                 },
                                 child: Card(
@@ -2763,16 +2941,12 @@ class _landingPageState extends State<landingPage> {
                                                 fontSize: 15,
                                               ),
                                             ),
-                                            Text(
-                                                "${snapshot3.data!.data6.alerts[i].subjectName.toString()}",
-                                                style: TextStyle(
-                                                  fontWeight: FontWeight.bold,
-                                                  fontFamily: 'Candara',
-                                                  color: Colors.grey,
-                                                  fontSize: 10,
-                                                ),
-                                                maxLines: 5,
-                                                overflow: TextOverflow.ellipsis),
+                                            Row(
+                                              children: [
+                                                Text("${snapshot3.data!.data6.alerts[i].date}",style: TextStyle(fontFamily: "Candara",fontSize: 11,color: Colors.grey),overflow: TextOverflow.ellipsis,maxLines: 2),
+                                                Text("  ${snapshot3.data!.data6.alerts[i].time}",style: TextStyle(fontFamily: "Candara",fontSize: 11,color: Colors.grey),overflow: TextOverflow.ellipsis,maxLines: 2),
+                                              ],
+                                            ),
 
                                             SizedBox(
                                               height: 10,
@@ -2907,7 +3081,7 @@ class _landingPageState extends State<landingPage> {
                           userImg=snapshot.data!.data4.img.toString();
                           schools=snapshot.data!.data4.school.toString();
                           var im=0;
-                          if(snapshot.data!.data4.img=="http://ec2-13-234-116-155.ap-south-1.compute.amazonaws.com/uploads/no-image.jpeg")
+                          if(snapshot.data!.data4.img=="${BASE}uploads/no-image.jpeg")
                             im=0;
                           else
                             im=1;
@@ -3240,6 +3414,9 @@ class _landingPageState extends State<landingPage> {
                 ListTile(
                 title: const Text('Logout'),
                 onTap: () async {
+                  var x= await getLogout();
+                  if (x==200){
+                    print("heelo");
                   await _logout();
                   setState(()  {
                     userName = "";
@@ -3249,7 +3426,7 @@ class _landingPageState extends State<landingPage> {
                     classId="";
                   });
                   Navigator.pop(context);
-                },
+                }}
               ),
               if(token=="")
                 ListTile(
@@ -3354,36 +3531,7 @@ Future<Future<ConfirmAction?>> _asyncConfirmDialog(
                       ),
                     ),
                     SizedBox(height: 20),
-                    /*Form(
-                      key: _formKey,
-                      child: Container(
-                        padding: EdgeInsets.only(left: 10,right: 10),
-                        child: TextFormField(
 
-                          controller: classController,
-                          validator: (input) {
-                            if (input!.isEmpty) return 'Enter Class';
-                          },
-                          decoration: InputDecoration(
-//fillColor: Colors.white,
-
-                            enabledBorder:OutlineInputBorder(
-                                borderSide: const BorderSide(color: Colors.grey, width: 2.0),
-                                borderRadius: BorderRadius.circular(5)),
-                            focusedBorder: OutlineInputBorder(
-                                borderSide: const BorderSide(color: Colors.teal,width: 2.0),
-                                borderRadius: BorderRadius.circular(5)
-                            ),
-                            labelText: 'CLASS',
-                            labelStyle: TextStyle(fontFamily: "Candara"),
-                            prefixIcon: Icon(Icons.school,color: Colors.teal),
-                            fillColor: Colors.grey,
-                            focusColor: Colors.grey,
-                          ),
-// onSaved: (input) => _email = input!
-                        ),
-                      ),
-                    ),*/
                     FormField<String>(
                       builder: (FormFieldState<String> state) {
                         String _currentSelectedValue='';

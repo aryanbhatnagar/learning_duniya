@@ -340,7 +340,7 @@ class _assessmentState extends State<assessment> {
                                     Navigator.pushReplacement(
                                         context,
                                         MaterialPageRoute(
-                                            builder: (context) =>ass_chap(ass.data.chapters[i].id.toString(), ass.data.assessment.id.toString(), ass_Image, ass.data.assessment.book)));}
+                                            builder: (context) =>ass_chap(ass.data.chapters[i].id.toString(), ass.data.assessment.id.toString(), ass_Image, ass.data.assessment.book,ass.data.chapters[i].chapterName.toString())));}
                                     else{
                                       Navigator.push(
                                           context, MaterialPageRoute(builder: (context) => Login2()));

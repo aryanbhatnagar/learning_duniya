@@ -1,19 +1,62 @@
 
+
+
+import 'dart:io';
+
+import 'package:advance_pdf_viewer/advance_pdf_viewer.dart';
 import 'package:audioplayers/audioplayers.dart';
+import 'package:dio/dio.dart';
+import 'package:flowder/flowder.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:favorite_button/favorite_button.dart';
+import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:group_button/group_button.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:learning_duniya/Login2.dart';
+import 'package:learning_duniya/dump.dart';
 import 'package:learning_duniya/videoplayer.dart';
+import 'package:open_file/open_file.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'package:url_launcher/url_launcher_string.dart';
+//import 'package:open_file/open_file.dart';
 import 'package:video_player/video_player.dart';
 import 'package:learning_duniya/quiz.dart';
 import 'package:wakelock/wakelock.dart';
 
 import 'Login.dart';
 import 'globals.dart';
+
+
+Future download(Dio dio, String url, String savePath) async {
+  try {
+    Response response = await dio.get(
+      url,
+      //onReceiveProgress: updateProgress,
+      options: Options(
+          responseType: ResponseType.bytes,
+          followRedirects: false,
+
+          validateStatus: (status) { return status! < 500; }
+      ),
+    );
+    var file = File(savePath).openSync(mode: FileMode.write);
+    file.writeFromSync(response.data);
+    await file.close();
+
+
+    // Here, you're catching an error and printing it. For production
+    // apps, you should display the warning to the user and give them a
+    // way to restart the download.
+  } catch (e) {
+    print(e);
+  }
+}
+
+
+
 
 K12Chapter k12ChapterFromJson(String str) => K12Chapter.fromJson(json.decode(str));
 String k12ChapterToJson(K12Chapter data) => json.encode(data.toJson());
@@ -295,320 +338,507 @@ class courseDescPage extends StatefulWidget {
 class _courseDescPageState extends State<courseDescPage> {
   bool curr_vis=true,mcq_vis=false;
   List<bool> isSelected = List.generate(2, (index) => false);
+  late DownloaderUtils options;
+  late DownloaderCore core;
+  late final String path;
+
+  Future<void> initPlatformState() async {
+    _setPath();
+    if (!mounted) return;
+  }
+  void _setPath() async {
+    Directory _path = await getApplicationDocumentsDirectory();
+    String _localPath = _path.path + Platform.pathSeparator + 'Download';
+    final savedDir = Directory(_localPath);
+    bool hasExisted = await savedDir.exists();
+    if (!hasExisted) {
+      savedDir.create();
+    }
+    path = _localPath;
+  }
+
+  @override
+  void initState(){
+    FlutterDownloader.initialize();
+    initPlatformState();
+  }
+
   @override
   Widget build(BuildContext context) {
     Size size =MediaQuery.of(context).size;
     final controller = GroupButtonController();
 
 
-    return Scaffold(
-      body: FutureBuilder(
-        future: createK12(chapid),
-        builder: (context, AsyncSnapshot<K12Chapter> snapshot1) {
-          if (snapshot1.hasData) {
-            K12Chapter? k12 = snapshot1.data;
-            return Stack(
-              children: [
-                Container(
-                  padding: EdgeInsets.all(25),
-                  height: (size.height)/2.70,
-                  width: (size.width),
-                  decoration: BoxDecoration(
-                      color: Colors.teal,
-                      image: DecorationImage(image: NetworkImage(img2),fit: BoxFit.fill)
-                  ),
-                ),
-                Align(
-                  alignment: Alignment.bottomCenter,
-                  child: Container(
-                    padding: EdgeInsets.only(left: 20,right: 20,top: 20),
-                    height: (size.height)-(size.height)/3,
+    return WillPopScope(
+      onWillPop: () async {
+        return true;
+      },
+      child: Scaffold(
+        body: FutureBuilder(
+          future: createK12(chapid),
+          builder: (context, AsyncSnapshot<K12Chapter> snapshot1) {
+            if (snapshot1.hasData) {
+              K12Chapter? k12 = snapshot1.data;
+              return Stack(
+                children: [
+                  Container(
+                    padding: EdgeInsets.all(25),
+                    height: (size.height)/2.70,
                     width: (size.width),
-                    decoration: BoxDecoration(color: Colors.white,borderRadius: BorderRadius.circular(34)),
-                    child: SingleChildScrollView(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: <Widget>[
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Flexible(child: Text(k12!.data.chapterDetails.chapterName,style: TextStyle(fontSize: 22,fontFamily: "Candara",color: Colors.black))),
-                                Row(
-                                  children: [
-                                    GestureDetector(
-                                      onTap:() async {
-                                        Future action = await _showMyDialog(context,k12!.data.chapterDetails.fileName);
+                    decoration: BoxDecoration(
+                        color: Colors.teal,
+                        image: DecorationImage(image: NetworkImage(img2),fit: BoxFit.fill)
+                    ),
+                  ),
+                  Align(
+                    alignment: Alignment.bottomCenter,
+                    child: Container(
+                      padding: EdgeInsets.only(left: 20,right: 20,top: 20),
+                      height: (size.height)-(size.height)/3,
+                      width: (size.width),
+                      decoration: BoxDecoration(color: Colors.white,borderRadius: BorderRadius.circular(34)),
+                      child: SingleChildScrollView(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: <Widget>[
+                              //Text("${chapid}"),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Flexible(child: Text(k12!.data.chapterDetails.chapterName,style: TextStyle(fontSize: 22,fontFamily: "Candara",color: Colors.black))),
+                                  Row(
+                                    children: [
+                                      GestureDetector(
+                                        onTap:() async {
+                                          Future action = await _showMyDialog(context,k12!.data.chapterDetails.fileName.toString(),k12!.data.chapterDetails.chapterName.toString());
+                                        },
+                                        child: Card(elevation: 2,child: Padding(
+                                          padding: const EdgeInsets.all(3),
+                                          child: Icon(Icons.mic,color: Colors.red, size: 22),
+                                        )),
+                                      ),
+
+                                    ],
+                                  )
+                                ],
+                              ),
+                              SizedBox(height: 10,),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                children: [
+                                  Icon(Icons.favorite,color: Colors.red,size: 22),
+                                  Text(" ${k12.data.chapterDetails.likes}",style: TextStyle(fontSize:15,fontFamily: "Candara",color: Colors.teal)),
+                                  SizedBox(width: 20),
+                                  Icon(Icons.people,color: Colors.yellow,size: 25),
+                                  Text(" ${k12.data.chapterDetails.visitors}",style: TextStyle(fontSize:15,fontFamily: "Candara",color: Colors.grey)),
+                                  SizedBox(width: 20,),
+                                  GestureDetector(
+                                    onTap: () async {
+                                      options = DownloaderUtils(
+                                        progressCallback: (current, total) {
+                                          final progress = (current / total) * 100;
+                                          print('Downloading: $progress');
+                                        },
+                                        file: File('$path/${k12.data.chapterDetails.pdfFileName.toString()}'),
+                                        progress: ProgressImplementation(),
+                                        onDone: () {
+                                          OpenFile.open('$path/${k12.data.chapterDetails.pdfFileName.toString()}');
+                                        },
+                                        deleteOnCancel: true,
+                                      );
+                                      core = await Flowder.download(
+                                        "http://ec2-3-108-42-71.ap-south-1.compute.amazonaws.com/uploads/${k12.data.chapterDetails.pdfFileName.toString()}",options
+
+                                      );
+                                      /*await FlutterDownloader.enqueue(
+                                        url: 'http://www.africau.edu/images/default/sample.pdf',
+                                        savedDir: "/storage/emulated/0/Download/",
+                                        showNotification: true, // show download progress in status bar (for Android)
+                                        openFileFromNotification: true, // click on notification to open downloaded file (for Android)
+                                      );*/
+                                      //var fname="${k12.data.chapterDetails.pdfFileName1.toString()}${DateTime.now().toString().split(" ")[0]}.pdf";
+                                     /* await download(Dio(), "http://www.africau.edu/images/default/sample.pdf", "/storage/emulated/0/Download/${fname}");
+                                      showDialog(
+                                          context: context,
+                                          builder: (BuildContext context) {
+
+                                            //dialogContext=context;
+                                            return WillPopScope(
+                                              onWillPop: () async => true,
+                                              child: AlertDialog(
+                                                //title: Text('Challenge'),
+                                                shape: RoundedRectangleBorder(
+                                                    borderRadius: BorderRadius.all(Radius.circular(15))),
+                                                title: Image.asset(
+                                                  'images/Learning_Duniya_logo.png',
+                                                  height: 50,
+                                                  width: 50,
+                                                ),
+                                                content: Container(
+                                                  width: double.infinity,
+                                                  //height: Wrap(),
+                                                  child: Column(
+                                                    mainAxisSize: MainAxisSize.min,
+                                                    children: [
+                                                      Column(
+                                                        children: [
+                                                          Text(
+                                                            "Download Complete",
+                                                            style: TextStyle(
+                                                              fontWeight: FontWeight.bold,
+                                                              fontFamily: 'Candara',
+                                                            ),
+                                                          ),
+                                                          SizedBox(height: 10),
+                                                          Text(
+                                                            "Your File has been stored at\nFile Location: /storage/emulated/0/Download/${fname}",
+                                                            style: TextStyle(
+                                                              fontFamily: 'Candara',
+                                                            ),
+                                                          ),
+                                                          SizedBox(height: 20),
+                                                        ],
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ),
+                                                actions: <Widget>[
+                                                  Center(
+                                                    child: Row(
+                                                      mainAxisAlignment: MainAxisAlignment.center,
+                                                      children: [
+                                                        SizedBox(width: 10),
+                                                        ElevatedButton(
+                                                          style: ButtonStyle(
+                                                              backgroundColor: MaterialStateProperty.all<Color>(
+                                                                  Colors.deepOrange)),
+                                                          child: Text(
+                                                            'OKAY',
+                                                            style: TextStyle(
+                                                              fontFamily: 'Candara',
+                                                            ),
+                                                          ),
+                                                          onPressed: () async {
+                                                            Navigator.pop(context);
+
+                                                          },
+                                                        ),
+                                                        SizedBox(width: 10),
+                                                        ElevatedButton(
+                                                          style: ButtonStyle(
+                                                              backgroundColor: MaterialStateProperty.all<Color>(
+                                                                  Colors.teal)),
+                                                          child: Text(
+                                                            'OPEN',
+                                                            style: TextStyle(
+                                                              fontFamily: 'Candara',
+                                                            ),
+                                                          ),
+                                                          onPressed: () async {
+
+                                                            final directory = await getExternalStorageDirectory();
+                                                            final path = await directory!.path;
+                                                             File file  =File('/storage/emulated/0/Download/${fname}');
+
+                                                            PDFDocument doc = await PDFDocument.fromFile(file);
+                                                            Navigator.push(context, MaterialPageRoute(
+                                                                builder: (context) =>pdf(doc)));
+
+                                                          },
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  ),
+
+                                                ],
+                                              ),
+                                            );
+                                          });*/
+                                      //OpenFile.open("/storage/emulated/0/Download/${fname}");
+
+
+                                    },
+                                      child:Card(elevation: 2,child: Padding(
+                                        padding: const EdgeInsets.all(3),
+                                        child: Icon(Icons.download_rounded,color: Colors.blue, size: 22),
+                                      ))),
+                                  Text(" Book",style: TextStyle(fontSize:15,fontFamily: "Candara",color: Colors.grey)),
+                                  SizedBox(width: 20,),
+                                  GestureDetector(
+                                      onTap: () async {
+                                        options = DownloaderUtils(
+                                          progressCallback: (current, total) {
+                                            final progress = (current / total) * 100;
+                                            print('Downloading: $progress');
+                                          },
+                                          file: File('$path/${k12.data.chapterDetails.pdfFileName1.toString()}'),
+                                          progress: ProgressImplementation(),
+                                          onDone: () {
+                                            OpenFile.open('$path/${k12.data.chapterDetails.pdfFileName1.toString()}');
+                                          },
+                                          deleteOnCancel: true,
+                                        );
+                                        core = await Flowder.download(
+                                            "http://ec2-3-108-42-71.ap-south-1.compute.amazonaws.com/uploads/${k12.data.chapterDetails.pdfFileName1.toString()}",options
+
+                                        );
+
                                       },
                                       child: Card(elevation: 2,child: Padding(
-                                        padding: const EdgeInsets.all(3),
-                                        child: Icon(Icons.mic,color: Colors.red, size: 22),
-                                      )),
-                                    ),
+                                    padding: const EdgeInsets.all(3),
+                                    child: Icon(Icons.download_rounded,color: Colors.green, size: 22),
+                                  ))),
+                                  Text(" Soln.",style: TextStyle(fontSize:15,fontFamily: "Candara",color: Colors.grey)),
 
-                                  ],
-                                )
-                              ],
-                            ),
-                            SizedBox(height: 10,),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              children: [
-                                Icon(Icons.favorite,color: Colors.red,size: 22),
-                                Text(" ${k12.data.chapterDetails.likes}",style: TextStyle(fontSize:15,fontFamily: "Candara",color: Colors.teal)),
-                                SizedBox(width: 20),
-                                Icon(Icons.people,color: Colors.yellow,size: 25),
-                                Text(" ${k12.data.chapterDetails.visitors}",style: TextStyle(fontSize:15,fontFamily: "Candara",color: Colors.grey)),
-                                SizedBox(width: 20,),
-                                GestureDetector(
-                                    child:Card(elevation: 2,child: Padding(
-                                      padding: const EdgeInsets.all(3),
-                                      child: Icon(Icons.download_rounded,color: Colors.blue, size: 22),
-                                    ))),
-                                Text(" Book",style: TextStyle(fontSize:15,fontFamily: "Candara",color: Colors.grey)),
-                                SizedBox(width: 20,),
-                                GestureDetector(child: Card(elevation: 2,child: Padding(
-                                  padding: const EdgeInsets.all(3),
-                                  child: Icon(Icons.download_rounded,color: Colors.green, size: 22),
-                                ))),
-                                Text(" Soln.",style: TextStyle(fontSize:15,fontFamily: "Candara",color: Colors.grey)),
+                                ],
+                              ),
+                              SizedBox(height: 20),
+                              if(k12!.data.chapterDetails.description.toString()!="null")
+                                Text(k12!.data.chapterDetails.description.toString(),style: TextStyle(fontSize:15,fontFamily: "Candara",color: Colors.grey)),
+                              SizedBox(height: 25),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                children: <Widget>[
+                                  Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: <Widget>[
+                                      Row(
+                                        children: [
+                                          Icon(Icons.monetization_on,color: Colors.orange,size: 20),
+                                          Text(" Price",style: TextStyle(fontSize: 16,fontFamily: "Candara",color: Colors.black)),
+                                        ],
+                                      ),
+                                      Text("     ${k12.data.chapterDetails.price.toString()}",style: TextStyle(fontSize: 16,fontFamily: "Candara",color: Colors.grey)),
+                                      SizedBox(height: 15),
+                                      Row(
+                                        children: [
+                                          Icon(Icons.money_off_csred_rounded,color: Colors.green,size: 20),
+                                          Text(" Sale Price",style: TextStyle(fontSize: 16,fontFamily: "Candara",color: Colors.black)),
+                                        ],
+                                      ),
+                                      Text("     ${k12.data.chapterDetails.salePrice.toString()}",style: TextStyle(fontSize: 16,fontFamily: "Candara",color: Colors.grey)),
+                                    ],
+                                  ),
+                                  SizedBox(width: 20),
+                                  Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: <Widget>[
+                                      Row(
+                                        children: [
+                                          Icon(Icons.language,color: Colors.teal,size: 20),
+                                          Text("  Language",style: TextStyle(fontSize: 16,fontFamily: "Candara",color: Colors.black)),
+                                        ],
+                                      ),
+                                      Text("      ${k12.data.chapterDetails.language.toString()}",style: TextStyle(fontSize: 16,fontFamily: "Candara",color: Colors.grey)),
+                                      SizedBox(height: 15),
+                                      Row(
+                                        children: [
+                                          Icon(Icons.network_check,color: Colors.teal,size: 20),
+                                          Text(" Status",style: TextStyle(fontSize:16,fontFamily: "Candara",color: Colors.black)),
+                                        ],
+                                      ),
+                                      Text("      ${k12.data.chapterDetails.status.toString()}",style: TextStyle(fontSize: 16,fontFamily: "Candara",color: Colors.grey)),
+                                    ],
+                                  )
+                                ],
+                              ),
 
-                              ],
-                            ),
-                            SizedBox(height: 20),
-                            if(k12!.data.chapterDetails.description.toString()!="null")
-                              Text(k12!.data.chapterDetails.description.toString(),style: TextStyle(fontSize:15,fontFamily: "Candara",color: Colors.grey)),
-                            SizedBox(height: 25),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                              children: <Widget>[
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
+                              SizedBox(height: 25),
+                              Center(
+                                child: ToggleButtons(
+
                                   children: <Widget>[
-                                    Row(
-                                      children: [
-                                        Icon(Icons.monetization_on,color: Colors.orange,size: 20),
-                                        Text(" Price",style: TextStyle(fontSize: 16,fontFamily: "Candara",color: Colors.black)),
-                                      ],
-                                    ),
-                                    Text("     ${k12.data.chapterDetails.price.toString()}",style: TextStyle(fontSize: 16,fontFamily: "Candara",color: Colors.grey)),
-                                    SizedBox(height: 15),
-                                    Row(
-                                      children: [
-                                        Icon(Icons.money_off_csred_rounded,color: Colors.green,size: 20),
-                                        Text(" Sale Price",style: TextStyle(fontSize: 16,fontFamily: "Candara",color: Colors.black)),
-                                      ],
-                                    ),
-                                    Text("     ${k12.data.chapterDetails.salePrice.toString()}",style: TextStyle(fontSize: 16,fontFamily: "Candara",color: Colors.grey)),
+                                    Text(" Curriculum ",style: TextStyle(fontSize: 20,fontFamily: "Candara",)),
+                                    Text("      MCQ      ",style: TextStyle(fontSize: 20,fontFamily: "Candara",)),
+                                  ],
+                                  selectedBorderColor: Colors.teal,
+                                  selectedColor: Colors.white,
+                                  borderColor: Colors.grey,
+                                  borderRadius: BorderRadius.circular(10),
+                                  disabledColor: Colors.transparent,
+                                  disabledBorderColor: Colors.transparent,
+                                  focusColor: Colors.teal,
+                                  fillColor: Colors.teal,
+                                  onPressed: (int index) {
+                                    setState(() {
+                                      for (int buttonIndex = 0; buttonIndex < isSelected.length; buttonIndex++) {
+                                        if (buttonIndex == index) {
+                                          isSelected[buttonIndex] = true;
+                                        } else {
+                                          isSelected[buttonIndex] = false;
+                                        }
+                                        if(index==0)
+                                          {
+                                            curr_vis=true;
+                                            mcq_vis=false;
+                                          }
+                                        if(index==1)
+                                        {
+                                          curr_vis=false;
+                                          mcq_vis=true;
+                                        }
+                                      }
+                                    });
+                                  },
+                                  isSelected: isSelected,
+                                ),
+                              ),
+
+                              SizedBox(height: 10),
+                              Visibility(
+                                visible: curr_vis,
+                                child: Column(
+                                  children: [
+                                    for(int i=0; i<k12.data.videos.length; i++)
+                                      GestureDetector(
+                                        onTap: () async {
+                                          if(token!="")
+                                            {
+                                              if(k12.data.videos[i].fileName.toString().contains("youtube"))
+                                                {
+                                                  String url = "${k12.data.videos[i].fileName.toString()}";
+                                                  if (await canLaunch(url)) {
+                                                  await launch(url,forceWebView: true,enableJavaScript: true);
+                                          }
+                                                  else {
+                                                      throw 'Could not launch $url';
+                                          }
+                                                }
+                                              else{
+                                              Wakelock.enable();
+                                          Navigator.push(context, MaterialPageRoute(
+                                              builder: (context) =>
+                                                  video(k12.data.videos[i].fileName,
+                                                      k12.data.videos[i].title,
+                                                      k12.data.videos[i].description,
+                                                      k12.data.videos[i].id.toString(),
+                                                    k12.data.videos[i].likes,
+                                                    k12.data.videos[i].visitors.toString()
+                                                  )));}}
+                                          else
+                                            Navigator.push(
+                                                context, MaterialPageRoute(builder: (context) => Login2()));
+                                        },
+                                        child: Card(
+                                          elevation: 5,
+                                          child: Container(
+                                            padding: EdgeInsets.all(8),
+                                            child: Row(
+                                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                              children: [
+                                                Flexible(
+                                                  child: Column(
+                                                    mainAxisAlignment: MainAxisAlignment.start,
+                                                    children: <Widget>[
+                                                      Align(
+                                                        alignment: Alignment.topLeft,
+                                                        child: Text(k12.data.videos[i].title.toString(),
+                                                          style: TextStyle(fontFamily: "Candara",
+                                                              fontSize: 15),
+                                                        ),
+                                                      ),
+                                                      Align(
+                                                        alignment: Alignment.topLeft,
+                                                        child: Text("Video",
+                                                          style: TextStyle(fontFamily: "Candara",color: Colors.grey,
+                                                              fontSize: 12),
+                                                        ),
+                                                      )
+                                                    ],
+                                                  ),
+                                                ),
+                                                Icon(Icons.play_arrow_rounded, color: Colors.green, size: 30)
+                                              ],
+                                            ),
+                                          ),
+                                        ),
+                                      ),
                                   ],
                                 ),
-                                SizedBox(width: 20),
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: <Widget>[
-                                    Row(
-                                      children: [
-                                        Icon(Icons.language,color: Colors.teal,size: 20),
-                                        Text("  Language",style: TextStyle(fontSize: 16,fontFamily: "Candara",color: Colors.black)),
-                                      ],
-                                    ),
-                                    Text("      ${k12.data.chapterDetails.language.toString()}",style: TextStyle(fontSize: 16,fontFamily: "Candara",color: Colors.grey)),
-                                    SizedBox(height: 15),
-                                    Row(
-                                      children: [
-                                        Icon(Icons.network_check,color: Colors.teal,size: 20),
-                                        Text(" Status",style: TextStyle(fontSize:16,fontFamily: "Candara",color: Colors.black)),
-                                      ],
-                                    ),
-                                    Text("      ${k12.data.chapterDetails.status.toString()}",style: TextStyle(fontSize: 16,fontFamily: "Candara",color: Colors.grey)),
-                                  ],
-                                )
-                              ],
-                            ),
-
-                            SizedBox(height: 25),
-                            Center(
-                              child: ToggleButtons(
-
-                                children: <Widget>[
-                                  Text(" Curriculum ",style: TextStyle(fontSize: 20,fontFamily: "Candara",)),
-                                  Text("      MCQ      ",style: TextStyle(fontSize: 20,fontFamily: "Candara",)),
-                                ],
-                                selectedBorderColor: Colors.teal,
-                                selectedColor: Colors.white,
-                                borderColor: Colors.grey,
-                                borderRadius: BorderRadius.circular(10),
-                                disabledColor: Colors.transparent,
-                                disabledBorderColor: Colors.transparent,
-                                focusColor: Colors.teal,
-                                fillColor: Colors.teal,
-                                onPressed: (int index) {
-                                  setState(() {
-                                    for (int buttonIndex = 0; buttonIndex < isSelected.length; buttonIndex++) {
-                                      if (buttonIndex == index) {
-                                        isSelected[buttonIndex] = true;
-                                      } else {
-                                        isSelected[buttonIndex] = false;
-                                      }
-                                      if(index==0)
-                                        {
-                                          curr_vis=true;
-                                          mcq_vis=false;
-                                        }
-                                      if(index==1)
-                                      {
-                                        curr_vis=false;
-                                        mcq_vis=true;
-                                      }
-                                    }
-                                  });
-                                },
-                                isSelected: isSelected,
                               ),
-                            ),
-
-                            SizedBox(height: 10),
-                            Visibility(
-                              visible: curr_vis,
-                              child: Column(
-                                children: [
-                                  for(int i=0; i<k12.data.videos.length; i++)
-                                    GestureDetector(
-                                      onTap: () {
-                                        if(token!="")
+                              Visibility(
+                                visible: mcq_vis,
+                                child: Column(
+                                  children: [
+                                    for(int i=0; i<k12.data.questionTypes.length; i++)
+                                      GestureDetector(
+                                        onTap: () {
+                                          if(token!="")
                                           {
-                                            Wakelock.enable();
-                                        Navigator.push(context, MaterialPageRoute(
-                                            builder: (context) =>
-                                                video(k12.data.videos[i].fileName,
-                                                    k12.data.videos[i].title,
-                                                    k12.data.videos[i].description,
-                                                    k12.data.videos[i].id.toString(),
-                                                  k12.data.videos[i].likes,
-                                                  k12.data.videos[i].visitors.toString()
-                                                )));}
-                                        else
-                                          Navigator.push(
-                                              context, MaterialPageRoute(builder: (context) => Login2()));
-                                      },
-                                      child: Card(
-                                        elevation: 5,
-                                        child: Container(
-                                          padding: EdgeInsets.all(8),
-                                          child: Row(
-                                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                            children: [
-                                              Flexible(
-                                                child: Column(
-                                                  mainAxisAlignment: MainAxisAlignment.start,
-                                                  children: <Widget>[
-                                                    Align(
-                                                      alignment: Alignment.topLeft,
-                                                      child: Text(k12.data.videos[i].title.toString(),
-                                                        style: TextStyle(fontFamily: "Candara",
-                                                            fontSize: 15),
+                                            Navigator.push(
+                                                context,
+                                                MaterialPageRoute(
+                                                    builder: (context) => quiz(snapshot1.data!.data.chapterDetails.id,snapshot1.data!.data.questionTypes[i].id)));
+                                          }
+                                          else
+                                            Navigator.push(
+                                                context, MaterialPageRoute(builder: (context) => Login2()));
+                                        },
+                                        child: Card(
+                                          elevation: 5,
+                                          child: Container(
+                                            padding: EdgeInsets.all(8),
+                                            child: Row(
+                                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                              children: [
+                                                Flexible(
+                                                  child: Column(
+                                                    mainAxisAlignment: MainAxisAlignment.start,
+                                                    children: <Widget>[
+                                                      Align(
+                                                        alignment: Alignment.topLeft,
+                                                        child: Text(k12.data.questionTypes[i].catName.toString(),
+                                                          style: TextStyle(fontFamily: "Candara",
+                                                              fontSize: 15),
+                                                        ),
                                                       ),
-                                                    ),
-                                                    Align(
-                                                      alignment: Alignment.topLeft,
-                                                      child: Text("Video",
-                                                        style: TextStyle(fontFamily: "Candara",color: Colors.grey,
-                                                            fontSize: 12),
-                                                      ),
-                                                    )
-                                                  ],
+                                                      Align(
+                                                        alignment: Alignment.topLeft,
+                                                        child: Text("Questions",
+                                                          style: TextStyle(fontFamily: "Candara",color: Colors.grey,
+                                                              fontSize: 12),
+                                                        ),
+                                                      )
+                                                    ],
+                                                  ),
                                                 ),
-                                              ),
-                                              Icon(Icons.play_arrow_rounded, color: Colors.green, size: 30)
-                                            ],
+                                                Icon(Icons.hourglass_bottom, color: Colors.deepOrange, size: 30)
+                                              ],
+                                            ),
                                           ),
                                         ),
                                       ),
-                                    ),
-                                ],
+                                  ],
+                                ),
                               ),
-                            ),
-                            Visibility(
-                              visible: mcq_vis,
-                              child: Column(
-                                children: [
-                                  for(int i=0; i<k12.data.questionTypes.length; i++)
-                                    GestureDetector(
-                                      onTap: () {
-                                        if(token!="")
-                                        {
-                                          Navigator.push(
-                                              context,
-                                              MaterialPageRoute(
-                                                  builder: (context) => quiz(snapshot1.data!.data.chapterDetails.id,snapshot1.data!.data.questionTypes[i].id)));
-                                        }
-                                        else
-                                          Navigator.push(
-                                              context, MaterialPageRoute(builder: (context) => Login2()));
-                                      },
-                                      child: Card(
-                                        elevation: 5,
-                                        child: Container(
-                                          padding: EdgeInsets.all(8),
-                                          child: Row(
-                                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                            children: [
-                                              Flexible(
-                                                child: Column(
-                                                  mainAxisAlignment: MainAxisAlignment.start,
-                                                  children: <Widget>[
-                                                    Align(
-                                                      alignment: Alignment.topLeft,
-                                                      child: Text(k12.data.questionTypes[i].catName.toString(),
-                                                        style: TextStyle(fontFamily: "Candara",
-                                                            fontSize: 15),
-                                                      ),
-                                                    ),
-                                                    Align(
-                                                      alignment: Alignment.topLeft,
-                                                      child: Text("Questions",
-                                                        style: TextStyle(fontFamily: "Candara",color: Colors.grey,
-                                                            fontSize: 12),
-                                                      ),
-                                                    )
-                                                  ],
-                                                ),
-                                              ),
-                                              Icon(Icons.hourglass_bottom, color: Colors.deepOrange, size: 30)
-                                            ],
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                ],
-                              ),
-                            ),
 
 
 
-                          ],
-                        )
+                            ],
+                          )
+                      ),
+
                     ),
+                  )
 
-                  ),
-                )
-
-              ],
-            );
-          } else {
-            return Container(
-              child: Center(
-                child: CircularProgressIndicator(),
-              ),
-            );
-          }
-        },
+                ],
+              );
+            } else {
+              return Container(
+                child: Center(
+                  child: CircularProgressIndicator(),
+                ),
+              );
+            }
+          },
+        ),
       ),
     );
   }
 }
 
-Future _showMyDialog(BuildContext context, String URL) async {
-
+Future _showMyDialog(BuildContext context, String URL,String name) async {
+  bool audiop=true;
   Duration _duration = Duration();
   Duration _position = Duration();
   AudioPlayer audioPlayer = AudioPlayer();
@@ -618,67 +848,72 @@ Future _showMyDialog(BuildContext context, String URL) async {
     barrierDismissible: false,
     context: context,
     builder: (BuildContext context) {
-      return StatefulBuilder(builder: (context, setState) {
-        return Dialog(
-          child: SingleChildScrollView(
-            child: Column(
-              children: [
-                Container(
+      return WillPopScope(
+        onWillPop: () async => audiop,
+        child: StatefulBuilder(builder: (context, setState) {
+          return Dialog(
+            child: SingleChildScrollView(
+              child: Column(
+                children: [
+                  Container(
 
-                  child: Text("Some Audio",style: TextStyle(fontFamily: "Candara"),)
-                ),
-                Slider.adaptive(
-                  onChanged: (double value) {
-                    setState(() {
-                      audioPlayer.seek(Duration(seconds: value.toInt()));
-                    });
-                  },
-                  min: 0.0,
-                  max: _duration.inSeconds.toDouble(),
-                  value: _position.inSeconds.toDouble(),
-                ),
-                InkWell(
-                  onTap: () async {
-                    var url =
-                        "http://ec2-13-234-116-155.ap-south-1.compute.amazonaws.com/uploads/${URL}";
-
-                    if (playing) {
-                      var res = await audioPlayer.pause();
-                      if (res == 1) {
-                        setState(() {
-                          playing = false;
-                        });
-                      }
-                    } else {
-                      var res = await audioPlayer.play(url, isLocal: true);
-                      if (res == 1) {
-                        setState(() {
-                          playing = true;
-                        });
-                      }
-                    }
-                    audioPlayer.onDurationChanged.listen((Duration duration) {
+                    child: Text("${name}",style: TextStyle(fontFamily: "Candara"),)
+                  ),
+                  Slider.adaptive(
+                    onChanged: (double value) {
                       setState(() {
-                        _duration = duration;
+                        audioPlayer.seek(Duration(seconds: value.toInt()));
                       });
-                    });
+                    },
+                    min: 0.0,
+                    max: _duration.inSeconds.toDouble(),
+                    value: _position.inSeconds.toDouble(),
+                  ),
+                  InkWell(
+                    onTap: () async {
+                      var url =
+                          "${BASE}/uploads/${URL}";
 
-                    audioPlayer.onAudioPositionChanged
-                        .listen((Duration duration) {
-                      setState(() {
-                        _position = duration;
+                      if (playing) {
+                        var res = await audioPlayer.pause();
+                        if (res == 1) {
+                          setState(() {
+                            playing = false;
+                            audiop=true;
+                          });
+                        }
+                      } else {
+                        var res = await audioPlayer.play(url, isLocal: true);
+                        if (res == 1) {
+                          setState(() {
+                            playing = true;
+                            audiop=false;
+                          });
+                        }
+                      }
+                      audioPlayer.onDurationChanged.listen((Duration duration) {
+                        setState(() {
+                          _duration = duration;
+                        });
                       });
-                    });
-                  },
-                  child:
-                  Icon(playing == false ? Icons.play_arrow : Icons.pause),
-                ),
-                SizedBox(height: 10,)
-              ],
+
+                      audioPlayer.onAudioPositionChanged
+                          .listen((Duration duration) {
+                        setState(() {
+                          _position = duration;
+                        });
+                      });
+                    },
+                    child:
+                    Icon(playing == false ? Icons.play_arrow : Icons.pause),
+                  ),
+                  SizedBox(height: 10,)
+                ],
+              ),
             ),
-          ),
-        );
-      });
+          );
+        }),
+      );
     },
   );
 }

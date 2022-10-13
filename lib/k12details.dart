@@ -3,6 +3,7 @@ import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:learning_duniya/courseDesc.dart';
 import 'package:audioplayers/audioplayers.dart';
+import 'package:learning_duniya/landing.dart';
 
 import 'globals.dart';
 
@@ -207,216 +208,223 @@ class _k12detailState extends State<k12detail> {
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
-    return Scaffold(
-      body: FutureBuilder(
-        future: createK12(courseID),
-        builder: (context, AsyncSnapshot<K12Api> snapshot) {
-          if (snapshot.hasData) {
-            K12Api? k12 = snapshot.data;
-            print(snapshot.data);
-            return Stack(
-              children: [
-                Container(
-                  padding: EdgeInsets.all(25),
-                  height: (size.height) / 2.5,
-                  width: (size.width),
-                  decoration: BoxDecoration(
-                      color: Colors.teal,
-                      image: DecorationImage(
-                          image: NetworkImage("${snapshot.data!.data.k12.img.toString()}"),
-                          fit: BoxFit.fill)),
-
-                ),
-                Align(
-                  alignment: Alignment.bottomCenter,
-                  child: Container(
-                    padding: EdgeInsets.only(left: 20, right: 20, top: 20),
-                    height: (size.height) - (size.height) / 3,
+    return WillPopScope(
+      onWillPop: ()async{
+        Navigator.pushReplacement(context, MaterialPageRoute(
+            builder: (context) =>landing()));
+        return false;
+      },
+      child: Scaffold(
+        body: FutureBuilder(
+          future: createK12(courseID),
+          builder: (context, AsyncSnapshot<K12Api> snapshot) {
+            if (snapshot.hasData) {
+              K12Api? k12 = snapshot.data;
+              print(snapshot.data);
+              return Stack(
+                children: [
+                  Container(
+                    padding: EdgeInsets.all(25),
+                    height: (size.height) / 2.5,
                     width: (size.width),
                     decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(34)),
-                    child: SingleChildScrollView(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: <Widget>[
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Flexible(
-                                  child: Text(k12!.data.k12.courseName.toString(),
-                                      style: TextStyle(
-                                          fontSize: 22,
-                                          fontFamily: "Candara",
-                                          color: Colors.black)),
-                                ),
+                        color: Colors.teal,
+                        image: DecorationImage(
+                            image: NetworkImage("${snapshot.data!.data.k12.img.toString()}"),
+                            fit: BoxFit.fill)),
 
-                              ],
-                            ),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              children: [
-                                Icon(Icons.favorite, color: Colors.red, size: 22),
-                                Text(" ${snapshot.data!.data.k12.likes}",
-                                    style: TextStyle(
-                                        fontSize: 15,
-                                        fontFamily: "Candara",
-                                        color: Colors.teal)),
-                                SizedBox(width: 30),
-                                Icon(Icons.people, color: Colors.yellow, size: 25),
-                                Text(" ${snapshot.data!.data.k12.visitor}",
-                                    style: TextStyle(
-                                        fontSize: 15,
-                                        fontFamily: "Candara",
-                                        color: Colors.grey))
-//IconButton(onPressed: (){  }, icon: Icon(Icons.favorite_outline,size: 25),color: Colors.grey,)
-                              ],
-                            ),
-                            SizedBox(height: 20),
-                            if(k12.data.k12.description.toString()!="null")
-                              Text(k12.data.k12.description.toString(),
-                                style: TextStyle(
-                                    fontSize: 15,
-                                    fontFamily: "Candara",
-                                    color: Colors.grey)),
-                            SizedBox(height: 25),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                              children: <Widget>[
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: <Widget>[
-                                    Row(
-                                      children: [
-                                        Icon(Icons.subject,color: Colors.orange,size: 20),
-                                        Text(" Subject",
-                                            style: TextStyle(
-                                                fontSize: 16,
-                                                fontFamily: "Candara",
-                                                color: Colors.black)),
-                                      ],
-                                    ),
-                                    Text("      ${k12.data.k12.subjectname.toString()}",
+                  ),
+                  Align(
+                    alignment: Alignment.bottomCenter,
+                    child: Container(
+                      padding: EdgeInsets.only(left: 20, right: 20, top: 20),
+                      height: (size.height) - (size.height) / 3,
+                      width: (size.width),
+                      decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(34)),
+                      child: SingleChildScrollView(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: <Widget>[
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Flexible(
+                                    child: Text(k12!.data.k12.courseName.toString(),
                                         style: TextStyle(
-                                            fontSize: 16,
-                                            fontFamily: "Candara",
-                                            color: Colors.grey)),
-                                    SizedBox(height: 15),
-                                    Row(
-                                      children: [
-                                    Icon(Icons.hourglass_bottom_outlined,color: Colors.teal,size: 20),
-                                    Text(" No. of MCQ",
-                                        style: TextStyle(
-                                            fontSize: 16,
+                                            fontSize: 22,
                                             fontFamily: "Candara",
                                             color: Colors.black)),
-                                  ],
-                                ),
-                                Text("      ${k12.data.k12.mcqcount.toString()}",
-                                    style: TextStyle(
-                                        fontSize: 16,
-                                        fontFamily: "Candara",
-                                        color: Colors.grey)),
-                                  ],
-                                ),
-                                SizedBox(width: 20),
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: <Widget>[
-                                    Row(
-                                      children: [
+                                  ),
 
-                                        Icon(Icons.account_box_outlined,color: Colors.green,size: 20),
-                                        Text(" Class",
-                                            style: TextStyle(
-                                                fontSize: 16,
-                                                fontFamily: "Candara",
-                                                color: Colors.black)),
-                                      ],
-                                    ),
-                                    Text("      ${k12.data.k12.classname.toString()}",
-                                        style: TextStyle(
-                                            fontSize: 16,
-                                            fontFamily: "Candara",
-                                            color: Colors.grey)),
-                                    SizedBox(height: 15),
-                                    Row(
-                                      children: [
-                                        Icon(Icons.video_collection,color: Colors.teal,size: 20),
-                                        Text(" Vidoes",
-                                            style: TextStyle(
-                                                fontSize: 16,
-                                                fontFamily: "Candara",
-                                                color: Colors.black)),
-                                      ],
-                                    ),
-                                    Text("      ${k12.data.k12.totalvideos.toString()}",
-                                        style: TextStyle(
-                                            fontSize: 16,
-                                            fontFamily: "Candara",
-                                            color: Colors.grey)),
-                                  ],
-                                )
-                              ],
-                            ),
+                                ],
+                              ),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                children: [
+                                  Icon(Icons.favorite, color: Colors.red, size: 22),
+                                  Text(" ${snapshot.data!.data.k12.likes}",
+                                      style: TextStyle(
+                                          fontSize: 15,
+                                          fontFamily: "Candara",
+                                          color: Colors.teal)),
+                                  SizedBox(width: 30),
+                                  Icon(Icons.people, color: Colors.yellow, size: 25),
+                                  Text(" ${snapshot.data!.data.k12.visitor}",
+                                      style: TextStyle(
+                                          fontSize: 15,
+                                          fontFamily: "Candara",
+                                          color: Colors.grey))
+//IconButton(onPressed: (){  }, icon: Icon(Icons.favorite_outline,size: 25),color: Colors.grey,)
+                                ],
+                              ),
+                              SizedBox(height: 20),
+                              if(k12.data.k12.description.toString()!="null")
+                                Text(k12.data.k12.description.toString(),
+                                  style: TextStyle(
+                                      fontSize: 15,
+                                      fontFamily: "Candara",
+                                      color: Colors.grey)),
+                              SizedBox(height: 25),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                children: <Widget>[
+                                  Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: <Widget>[
+                                      Row(
+                                        children: [
+                                          Icon(Icons.subject,color: Colors.orange,size: 20),
+                                          Text(" Subject",
+                                              style: TextStyle(
+                                                  fontSize: 16,
+                                                  fontFamily: "Candara",
+                                                  color: Colors.black)),
+                                        ],
+                                      ),
+                                      Text("      ${k12.data.k12.subjectname.toString()}",
+                                          style: TextStyle(
+                                              fontSize: 16,
+                                              fontFamily: "Candara",
+                                              color: Colors.grey)),
+                                      SizedBox(height: 15),
+                                      Row(
+                                        children: [
+                                      Icon(Icons.hourglass_bottom_outlined,color: Colors.teal,size: 20),
+                                      Text(" No. of MCQ",
+                                          style: TextStyle(
+                                              fontSize: 16,
+                                              fontFamily: "Candara",
+                                              color: Colors.black)),
+                                    ],
+                                  ),
+                                  Text("      ${k12.data.k12.mcqcount.toString()}",
+                                      style: TextStyle(
+                                          fontSize: 16,
+                                          fontFamily: "Candara",
+                                          color: Colors.grey)),
+                                    ],
+                                  ),
+                                  SizedBox(width: 20),
+                                  Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: <Widget>[
+                                      Row(
+                                        children: [
 
-                            SizedBox(height: 25),
-                            for(int i=0; i<k12.data.k12Details.length; i++)
-                              GestureDetector(
-                                onTap: () {
-                                  Navigator.push(context, MaterialPageRoute(
-                                      builder: (context) =>
-                                          courseDesc(k12.data.k12Details[i].id.toString(),snapshot.data!.data.k12.img.toString())));
-                                },
-                                child: Card(
-                                  elevation: 5,
-                                  child: Container(
-                                    padding: EdgeInsets.all(8),
-                                    child: Row(
-                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        Flexible(
-                                          child: Column(
-                                            mainAxisAlignment: MainAxisAlignment.start,
-                                            children: <Widget>[
-                                              Align(
-                                                alignment: Alignment.topLeft,
-                                                child: Text(k12.data.k12Details[i].chapterName.toString(),
-                                                  style: TextStyle(fontFamily: "Candara",
-                                                      fontSize: 15),
+                                          Icon(Icons.account_box_outlined,color: Colors.green,size: 20),
+                                          Text(" Class",
+                                              style: TextStyle(
+                                                  fontSize: 16,
+                                                  fontFamily: "Candara",
+                                                  color: Colors.black)),
+                                        ],
+                                      ),
+                                      Text("      ${k12.data.k12.classname.toString()}",
+                                          style: TextStyle(
+                                              fontSize: 16,
+                                              fontFamily: "Candara",
+                                              color: Colors.grey)),
+                                      SizedBox(height: 15),
+                                      Row(
+                                        children: [
+                                          Icon(Icons.video_collection,color: Colors.teal,size: 20),
+                                          Text(" Vidoes",
+                                              style: TextStyle(
+                                                  fontSize: 16,
+                                                  fontFamily: "Candara",
+                                                  color: Colors.black)),
+                                        ],
+                                      ),
+                                      Text("      ${k12.data.k12.totalvideos.toString()}",
+                                          style: TextStyle(
+                                              fontSize: 16,
+                                              fontFamily: "Candara",
+                                              color: Colors.grey)),
+                                    ],
+                                  )
+                                ],
+                              ),
+
+                              SizedBox(height: 25),
+                              for(int i=0; i<k12.data.k12Details.length; i++)
+                                GestureDetector(
+                                  onTap: () {
+                                    Navigator.push(context, MaterialPageRoute(
+                                        builder: (context) =>
+                                            courseDesc(k12.data.k12Details[i].id.toString(),snapshot.data!.data.k12.img.toString())));
+                                  },
+                                  child: Card(
+                                    elevation: 5,
+                                    child: Container(
+                                      padding: EdgeInsets.all(8),
+                                      child: Row(
+                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Flexible(
+                                            child: Column(
+                                              mainAxisAlignment: MainAxisAlignment.start,
+                                              children: <Widget>[
+                                                Align(
+                                                  alignment: Alignment.topLeft,
+                                                  child: Text(k12.data.k12Details[i].chapterName.toString(),
+                                                    style: TextStyle(fontFamily: "Candara",
+                                                        fontSize: 15),
+                                                  ),
                                                 ),
-                                              ),
-                                              Align(
-                                                alignment: Alignment.topLeft,
-                                                child: Text("Videos : ${k12.data.k12Details[i].video_count.toString()}",
-                                                  style: TextStyle(fontFamily: "Candara",color: Colors.grey,
-                                                      fontSize: 12),
-                                                ),
-                                              )
-                                            ],
+                                                Align(
+                                                  alignment: Alignment.topLeft,
+                                                  child: Text("Videos : ${k12.data.k12Details[i].video_count.toString()}",
+                                                    style: TextStyle(fontFamily: "Candara",color: Colors.grey,
+                                                        fontSize: 12),
+                                                  ),
+                                                )
+                                              ],
+                                            ),
                                           ),
-                                        ),
-                                        Icon(Icons.arrow_forward_ios, color: Colors.black, size: 30)
-                                      ],
+                                          Icon(Icons.arrow_forward_ios, color: Colors.black, size: 30)
+                                        ],
+                                      ),
                                     ),
                                   ),
                                 ),
-                              ),
 
-                          ],
-                        )),
-                  ),
-                )
-              ],
-            );
-          } else {
-            return Container(
-              child: Center(
-                child: CircularProgressIndicator(),
-              ),
-            );
-          }
-        },
+                            ],
+                          )),
+                    ),
+                  )
+                ],
+              );
+            } else {
+              return Container(
+                child: Center(
+                  child: CircularProgressIndicator(),
+                ),
+              );
+            }
+          },
+        ),
       ),
     );
   }

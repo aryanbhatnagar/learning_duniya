@@ -39,9 +39,9 @@ class _IntroScreenState extends State<IntroScreen>
       new Slide(
         //title: "ERASER",
 
-        description: "\n\n\n\n1. Ye indulgence unreserved connection alteration appearance. this is sample text.",
+        description: "\n\n\n\n\nPersonalized Learning\nOnline education allows scholars to choose from an assortment of tools and features to accommodate their learning style and customize their educational experience.",
         styleDescription:
-        TextStyle(color: Colors.black, fontSize: 25.0, fontFamily: 'Candara'),
+        TextStyle(color: Colors.black, fontSize: 22, fontFamily: 'Candara'),
         backgroundImage: "images/slider.png",
         backgroundOpacity: 0,
 
@@ -50,9 +50,9 @@ class _IntroScreenState extends State<IntroScreen>
     slides.add(
       new Slide(
         //title: "PENCIL",
-        description: "\n\n\n\n2. Ye indulgence unreserved connection alteration appearance. this is sample text.",
+        description: "\n\n\n\nSelf-Directed & Independent Learning\nOnline education encourages scholars to be self-motivated and organized through advice from their teachers. They learn how to become critical problem-solvers and researchers.",
         styleDescription:
-        TextStyle(color: Colors.black, fontSize: 25.0, fontFamily: 'Candara'),
+        TextStyle(color: Colors.black, fontSize: 22, fontFamily: 'Candara'),
         backgroundImage: "images/slider.png",
         backgroundOpacity: 0,
           //backgroundColor: Color(0xff203152),
@@ -62,11 +62,11 @@ class _IntroScreenState extends State<IntroScreen>
       new Slide(
         //title: "RULER",
         description:
-        "\n\n\n\n3. Ye indulgence unreserved connection alteration appearance. this is sample text.",
+        "\n\n\n\nVaried Social Interaction\nOnline education allows scholars to apply their academic lessons outside of the classroom. Through online learning, they have the opportunity to participate in more field trips than traditional schools can offer.",
         styleDescription:
-        TextStyle(color: Colors.black, fontSize: 25.0, fontFamily: 'Candara'),
+        TextStyle(color: Colors.black, fontSize: 22, fontFamily: 'Candara'),
         backgroundImage: "images/slider.png",
-        backgroundOpacity: 0,
+        backgroundOpacity: 0
         //backgroundColor: Color(0xff9932CC),
       ),
     );
